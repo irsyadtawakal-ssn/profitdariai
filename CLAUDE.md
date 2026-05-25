@@ -1,6 +1,6 @@
 # profitdariai
 
-Platform membership kursus & ebook AI Indonesia. **Stack:** Next.js 15 (App Router) + Supabase + Tripay + Bunny.net + Resend + Vercel.
+Platform membership kursus & ebook AI Indonesia. **Stack:** Next.js 15 (App Router) + Supabase + Tripay + YouTube Unlisted (video) + Resend + Vercel.
 
 ## Quick Commands
 
@@ -20,6 +20,8 @@ pnpm typecheck    # tsc --noEmit
 - **`src/app/api/`** — API routes (auth callback, Tripay payment + webhook, ebook download)
 - **`src/lib/supabase/`** — `client.ts` (browser), `server.ts` (RSC), `admin.ts` (service_role)
 - **`src/lib/tripay/`** — Payment integration
+- **`src/lib/youtube.ts`** — Extract YouTube ID + generate embed URL
+- **`src/components/member/VideoPlayer.tsx`** — YouTube iframe player
 - **`src/lib/email/`** — Resend email sender
 - **`src/lib/membership.ts`** — Membership status helpers
 - **`src/middleware.ts`** — Auth gate + membership check
@@ -30,6 +32,7 @@ pnpm typecheck    # tsc --noEmit
 - **Never** expose `SUPABASE_SERVICE_ROLE_KEY` to the client — admin client is server-only
 - **Always** verify Tripay webhook signature before processing
 - **RLS enabled** on all Supabase tables
+- **Video:** YouTube Unlisted MVP — `course_modules.video_url` simpan YouTube video ID atau URL. Phase 2+ migrasi ke Bunny.net.
 - Membership check = `membership_expires_at > NOW()`
 - Brand colors: Obsidian `#0A0A0A`, Gold `#D4AF37`, Ivory `#F5F5F0`
 - UI tone: confident, direct, "kamu" (not "Anda" or "lo")
