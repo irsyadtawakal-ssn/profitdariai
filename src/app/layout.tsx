@@ -1,0 +1,44 @@
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+export const metadata: Metadata = {
+  title: {
+    default: 'profitdariai — Belajar Cuan dari AI',
+    template: '%s | profitdariai',
+  },
+  description:
+    'Platform membership eksklusif untuk kursus & ebook monetisasi AI. Bergabung dengan ribuan member yang sudah cuan dari AI.',
+  keywords: ['AI', 'kursus AI', 'ebook AI', 'monetisasi AI', 'side income', 'Indonesia'],
+  authors: [{ name: 'profitdariai' }],
+  openGraph: {
+    type: 'website',
+    locale: 'id_ID',
+    url: 'https://profitdariai.com',
+    siteName: 'profitdariai',
+    title: 'profitdariai — Belajar Cuan dari AI',
+    description:
+      'Platform membership eksklusif untuk kursus & ebook monetisasi AI di Indonesia.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'profitdariai — Belajar Cuan dari AI',
+    description: 'Platform membership eksklusif untuk kursus & ebook monetisasi AI di Indonesia.',
+    images: ['/og-image.png'],
+  },
+  robots: { index: true, follow: true },
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="id" className={`${inter.className} h-full`}>
+      <body className="min-h-full flex flex-col">{children}</body>
+    </html>
+  )
+}

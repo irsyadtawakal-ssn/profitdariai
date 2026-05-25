@@ -1,0 +1,3 @@
+-- Seed: set first admin user
+-- Run after creating your Supabase account and first signup
+-- UPDATE profiles SET role = 'admin' WHERE email = 'your-email@example.com';
