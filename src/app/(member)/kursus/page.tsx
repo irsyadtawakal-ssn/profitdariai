@@ -32,14 +32,14 @@ export default async function KursusPage({ searchParams }: KursusPageProps) {
 
       <div className="mb-6">
         <Suspense fallback={null}>
-          <CategoryFilter />
+          <CategoryFilter activeCategory={category} />
         </Suspense>
       </div>
 
       {courses && courses.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {courses.map((course) => {
-            const modules = course.course_modules as unknown as [{ count: number }]
+            const modules = course.course_modules as { count: number }[]
             return (
               <CourseCard
                 key={course.id}

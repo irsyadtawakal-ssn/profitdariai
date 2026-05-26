@@ -26,8 +26,14 @@ describe('ModuleList', () => {
 
   it('switches video when module clicked', async () => {
     render(<ModuleList modules={modules} />)
-    await userEvent.click(screen.getByText('Setup Tools Gratis'))
+    await userEvent.click(screen.getByRole('button', { name: /Setup Tools Gratis/i }))
     expect(screen.getByTestId('video-player')).toHaveTextContent('abc123')
+  })
+
+  it('marks first module as active by default', () => {
+    render(<ModuleList modules={modules} />)
+    expect(screen.getByRole('button', { name: /Pengenalan AI Bisnis/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /Setup Tools Gratis/i })).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('renders empty state when no modules', () => {

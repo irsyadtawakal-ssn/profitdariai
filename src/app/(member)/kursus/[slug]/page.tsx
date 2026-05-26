@@ -13,7 +13,7 @@ export default async function KursusDetailPage({ params }: KursusDetailPageProps
 
   const { data: course } = await supabase
     .from('courses')
-    .select('*')
+    .select('id, slug, title, category, description, thumbnail_url')
     .eq('slug', slug)
     .eq('is_published', true)
     .single()

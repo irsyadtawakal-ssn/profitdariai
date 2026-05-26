@@ -46,6 +46,7 @@ export function ModuleList({ modules }: ModuleListProps) {
             <button
               key={mod.id}
               onClick={() => setActiveIndex(i)}
+              aria-pressed={i === activeIndex}
               className={`flex items-start gap-3 p-3 rounded-lg text-left transition-colors w-full ${
                 i === activeIndex
                   ? 'bg-[#D4AF37]/10 border border-[#D4AF37]/30'
@@ -68,7 +69,7 @@ export function ModuleList({ modules }: ModuleListProps) {
         </div>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1" role="region" aria-label="Video pemutaran">
         <VideoPlayer videoUrl={active.video_url} title={active.title} />
         <div className="mt-3">
           <p className="text-[#888888] text-xs">Modul {activeIndex + 1} dari {modules.length}</p>
