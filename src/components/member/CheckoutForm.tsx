@@ -73,7 +73,6 @@ export function CheckoutForm() {
                 checked={selected === code}
                 onChange={() => setSelected(code)}
                 className="accent-[#D4AF37]"
-                aria-label={label}
               />
               <span className="text-[#F5F5F0] text-sm">{label}</span>
             </label>
@@ -89,10 +88,10 @@ export function CheckoutForm() {
 
       <Button
         onClick={handleSubmit}
-        disabled={loading}
-        className="w-full bg-[#D4AF37] text-[#0A0A0A] hover:bg-[#D4AF37]/90 font-semibold py-3"
+        loading={loading}
+        className="w-full py-3"
       >
-        {loading ? 'Memproses...' : 'Bayar Sekarang'}
+        Bayar Sekarang
       </Button>
 
       <p className="text-[#888888] text-xs text-center mt-4">
