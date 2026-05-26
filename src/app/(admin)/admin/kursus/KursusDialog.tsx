@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
@@ -36,7 +36,14 @@ export function KursusDialog({ open, onClose, course }: KursusDialogProps) {
   const [isPending, startTransition] = useTransition()
   const [title, setTitle] = useState(course?.title ?? '')
   const [slug, setSlug] = useState(course?.slug ?? '')
+  const [isPublished, setIsPublished] = useState(course?.is_published ?? false)
   const isEdit = !!course
+
+  useEffect(() => {
+    setTitle(course?.title ?? '')
+    setSlug(course?.slug ?? '')
+    setIsPublished(course?.is_published ?? false)
+  }, [open, course])
 
   function handleTitleChange(val: string) {
     setTitle(val)
@@ -109,7 +116,8 @@ export function KursusDialog({ open, onClose, course }: KursusDialogProps) {
               name="is_published"
               value="true"
               id="kursus_published"
-              defaultChecked={course?.is_published ?? false}
+              checked={isPublished}
+              onChange={(e) => setIsPublished(e.target.checked)}
               className="accent-[#D4AF37] w-4 h-4"
             />
             <Label htmlFor="kursus_published">Published</Label>

@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function createKursus(formData: FormData) {
   const supabase = createAdminClient()
-  await supabase.from('courses').insert({
+  const { error } = await supabase.from('courses').insert({
     title: formData.get('title') as string,
     slug: formData.get('slug') as string,
     description: (formData.get('description') as string) || null,
@@ -13,12 +13,13 @@ export async function createKursus(formData: FormData) {
     thumbnail_url: (formData.get('thumbnail_url') as string) || null,
     is_published: formData.get('is_published') === 'true',
   })
+  if (error) console.error('[createKursus]', error.message)
   revalidatePath('/admin/kursus')
 }
 
 export async function updateKursus(id: string, formData: FormData) {
   const supabase = createAdminClient()
-  await supabase
+  const { error } = await supabase
     .from('courses')
     .update({
       title: formData.get('title') as string,
@@ -30,11 +31,13 @@ export async function updateKursus(id: string, formData: FormData) {
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
+  if (error) console.error('[updateKursus]', error.message)
   revalidatePath('/admin/kursus')
 }
 
 export async function deleteKursus(id: string) {
   const supabase = createAdminClient()
-  await supabase.from('courses').delete().eq('id', id)
+  const { error } = await supabase.from('courses').delete().eq('id', id)
+  if (error) console.error('[deleteKursus]', error.message)
   revalidatePath('/admin/kursus')
 }
