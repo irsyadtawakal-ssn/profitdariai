@@ -1,6 +1,6 @@
 # profitdariai — Build Plan
 
-## Status: Week 3-4 Marketing & Auth (Next Up)
+## Status: Week 8 Polish & Launch (Next Up)
 
 ---
 
@@ -24,38 +24,44 @@
 - [x] Auth forms: react-hook-form + zod + Supabase Auth
 - [x] Vitest + @testing-library/react — 20 tests, semua pass
 
-## Week 3-4: Marketing & Auth
+## Week 3-4: Marketing & Auth ✅ SELESAI
 
-- [ ] Landing page (hero, value prop, FAQ, CTA)
-- [ ] Pricing page (single tier, early bird counter)
-- [x] Signup form + Supabase auth ✅
-- [x] Login form + session handling ✅
-- [x] Reset password flow ✅
-- [x] Email verification callback (`/api/auth/callback`) ✅
+- [x] Landing page (hero, value prop, FAQ, CTA) — `src/app/(marketing)/page.tsx`
+- [x] Pricing page (single tier, early bird counter) — `src/app/(marketing)/pricing/page.tsx`
+- [x] FAQ page — `src/app/(marketing)/faq/page.tsx`
+- [x] Signup form + Supabase auth
+- [x] Login form + session handling
+- [x] Reset password flow
+- [x] Email verification callback (`/api/auth/callback`)
 
-## Week 5-6: Payment & Member Area
+## Week 5-6: Payment & Member Area ✅ SELESAI
 
-- [ ] Checkout flow (payment method picker → Tripay create)
-- [ ] Tripay webhook handler + membership activation
-- [ ] Member dashboard (greeting, highlights, status badge)
-- [ ] Library kursus (grid, category filter)
-- [ ] Kursus detail + video player (YouTube embed — MVP)
-- [ ] Library ebook (grid, download)
-- [ ] Ebook download via signed URL
-- [ ] Profile page (info, membership badge, logout)
-- [ ] Renewal reminder banner (14 days warning)
+- [x] Checkout flow — `src/app/(member)/checkout/page.tsx` + `CheckoutForm.tsx`
+- [x] Payment create API — `src/app/api/payment/create/route.ts`
+- [x] Tripay webhook handler + membership activation — `src/app/api/payment/webhook/route.ts`
+- [x] Payment success page — `src/app/(member)/payment/success/page.tsx`
+- [x] Member dashboard (greeting, highlights, status badge) — `src/app/(member)/dashboard/page.tsx`
+- [x] Library kursus (grid, category filter) — `src/app/(member)/kursus/page.tsx`
+- [x] Kursus detail + video player (YouTube embed) — `src/app/(member)/kursus/[slug]/page.tsx`
+- [x] Library ebook (grid, download) — `src/app/(member)/ebook/page.tsx`
+- [x] Ebook detail — `src/app/(member)/ebook/[slug]/page.tsx`
+- [x] Ebook download via signed URL — `src/app/api/ebook/download/[id]/route.ts`
+- [x] Profile page (info, membership badge, logout) — `src/app/(member)/profile/page.tsx`
+- [x] Renewal reminder banner — `src/components/member/RenewalBanner.tsx`
+- [x] Member sidebar + bottom nav
+- [x] Category filter, CourseCard, EbookCard, ModuleList, VideoPlayer components
 
-## Week 7: Admin Panel
+## Week 7: Admin Panel ✅ SELESAI
 
-- [ ] Admin layout + role guard
-- [ ] CRUD kursus + modul
-- [ ] CRUD ebook (upload PDF ke Supabase Storage)
-- [ ] Admin dashboard metrics (members, MRR, top content)
-- [ ] Member list (search, filter by status)
+- [x] Admin layout + role guard — `src/app/(admin)/layout.tsx`
+- [x] Admin dashboard dengan metrics (members, revenue, content count) — `src/app/(admin)/admin/dashboard/page.tsx`
+- [x] Member list (search, filter by status) — `src/app/(admin)/admin/members/page.tsx`
+- [x] CRUD kursus + modul — `src/app/(admin)/admin/kursus/`
+- [x] CRUD ebook (upload PDF ke Supabase Storage) — `src/app/(admin)/admin/ebook/`
 
 ## Week 8: Polish & Launch
 
-- [ ] QA & bug fixing
+- [ ] QA & bug fixing end-to-end
 - [ ] Seed 10 kursus + 15 ebook konten
 - [ ] Email transactional final (payment success, renewal reminder)
 - [ ] Renewal reminder cron (Vercel Cron)
