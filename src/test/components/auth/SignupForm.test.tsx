@@ -51,4 +51,29 @@ describe('SignupForm', () => {
       expect(screen.getByText(/nama minimal 2 karakter/i)).toBeInTheDocument()
     })
   })
+
+  it('calls signUp with correct data (without confirm_password) on valid submit', async () => {
+    const mockPush = vi.fn()
+    vi.mocked(vi.importMock ?? vi.fn)
+    render(<SignupForm />)
+    await userEvent.type(screen.getByLabelText(/nama lengkap/i), 'Budi Santoso')
+    await userEvent.type(screen.getByLabelText(/email/i), 'budi@test.com')
+    await userEvent.type(screen.getByLabelText(/^password$/i), 'password123')
+    await userEvent.type(screen.getByLabelText(/konfirmasi password/i), 'password123')
+    fireEvent.click(screen.getByRole('button', { name: /buat akun/i }))
+    await waitFor(() => {
+      expect(mockSignUp).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'budi@test.com',
+          password: 'password123',
+          options: expect.objectContaining({
+            data: { full_name: 'Budi Santoso' },
+          }),
+        })
+      )
+      // confirm_password must NOT be sent to Supabase
+      const callArg = mockSignUp.mock.calls[0][0]
+      expect(callArg).not.toHaveProperty('confirm_password')
+    })
+  })
 })

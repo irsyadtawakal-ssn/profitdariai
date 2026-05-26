@@ -50,7 +50,7 @@ export function SignupForm() {
         password: data.password,
         options: {
           data: { full_name: data.full_name },
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/dashboard`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/dashboard`,
         },
       })
 
