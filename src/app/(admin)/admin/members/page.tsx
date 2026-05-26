@@ -27,7 +27,8 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
     query = query.or(`membership_expires_at.is.null,membership_expires_at.lt.${now}`)
   }
 
-  const { data: members } = await query.limit(100)
+  const { data: members, error } = await query.limit(100)
+  if (error) console.error('[Members] Query failed:', error)
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -75,7 +76,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
                   <td className="px-4 py-3 text-[#888888]">{m.email}</td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      isActive ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-red-900/20 text-red-400'
+                      isActive ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-[#888888]/20 text-[#888888]'
                     }`}>
                       {isActive ? 'Aktif' : 'Expired'}
                     </span>
