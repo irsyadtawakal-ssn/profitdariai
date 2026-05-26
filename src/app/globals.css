@@ -3,25 +3,25 @@
 @layer base {
   :root {
     /* shadcn CSS variable mapping → profitdariai brand */
-    --background: #0A0A0A;
-    --foreground: #F5F5F0;
-    --card: #1A1A1A;
-    --card-foreground: #F5F5F0;
-    --popover: #1A1A1A;
-    --popover-foreground: #F5F5F0;
-    --primary: #D4AF37;
-    --primary-foreground: #0A0A0A;
-    --secondary: #1A1A1A;
-    --secondary-foreground: #F5F5F0;
-    --muted: #1A1A1A;
-    --muted-foreground: #888888;
-    --accent: #1A1A1A;
-    --accent-foreground: #F5F5F0;
-    --destructive: #EF4444;
-    --destructive-foreground: #F5F5F0;
-    --border: #2A2A2A;
-    --input: #0A0A0A;
-    --ring: rgba(212, 175, 55, 0.3);
+    --background: 0 0% 4%;          /* #0A0A0A obsidian */
+    --foreground: 60 14% 96%;       /* #F5F5F0 ivory */
+    --card: 0 0% 10%;               /* #1A1A1A charcoal */
+    --card-foreground: 60 14% 96%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 60 14% 96%;
+    --primary: 43 62% 52%;          /* #D4AF37 gold */
+    --primary-foreground: 0 0% 4%;  /* #0A0A0A */
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 60 14% 96%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 53%;   /* #888888 */
+    --accent: 0 0% 10%;
+    --accent-foreground: 60 14% 96%;
+    --destructive: 0 84% 60%;       /* #EF4444 */
+    --destructive-foreground: 60 14% 96%;
+    --border: 0 0% 16%;             /* #2A2A2A */
+    --input: 0 0% 4%;               /* #0A0A0A */
+    --ring: 43 62% 52%;             /* gold (ring opacity handled by Tailwind) */
     --radius: 0.5rem;
   }
 }
