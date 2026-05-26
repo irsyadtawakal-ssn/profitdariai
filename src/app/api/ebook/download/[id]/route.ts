@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
 import { isMembershipActive } from '@/lib/membership'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -21,7 +22,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const { data: ebook } = await supabase
     .from('ebooks')
     .select('file_path, title')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!ebook) return NextResponse.json({ error: 'Not found' }, { status: 404 })
