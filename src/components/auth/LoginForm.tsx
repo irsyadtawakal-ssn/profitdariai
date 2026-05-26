@@ -49,6 +49,7 @@ export function LoginForm() {
       }
 
       toast.success('Berhasil masuk!')
+      router.refresh()
       router.push('/dashboard')
     } catch {
       toast.error('Terjadi kesalahan jaringan. Periksa koneksi kamu.')
@@ -58,7 +59,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       <div>
         <Label htmlFor="email" error={!!errors.email}>Email</Label>
         <Input

@@ -50,7 +50,7 @@ export function SignupForm() {
         password: data.password,
         options: {
           data: { full_name: data.full_name },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/dashboard`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/api/auth/callback?next=/dashboard`,
         },
       })
 
@@ -73,7 +73,7 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       <div>
         <Label htmlFor="full_name" error={!!errors.full_name}>Nama Lengkap</Label>
         <Input

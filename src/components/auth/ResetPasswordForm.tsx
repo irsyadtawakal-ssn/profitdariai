@@ -36,7 +36,7 @@ export function ResetPasswordForm() {
       const supabase = createClient()
 
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/reset-password/confirm`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/api/auth/callback?next=/reset-password/confirm`,
       })
 
       if (error) {
