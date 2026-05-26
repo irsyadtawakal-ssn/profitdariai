@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    /* shadcn CSS variable mapping → profitdariai brand */
+    --background: #0A0A0A;
+    --foreground: #F5F5F0;
+    --card: #1A1A1A;
+    --card-foreground: #F5F5F0;
+    --popover: #1A1A1A;
+    --popover-foreground: #F5F5F0;
+    --primary: #D4AF37;
+    --primary-foreground: #0A0A0A;
+    --secondary: #1A1A1A;
+    --secondary-foreground: #F5F5F0;
+    --muted: #1A1A1A;
+    --muted-foreground: #888888;
+    --accent: #1A1A1A;
+    --accent-foreground: #F5F5F0;
+    --destructive: #EF4444;
+    --destructive-foreground: #F5F5F0;
+    --border: #2A2A2A;
+    --input: #0A0A0A;
+    --ring: rgba(212, 175, 55, 0.3);
+    --radius: 0.5rem;
+  }
+}
+
 @theme inline {
   /* Brand colors */
   --color-obsidian: #0A0A0A;
