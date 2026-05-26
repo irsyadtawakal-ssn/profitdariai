@@ -64,7 +64,7 @@
 - [ ] QA & bug fixing end-to-end
 - [ ] Seed 10 kursus + 15 ebook konten
 - [ ] Email transactional final (payment success, renewal reminder)
-- [ ] Renewal reminder cron (Vercel Cron)
+- [x] Renewal reminder cron (Vercel Cron) — `src/app/api/cron/renewal-reminder/route.ts` + `vercel.json`
 - [ ] Google Analytics 4 + Vercel Analytics setup
 - [ ] Sentry error monitoring
 - [ ] Security audit (RLS, webhook signature, signed URLs)
