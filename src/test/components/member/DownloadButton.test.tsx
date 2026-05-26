@@ -10,6 +10,7 @@ global.window.open = mockWindowOpen
 
 describe('DownloadButton', () => {
   beforeEach(() => {
+    mockFetch.mockClear()
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ url: 'https://supabase.co/storage/signed/ebook.pdf' }),

@@ -21,7 +21,8 @@ export default async function EbookPage({ searchParams }: EbookPageProps) {
     query = query.eq('category', category)
   }
 
-  const { data: ebooks } = await query
+  const { data: ebooks, error } = await query
+  if (error) throw error
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
