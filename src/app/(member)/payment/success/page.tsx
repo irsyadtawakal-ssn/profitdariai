@@ -11,21 +11,27 @@ export default function PaymentSuccessPage() {
   const router = useRouter()
   const [expiresAt, setExpiresAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.push('/login'); return }
-      supabase
-        .from('profiles')
-        .select('membership_expires_at')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          setExpiresAt(data?.membership_expires_at ?? null)
-          setLoading(false)
-        })
-    })
+    async function fetchProfile() {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { router.push('/login'); return }
+        const { data } = await supabase
+          .from('profiles')
+          .select('membership_expires_at')
+          .eq('id', user.id)
+          .single()
+        setExpiresAt(data?.membership_expires_at ?? null)
+      } catch {
+        setError('Gagal memuat data. Silakan refresh halaman.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
   }, [router])
 
   const expiryLabel = expiresAt
@@ -35,11 +41,8 @@ export default function PaymentSuccessPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="text-center max-w-sm">
-        <div
-          className="w-20 h-20 rounded-full bg-[#D4AF37]/20 border-2 border-[#D4AF37] flex items-center justify-center mx-auto mb-6"
-          style={{ animation: 'scale-in 0.4s ease-out' }}
-        >
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <div className="w-20 h-20 rounded-full bg-[#D4AF37]/20 border-2 border-[#D4AF37] flex items-center justify-center mx-auto mb-6 animate-bounce-once">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
@@ -49,17 +52,24 @@ export default function PaymentSuccessPage() {
           Selamat datang di profitdariai. Akses kamu sudah aktif.
         </p>
 
-        {!loading && expiryLabel && (
+        {error && (
+          <p role="alert" className="text-red-400 text-sm mb-4">{error}</p>
+        )}
+
+        {!loading && !error && expiryLabel && (
           <p className="text-[#D4AF37] text-sm font-medium mb-8">
             Membership aktif sampai {expiryLabel}
           </p>
         )}
 
-        {!loading && (
-          <Button onClick={() => router.push('/dashboard')} className="px-8">
-            Mulai Belajar →
-          </Button>
-        )}
+        <Button
+          variant="primary"
+          loading={loading}
+          onClick={() => router.push('/dashboard')}
+          className="px-8"
+        >
+          Mulai Belajar →
+        </Button>
       </div>
     </div>
   )
