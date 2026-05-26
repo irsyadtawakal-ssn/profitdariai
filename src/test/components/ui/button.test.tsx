@@ -29,4 +29,21 @@ describe('Button', () => {
     render(<Button variant="ghost">Ghost</Button>)
     expect(screen.getByText('Ghost')).toBeInTheDocument()
   })
+
+  it('is disabled when loading is true', () => {
+    render(<Button loading>Simpan</Button>)
+    expect(screen.getByRole('button')).toBeDisabled()
+  })
+
+  it('does not call onClick when loading', () => {
+    const onClick = vi.fn()
+    render(<Button loading onClick={onClick}>Simpan</Button>)
+    fireEvent.click(screen.getByRole('button'))
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('shows spinner when loading', () => {
+    render(<Button loading>Simpan</Button>)
+    expect(screen.getByRole('button').querySelector('svg')).toBeTruthy()
+  })
 })
