@@ -1,32 +1,37 @@
 # profitdariai — Build Plan
 
-## Status: Week 1-2 Foundation (In Progress)
+## Status: Week 3-4 Marketing & Auth (Next Up)
 
 ---
 
-## Week 1-2: Foundation ✅ Scaffolding Done
+## Week 1-2: Foundation ✅ SELESAI
 
-- [x] Setup repo, Next.js 15, Tailwind 4, TypeScript, ESLint, Prettier
+- [x] Setup repo, Next.js 16, Tailwind 4, TypeScript, ESLint, Prettier
 - [x] Folder structure (route groups, lib, types, supabase migrations)
 - [x] Supabase client (browser + server + admin)
-- [x] Auth middleware (`src/middleware.ts`)
+- [x] Auth middleware (`src/proxy.ts` — Next.js 16 convention)
 - [x] Tripay integration skeleton (`src/lib/tripay/`)
 - [x] Email system skeleton (`src/lib/email/`)
 - [x] Type definitions (`src/types/database.ts`)
-- [x] SQL migrations (`supabase/migrations/`)
+- [x] SQL migrations (`supabase/migrations/`) — sudah dijalankan di Supabase
 - [x] `.env.example`
-- [ ] Setup Supabase project + run migrations
-- [ ] Setup Vercel project (free tier) + connect domain profitdariai.com (Hostinger DNS → Vercel CNAME)
-- [ ] Implement UI primitives: Button, Card, Input, Badge, Modal
+- [x] Setup Supabase project + run migrations
+- [x] Setup Vercel project (free tier) — domain profitdariai.com belakangan
+- [x] Shadcn/ui + brand CSS variables (HSL, CSS-first Tailwind 4)
+- [x] UI primitives: Button, Card, Input, Label, Badge, Dialog
+- [x] Logo component + Sonner Toaster
+- [x] Auth pages: Login, Signup, Reset Password, Reset Confirm
+- [x] Auth forms: react-hook-form + zod + Supabase Auth
+- [x] Vitest + @testing-library/react — 20 tests, semua pass
 
 ## Week 3-4: Marketing & Auth
 
 - [ ] Landing page (hero, value prop, FAQ, CTA)
 - [ ] Pricing page (single tier, early bird counter)
-- [ ] Signup form + Supabase auth
-- [ ] Login form + session handling
-- [ ] Reset password flow
-- [ ] Email verification callback (`/api/auth/callback`)
+- [x] Signup form + Supabase auth ✅
+- [x] Login form + session handling ✅
+- [x] Reset password flow ✅
+- [x] Email verification callback (`/api/auth/callback`) ✅
 
 ## Week 5-6: Payment & Member Area
 
@@ -34,7 +39,7 @@
 - [ ] Tripay webhook handler + membership activation
 - [ ] Member dashboard (greeting, highlights, status badge)
 - [ ] Library kursus (grid, category filter)
-- [ ] Kursus detail + video player (hls.js)
+- [ ] Kursus detail + video player (YouTube embed — MVP)
 - [ ] Library ebook (grid, download)
 - [ ] Ebook download via signed URL
 - [ ] Profile page (info, membership badge, logout)
