@@ -35,21 +35,26 @@ export function LoginForm() {
 
   async function onSubmit(data: LoginFormData) {
     setLoading(true)
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
 
-    if (error) {
-      toast.error('Email atau password salah. Coba lagi.')
+      if (error) {
+        toast.error('Email atau password salah. Coba lagi.')
+        return
+      }
+
+      toast.success('Berhasil masuk!')
+      router.push('/dashboard')
+    } catch {
+      toast.error('Terjadi kesalahan jaringan. Periksa koneksi kamu.')
+    } finally {
       setLoading(false)
-      return
     }
-
-    toast.success('Berhasil masuk!')
-    router.push('/dashboard')
   }
 
   return (
@@ -65,7 +70,7 @@ export function LoginForm() {
           {...register('email')}
         />
         {errors.email && (
-          <p className="mt-1 text-xs text-[#EF4444]">{errors.email.message}</p>
+          <p role="alert" className="mt-1 text-xs text-[#EF4444]">{errors.email.message}</p>
         )}
       </div>
 
@@ -90,7 +95,7 @@ export function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="mt-1 text-xs text-[#EF4444]">{errors.password.message}</p>
+          <p role="alert" className="mt-1 text-xs text-[#EF4444]">{errors.password.message}</p>
         )}
       </div>
 
