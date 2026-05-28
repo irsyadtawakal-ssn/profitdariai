@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 
 interface CourseCardProps {
@@ -15,10 +16,12 @@ export function CourseCard({ slug, title, category, thumbnail_url, moduleCount }
       <div className="rounded-xl overflow-hidden bg-[#111111] border border-[#222222] hover:border-[#D4AF37]/40 transition-colors">
         <div className="aspect-video bg-[#1A1A1A] relative overflow-hidden">
           {thumbnail_url ? (
-            <img
+            <Image
               src={thumbnail_url}
               alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { createServerClient } from '@/lib/supabase/server'
 import { getCachedCourses, getCachedEbooks, getCachedCourseCounts } from '@/lib/cache/content'
 import { isMembershipActive } from '@/lib/membership'
@@ -8,24 +9,15 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 
-export default async function DashboardPage() {
+// Streams in after profile DB query resolves — shows skeleton meanwhile
+async function MemberHeader() {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-
-  const [
-    { data: profile },
-    allCourses,
-    allEbooks,
-    { courseCount, ebookCount },
-  ] = await Promise.all([
-    supabase.from('profiles').select('full_name, membership_expires_at').eq('id', user!.id).single(),
-    getCachedCourses(),
-    getCachedEbooks(),
-    getCachedCourseCounts(),
-  ])
-
-  const courses = allCourses.slice(0, 3)
-  const ebooks = allEbooks.slice(0, 3)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name, membership_expires_at')
+    .eq('id', user!.id)
+    .single()
 
   const isActive = isMembershipActive({ membership_expires_at: profile?.membership_expires_at ?? null })
   const expiryLabel = profile?.membership_expires_at
@@ -33,22 +25,18 @@ export default async function DashboardPage() {
     : null
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <>
       {profile?.membership_expires_at && <RenewalBanner expiresAt={profile.membership_expires_at} />}
-
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#F5F5F0] mb-1">
           Halo, {profile?.full_name ?? 'Member'}!
         </h1>
         <p className="text-[#888888]">Selamat belajar hari ini.</p>
       </div>
-
       <div className="bg-[#111111] border border-[#222222] rounded-xl p-4 mb-6 flex items-center gap-3">
-        <span
-          className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            isActive ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'bg-red-900/30 text-red-400'
-          }`}
-        >
+        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+          isActive ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'bg-red-900/30 text-red-400'
+        }`}>
           {isActive ? 'Member Aktif' : 'Expired'}
         </span>
         {expiryLabel && (
@@ -57,11 +45,48 @@ export default async function DashboardPage() {
           </span>
         )}
       </div>
+    </>
+  )
+}
 
+function MemberHeaderSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="mb-8">
+        <div className="h-9 w-56 bg-[#1A1A1A] rounded-lg mb-2" />
+        <div className="h-4 w-40 bg-[#1A1A1A] rounded" />
+      </div>
+      <div className="bg-[#111111] border border-[#222222] rounded-xl p-4 mb-6 flex items-center gap-3">
+        <div className="h-7 w-24 bg-[#1A1A1A] rounded-full" />
+        <div className="h-4 w-40 bg-[#1A1A1A] rounded" />
+      </div>
+    </div>
+  )
+}
+
+export default async function DashboardPage() {
+  // Cached — resolves instantly, no DB roundtrip on subsequent visits
+  const [allCourses, allEbooks, { courseCount, ebookCount }] = await Promise.all([
+    getCachedCourses(),
+    getCachedEbooks(),
+    getCachedCourseCounts(),
+  ])
+
+  const courses = allCourses.slice(0, 3)
+  const ebooks = allEbooks.slice(0, 3)
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto">
+      {/* User-specific: streams in after profile query, shows skeleton meanwhile */}
+      <Suspense fallback={<MemberHeaderSkeleton />}>
+        <MemberHeader />
+      </Suspense>
+
+      {/* Stats — rendered immediately from cache */}
       <div className="grid grid-cols-3 gap-3 mb-10">
         {[
-          { label: 'Kursus', value: courseCount ?? 0 },
-          { label: 'Ebook', value: ebookCount ?? 0 },
+          { label: 'Kursus', value: courseCount },
+          { label: 'Ebook', value: ebookCount },
           { label: 'Akses', value: 'Penuh' },
         ].map(({ label, value }) => (
           <div key={label} className="bg-[#111111] border border-[#222222] rounded-xl p-4 text-center">

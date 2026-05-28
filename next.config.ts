@@ -2,7 +2,14 @@ import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: '**.supabase.in' },
+      { protocol: 'https', hostname: 'belajarpakai.ai' },
+      { protocol: 'https', hostname: 'drive.google.com' },
+    ],
+  },
 }
 
 export default withSentryConfig(nextConfig, {
