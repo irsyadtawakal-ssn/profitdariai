@@ -28,12 +28,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   if (!ebook) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  // Jika file_path adalah GDrive URL → redirect langsung (sudah direct download)
+  // Jika GDrive URL → return langsung sebagai JSON (client pakai window.location.href)
   if (ebook.file_path.startsWith('https://')) {
-    return NextResponse.redirect(ebook.file_path)
+    return NextResponse.json({ url: ebook.file_path })
   }
 
-  // Jika file_path adalah path Supabase Storage → generate signed URL
+  // Jika Supabase Storage path → generate signed URL
   const adminClient = createAdminClient()
   const { data } = await adminClient.storage
     .from('ebooks')
@@ -43,6 +43,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 })
   }
 
-  return NextResponse.redirect(data.signedUrl)
+  return NextResponse.json({ url: data.signedUrl })
 }
-
