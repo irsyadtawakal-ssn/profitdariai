@@ -59,9 +59,9 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
       const supabase = createClient()
       const ext = file.name.split('.').pop()
       const path = `ebooks/${Date.now()}-${slugify(file.name.replace(`.${ext}`, ''))}.${ext}`
-      const { error } = await supabase.storage.from('images').upload(path, file, { upsert: false })
+      const { error } = await supabase.storage.from('image').upload(path, file, { upsert: false })
       if (error) throw error
-      const { data } = supabase.storage.from('images').getPublicUrl(path)
+      const { data } = supabase.storage.from('image').getPublicUrl(path)
       setCoverUrl(data.publicUrl)
     } catch (err) {
       console.error('[EbookDialog cover upload]', err)

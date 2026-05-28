@@ -57,9 +57,9 @@ export function KursusDialog({ open, onClose, course }: KursusDialogProps) {
       const supabase = createClient()
       const ext = file.name.split('.').pop()
       const path = `courses/${Date.now()}-${slugify(file.name.replace(`.${ext}`, ''))}.${ext}`
-      const { error } = await supabase.storage.from('images').upload(path, file, { upsert: false })
+      const { error } = await supabase.storage.from('image').upload(path, file, { upsert: false })
       if (error) throw error
-      const { data } = supabase.storage.from('images').getPublicUrl(path)
+      const { data } = supabase.storage.from('image').getPublicUrl(path)
       setThumbnailUrl(data.publicUrl)
     } catch (err) {
       console.error('[KursusDialog upload]', err)
