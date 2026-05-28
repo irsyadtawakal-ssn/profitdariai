@@ -17,9 +17,12 @@ function getHeaders() {
 }
 
 export function createSignature(merchantRef: string, amount: number): string {
+  // .trim() penting — PowerShell echo tambah \n saat set env var, bisa corrupt signature
+  const privateKey = process.env.TRIPAY_PRIVATE_KEY!.trim()
+  const merchantCode = process.env.TRIPAY_MERCHANT_CODE!.trim()
   return crypto
-    .createHmac('sha256', process.env.TRIPAY_PRIVATE_KEY!)
-    .update(process.env.TRIPAY_MERCHANT_CODE! + merchantRef + amount)
+    .createHmac('sha256', privateKey)
+    .update(merchantCode + merchantRef + amount)
     .digest('hex')
 }
 

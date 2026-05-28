@@ -1,8 +1,9 @@
 import crypto from 'crypto'
 
 export function verifyWebhookSignature(rawBody: string, signature: string): boolean {
+  // .trim() penting — PowerShell echo tambah \n saat set env var
   const expected = crypto
-    .createHmac('sha256', process.env.TRIPAY_PRIVATE_KEY!)
+    .createHmac('sha256', process.env.TRIPAY_PRIVATE_KEY!.trim())
     .update(rawBody)
     .digest()
   try {
