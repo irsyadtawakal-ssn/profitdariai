@@ -16,13 +16,19 @@ export function DownloadButton({ ebookId }: DownloadButtonProps) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/ebook/download/${ebookId}`)
-      const data = await res.json()
+      const res = await fetch(`/api/ebook/download/${ebookId}`, { redirect: 'follow' })
       if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
         setError(data.error ?? 'Gagal mengunduh, coba lagi.')
         return
       }
-      window.open(data.url, '_blank')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'ebook.pdf'
+      a.click()
+      URL.revokeObjectURL(url)
     } catch {
       setError('Gagal mengunduh, coba lagi.')
     } finally {

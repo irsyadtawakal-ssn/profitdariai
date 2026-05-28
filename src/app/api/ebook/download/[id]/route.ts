@@ -31,11 +31,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const adminClient = createAdminClient()
   const { data } = await adminClient.storage
     .from('ebooks')
-    .createSignedUrl(ebook.file_path, 60 * 60) // 1 hour
+    .createSignedUrl(ebook.file_path, 60 * 60, { download: ebook.title + '.pdf' })
 
   if (!data?.signedUrl) {
     return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 })
   }
 
-  return NextResponse.json({ url: data.signedUrl })
+  return NextResponse.redirect(data.signedUrl)
 }
