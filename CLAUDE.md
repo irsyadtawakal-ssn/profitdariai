@@ -13,7 +13,7 @@ pnpm typecheck    # tsc --noEmit
 
 ## Architecture
 
-- **`src/app/(marketing)/`** — Public pages (landing, pricing, FAQ) — no auth
+- **`src/app/(marketing)/`** — Public pages (landing, pricing, FAQ, legal pages) — no auth
 - **`src/app/(auth)/`** — Auth flow (login, signup, reset)
 - **`src/app/(member)/`** — Protected member area (dashboard, kursus, ebook, profile)
 - **`src/app/(admin)/`** — Admin CMS (role = 'admin' only)
@@ -27,6 +27,27 @@ pnpm typecheck    # tsc --noEmit
 - **`src/lib/membership.ts`** — Membership status helpers
 - **`src/proxy.ts`** — Auth gate + membership check + admin gate (Next.js 16 uses `proxy.ts` / `export function proxy`)
 - **`supabase/migrations/`** — SQL migrations (run in Supabase SQL editor)
+
+## Legal Pages (Tripay Merchant Review)
+
+Semua legal pages ada di `src/app/(marketing)/` dan dapat diakses tanpa login:
+
+| Route | File | Keterangan |
+|---|---|---|
+| `/ketentuan-layanan` | `ketentuan-layanan/page.tsx` | Terms of Service |
+| `/kebijakan-privasi` | `kebijakan-privasi/page.tsx` | Privacy Policy |
+| `/kebijakan-refund` | `kebijakan-refund/page.tsx` | No-refund policy (produk digital) |
+| `/kontak` | `kontak/page.tsx` | Kontak Support (WA + Email) |
+
+**Contact info:**
+- WhatsApp: `628212638792`
+- Email: `adimin@profitdariai.com`
+
+## Tripay Integration Notes
+
+- **Whitelist IP:** Vercel menggunakan IP dinamis — tidak bisa diisi IP tetap tanpa upgrade ke Vercel Pro + Static IPs ($100/bulan) atau VPS proxy. Solusi: hubungi Tripay support untuk exception, atau gunakan VPS murah (~Rp 30–50rb/bulan) sebagai proxy.
+- Webhook signature diverifikasi dengan `timingSafeEqual` di `src/lib/tripay/`
+- SKU produk: `PDA-MEMBERSHIP-LIFETIME` (tidak diubah agar tidak merusak transaksi lama)
 
 ## Key Rules
 
@@ -42,6 +63,7 @@ pnpm typecheck    # tsc --noEmit
 - Brand colors: Obsidian `#0A0A0A`, Gold `#D4AF37`, Ivory `#F5F5F0`
 - UI tone: confident, direct, "kamu" (not "Anda" or "lo")
 - Package manager: **pnpm only**
+- Kata "lifetime" sudah dihapus dari semua marketing copy (landing page, checkout, API) — gunakan "Akses Penuh" atau "Sekali Bayar"
 
 ## Env Setup
 
@@ -56,6 +78,6 @@ Run migrations in order in Supabase SQL editor:
 
 ## Pricing
 
-- **Lifetime** membership: `MEMBERSHIP_LIFETIME_EXPIRY = '2099-12-31'`
+- **Sekali bayar** (tanpa biaya bulanan): `MEMBERSHIP_LIFETIME_EXPIRY = '2099-12-31'`
 - Harga: `MEMBERSHIP_EARLY_BIRD_PRICE = 199_000` (aktif sekarang)
 - Konstanta di `src/types/index.ts`
