@@ -25,7 +25,7 @@ pnpm typecheck    # tsc --noEmit
 - **`src/components/member/VideoPlayer.tsx`** — YouTube iframe player
 - **`src/lib/email/`** — SMTP email (mailer, sender, templates)
 - **`src/lib/membership.ts`** — Membership status helpers
-- **`src/middleware.ts`** — Auth gate + membership check + admin gate
+- **`src/proxy.ts`** — Auth gate + membership check + admin gate (Next.js 16 uses `proxy.ts` / `export function proxy`)
 - **`supabase/migrations/`** — SQL migrations (run in Supabase SQL editor)
 
 ## Key Rules
