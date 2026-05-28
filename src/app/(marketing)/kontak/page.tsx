@@ -74,12 +74,28 @@ export default function KontakPage() {
         </div>
 
         {/* Response time note */}
-        <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-xl p-5">
+        <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-xl p-5 mb-6">
           <p className="text-[#888888] text-sm leading-relaxed">
             <strong className="text-[#D4AF37]">Estimasi waktu respons:</strong>{' '}
             WhatsApp biasanya direspons dalam 1–3 jam di jam kerja. Email biasanya direspons dalam 1x24 jam kerja.
             Untuk pertanyaan atau masalah akun, sertakan nama dan email akun kamu agar tim kami bisa membantu lebih cepat.
           </p>
+        </div>
+
+        {/* Anti-phishing notice */}
+        <div className="bg-red-950/30 border border-red-800/40 rounded-xl p-5">
+          <div className="flex items-start gap-3">
+            <span className="text-red-400 text-lg mt-0.5">🔒</span>
+            <div>
+              <p className="text-red-400 font-bold text-sm mb-2">Peringatan Keamanan</p>
+              <p className="text-[#888888] text-sm leading-relaxed">
+                Tim Profit dari AI <strong className="text-[#F5F5F0]">tidak pernah</strong> meminta password, data kartu kredit,
+                atau kode OTP kamu melalui WhatsApp, email, atau media apapun.
+                Jika ada yang mengaku sebagai tim kami dan meminta hal tersebut,
+                itu adalah <strong className="text-red-400">penipuan</strong> — abaikan dan laporkan ke kami.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="border-t border-[#222222] pt-8 mt-10 flex flex-wrap gap-4 text-sm text-[#555555]">
