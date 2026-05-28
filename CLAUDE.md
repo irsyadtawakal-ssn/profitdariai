@@ -31,8 +31,10 @@ pnpm typecheck    # tsc --noEmit
 - **`src/components/member/VideoPlayer.tsx`** — YouTube iframe player
 - **`src/lib/email/`** — SMTP email (mailer, sender, templates)
 - **`src/lib/membership.ts`** — Membership status helpers
-- **`src/proxy.ts`** — Auth gate + membership check + admin gate (Next.js 16 uses `proxy.ts` / `export function proxy`)
+- **`src/middleware.ts`** — Entry point Next.js middleware, re-export `proxy` dari `proxy.ts`
+- **`src/proxy.ts`** — Implementasi middleware: auth gate, membership check, admin gate. Proteksi routes: `/dashboard`, `/kursus`, `/ebook`, `/profile`, `/admin`
 - **`supabase/migrations/`** — SQL migrations (run in Supabase SQL editor)
+- **`docs/vps-migration.md`** — Panduan lengkap migrasi dari Vercel ke Hostinger VPS (Phase 2+)
 
 ## Legal Pages (Tripay Merchant Review)
 
@@ -73,6 +75,16 @@ Semua legal pages ada di `src/app/(marketing)/` dan dapat diakses tanpa login:
 - UI tone: confident, direct, "kamu" (not "Anda" or "lo")
 - Package manager: **pnpm only**
 - Kata "lifetime" sudah dihapus dari semua marketing copy (landing page, checkout, API) — gunakan "Akses Penuh" atau "Sekali Bayar"
+
+## Security
+
+- **Middleware** — `src/middleware.ts` → `src/proxy.ts` aktif di semua protected routes sebelum page render
+- **Auth callback** — `?next=` param divalidasi: harus diawali `/` dan bukan `//` (cegah open redirect)
+- **Payment create** — email regex + fullName length validated sebelum request ke Tripay API
+- **Webhook** — signature diverifikasi dengan `timingSafeEqual` (timing-safe). Guest email yang sudah terdaftar di-link ke akun existing, bukan gagal silent
+- **Ebook download** — cek auth + active membership + `is_published = true` sebelum serve URL
+- **Admin actions** — semua server actions wajib `await requireAdmin()` di baris pertama (pakai `.maybeSingle()`)
+- **RLS** — enabled di semua tabel Supabase
 
 ## Performance
 

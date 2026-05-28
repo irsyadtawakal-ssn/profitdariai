@@ -1,6 +1,6 @@
 # profitdariai — Build Plan
 
-## Status: Week 8 Polish & Launch (In Progress)
+## Status: Week 8 — Security ✅ | QA & Launch Remaining
 
 ---
 
@@ -89,6 +89,14 @@
 - [x] **`next/image`** — `CourseCard` + `EbookCard`: lazy load, WebP, responsive sizes
 - [x] **Streaming Suspense** — dashboard: content grid (instant) + MemberHeader (stream after profile query)
 
+### Security Audit (Done)
+- [x] **`middleware.ts` dibuat** — `proxy.ts` tidak pernah dipanggil Next.js; semua route `/dashboard`, `/kursus`, `/ebook`, `/profile`, `/admin` sekarang diproteksi di edge
+- [x] **Open redirect** — `?next=//evil.com` di auth callback diblock; harus path relatif valid
+- [x] **Input validation payment create** — email regex + fullName length check sebelum buat transaksi Tripay
+- [x] **Webhook silent failure** — guest checkout dengan email yang sudah ada kini di-link ke akun existing, membership tetap diberikan
+- [x] **Ebook download draft** — tambah `.eq('is_published', true)` agar ebook draft tidak bisa didownload
+- [x] **`requireAdmin` error handling** — `.single()` → `.maybeSingle()` + explicit error check
+
 ### Remaining
 - [ ] QA & bug fixing end-to-end
 - [x] Seed 10 kursus + 15 ebook konten
@@ -96,7 +104,7 @@
 - [x] Renewal reminder cron (Vercel Cron) — `src/app/api/cron/renewal-reminder/route.ts` + `vercel.json`
 - [ ] Google Analytics 4 + Vercel Analytics setup
 - [x] Sentry error monitoring
-- [ ] Security audit (RLS, webhook signature, signed URLs)
+- [x] Security audit — lihat Security Audit section di atas
 - [ ] Soft launch (50 member)
 - [ ] Public launch (IG/TikTok ads)
 
