@@ -31,6 +31,71 @@
 
 ---
 
+## Database — Tidak Perlu Dimigrasikan
+
+> **TL;DR:** Supabase tetap di tempatnya. Kamu hanya pindahkan Next.js server dari Vercel ke VPS.
+
+```
+SEBELUM (Vercel)          SESUDAH (VPS)
+─────────────────         ─────────────────
+Vercel (Next.js)    →     VPS (Next.js + PM2)
+     ↓                          ↓
+Supabase (DB)       →     Supabase (DB)  ← TIDAK BERUBAH
+     ↓                          ↓
+Tripay (Payment)    →     Tripay (Payment) ← TIDAK BERUBAH
+```
+
+Supabase adalah **managed PostgreSQL** yang independent — tidak terikat ke Vercel maupun VPS. Env vars Supabase (`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, dll.) cukup di-copy ke `.env.production` di VPS, selesai.
+
+### Yang Tidak Berubah
+
+| Komponen | Status |
+|---|---|
+| Supabase project URL | ✅ Sama persis |
+| Database schema & data | ✅ Tidak tersentuh |
+| RLS policies | ✅ Tidak tersentuh |
+| Auth (Supabase Auth) | ✅ Sama — session tetap valid |
+| Storage (signed URLs) | ✅ Sama |
+| Realtime subscriptions | ✅ Sama |
+
+### Yang Perlu Dicek
+
+**Supabase Auth Redirect URLs** — setelah DNS pindah, pastikan domain sudah terdaftar:
+
+1. Buka [supabase.com/dashboard](https://supabase.com/dashboard) → project kamu
+2. **Authentication → URL Configuration**
+3. Pastikan ada:
+   ```
+   Site URL:          https://profitdariai.com
+   Redirect URLs:     https://profitdariai.com/api/auth/callback
+                      https://profitdariai.com/dashboard
+   ```
+4. Kalau belum ada → tambahkan sebelum DNS dipindah
+
+**Supabase connection pooling** — default Supabase pakai port 5432 (direct) atau 6543 (pooler via pgBouncer). Untuk produksi dengan traffic, pertimbangkan ganti ke Transaction Pooler:
+
+```
+# .env.production
+# Ganti dari direct connection ke pooler jika mulai dapat banyak concurrent user
+# Supabase dashboard → Settings → Database → Connection Pooling
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co   # tidak berubah
+```
+
+Untuk skala sekarang (awal launch), direct connection sudah cukup.
+
+### Kapan Pertimbangkan Self-Host PostgreSQL di VPS?
+
+> Ini **Phase 3+**, jauh ke depan, tidak perlu sekarang.
+
+Baru perlu kalau:
+- Biaya Supabase > Rp 500rb/bulan (plan Pro $25)
+- Butuh query custom yang tidak bisa di Supabase
+- Compliance data harus di Indonesia
+
+Jika sampai di titik itu, prosesnya: install PostgreSQL di VPS → `pg_dump` dari Supabase → `pg_restore` ke VPS → update connection string. Tapi ini membawa tanggung jawab backup, upgrade, HA — tidak trivial.
+
+---
+
 ## Fase 1 — Persiapan Sebelum Migrasi
 
 ### 1.1 Update `next.config.ts` untuk standalone output
