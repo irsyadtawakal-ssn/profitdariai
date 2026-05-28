@@ -7,6 +7,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { createClient } from '@/lib/supabase/client'
 import { createKursus, updateKursus } from './actions'
 
 interface Course {
@@ -37,13 +38,35 @@ export function KursusDialog({ open, onClose, course }: KursusDialogProps) {
   const [title, setTitle] = useState(course?.title ?? '')
   const [slug, setSlug] = useState(course?.slug ?? '')
   const [isPublished, setIsPublished] = useState(course?.is_published ?? false)
+  const [thumbnailUrl, setThumbnailUrl] = useState(course?.thumbnail_url ?? '')
+  const [uploading, setUploading] = useState(false)
   const isEdit = !!course
 
   useEffect(() => {
     setTitle(course?.title ?? '')
     setSlug(course?.slug ?? '')
     setIsPublished(course?.is_published ?? false)
+    setThumbnailUrl(course?.thumbnail_url ?? '')
   }, [open, course])
+
+  async function handleThumbnailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop()
+      const path = `courses/${Date.now()}-${slugify(file.name.replace(`.${ext}`, ''))}.${ext}`
+      const { error } = await supabase.storage.from('images').upload(path, file, { upsert: false })
+      if (error) throw error
+      const { data } = supabase.storage.from('images').getPublicUrl(path)
+      setThumbnailUrl(data.publicUrl)
+    } catch (err) {
+      console.error('[KursusDialog upload]', err)
+    } finally {
+      setUploading(false)
+    }
+  }
 
   function handleTitleChange(val: string) {
     setTitle(val)
@@ -107,8 +130,18 @@ export function KursusDialog({ open, onClose, course }: KursusDialogProps) {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="kursus_thumbnail">Thumbnail URL</Label>
-            <Input id="kursus_thumbnail" name="thumbnail_url" defaultValue={course?.thumbnail_url ?? ''} />
+            <Label>Thumbnail</Label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleThumbnailChange}
+              className="text-sm text-[#888888] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-[#222222] file:text-[#F5F5F0] file:text-xs file:cursor-pointer hover:file:bg-[#2A2A2A]"
+            />
+            {uploading && <p className="text-xs text-[#D4AF37]">Mengupload...</p>}
+            {thumbnailUrl && !uploading && (
+              <p className="text-xs text-green-400 truncate">&#10003; Thumbnail siap</p>
+            )}
+            <input type="hidden" name="thumbnail_url" value={thumbnailUrl} />
           </div>
           <div className="flex items-center gap-2">
             <input

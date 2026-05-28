@@ -37,16 +37,38 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
   const [title, setTitle] = useState(ebook?.title ?? '')
   const [slug, setSlug] = useState(ebook?.slug ?? '')
   const [filePath, setFilePath] = useState(ebook?.file_path ?? '')
+  const [coverUrl, setCoverUrl] = useState(ebook?.cover_url ?? '')
   const [isPublished, setIsPublished] = useState(ebook?.is_published ?? false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingCover, setUploadingCover] = useState(false)
   const isEdit = !!ebook
 
   useEffect(() => {
     setTitle(ebook?.title ?? '')
     setSlug(ebook?.slug ?? '')
     setFilePath(ebook?.file_path ?? '')
+    setCoverUrl(ebook?.cover_url ?? '')
     setIsPublished(ebook?.is_published ?? false)
   }, [open, ebook])
+
+  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingCover(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop()
+      const path = `ebooks/${Date.now()}-${slugify(file.name.replace(`.${ext}`, ''))}.${ext}`
+      const { error } = await supabase.storage.from('images').upload(path, file, { upsert: false })
+      if (error) throw error
+      const { data } = supabase.storage.from('images').getPublicUrl(path)
+      setCoverUrl(data.publicUrl)
+    } catch (err) {
+      console.error('[EbookDialog cover upload]', err)
+    } finally {
+      setUploadingCover(false)
+    }
+  }
 
   function handleTitleChange(val: string) {
     setTitle(val)
@@ -119,8 +141,16 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
           </div>
           <div className="flex gap-4">
             <div className="flex flex-col gap-1.5 flex-1">
-              <Label htmlFor="ebook_cover_url">Cover URL</Label>
-              <Input id="ebook_cover_url" name="cover_url" defaultValue={ebook?.cover_url ?? ''} />
+              <Label>Cover</Label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleCoverChange}
+                className="text-sm text-[#888888] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-[#222222] file:text-[#F5F5F0] file:text-xs file:cursor-pointer hover:file:bg-[#2A2A2A]"
+              />
+              {uploadingCover && <p className="text-xs text-[#D4AF37]">Mengupload...</p>}
+              {coverUrl && !uploadingCover && <p className="text-xs text-green-400">&#10003; Cover siap</p>}
+              <input type="hidden" name="cover_url" value={coverUrl} />
             </div>
             <div className="flex flex-col gap-1.5 w-28">
               <Label htmlFor="ebook_page_count">Jumlah Hal.</Label>
