@@ -23,6 +23,8 @@ export async function createEbook(formData: FormData) {
     throw new Error(error.message)
   }
   revalidatePath('/admin/ebook')
+  revalidatePath('/ebook')
+  revalidatePath('/dashboard')
 }
 
 export async function updateEbook(id: string, formData: FormData) {
@@ -48,6 +50,8 @@ export async function updateEbook(id: string, formData: FormData) {
     throw new Error(error.message)
   }
   revalidatePath('/admin/ebook')
+  revalidatePath('/ebook')
+  revalidatePath('/dashboard')
 }
 
 export async function deleteEbook(id: string) {
@@ -59,4 +63,6 @@ export async function deleteEbook(id: string) {
     throw new Error(error.message)
   }
   revalidatePath('/admin/ebook')
+  revalidatePath('/ebook')
+  revalidatePath('/dashboard')
 }

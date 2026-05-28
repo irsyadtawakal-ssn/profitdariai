@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { getCachedCourses, getCachedEbooks, getCachedCourseCounts } from '@/lib/cache/content'
 import { isMembershipActive } from '@/lib/membership'
 import { CourseCard } from '@/components/member/CourseCard'
 import { EbookCard } from '@/components/member/EbookCard'
@@ -13,27 +14,18 @@ export default async function DashboardPage() {
 
   const [
     { data: profile },
-    { data: courses },
-    { data: ebooks },
-    { count: courseCount },
-    { count: ebookCount },
+    allCourses,
+    allEbooks,
+    { courseCount, ebookCount },
   ] = await Promise.all([
     supabase.from('profiles').select('full_name, membership_expires_at').eq('id', user!.id).single(),
-    supabase
-      .from('courses')
-      .select('id, slug, title, category, thumbnail_url, course_modules(count)')
-      .eq('is_published', true)
-      .order('sort_order')
-      .limit(3),
-    supabase
-      .from('ebooks')
-      .select('id, slug, title, category, cover_url')
-      .eq('is_published', true)
-      .order('sort_order')
-      .limit(3),
-    supabase.from('courses').select('*', { count: 'exact', head: true }).eq('is_published', true),
-    supabase.from('ebooks').select('*', { count: 'exact', head: true }).eq('is_published', true),
+    getCachedCourses(),
+    getCachedEbooks(),
+    getCachedCourseCounts(),
   ])
+
+  const courses = allCourses.slice(0, 3)
+  const ebooks = allEbooks.slice(0, 3)
 
   const isActive = isMembershipActive({ membership_expires_at: profile?.membership_expires_at ?? null })
   const expiryLabel = profile?.membership_expires_at
@@ -84,7 +76,7 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-semibold text-[#F5F5F0]">Kursus Terbaru</h2>
           <Link href="/kursus" className="text-[#D4AF37] text-sm hover:underline">Lihat Semua →</Link>
         </div>
-        {courses && courses.length > 0 ? (
+        {courses.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {courses.map((course) => {
               const modules = course.course_modules as unknown as [{ count: number }]
@@ -110,7 +102,7 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-semibold text-[#F5F5F0]">Ebook Terbaru</h2>
           <Link href="/ebook" className="text-[#D4AF37] text-sm hover:underline">Lihat Semua →</Link>
         </div>
-        {ebooks && ebooks.length > 0 ? (
+        {ebooks.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {ebooks.map((ebook) => (
               <EbookCard

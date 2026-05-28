@@ -17,6 +17,8 @@ export async function createKursus(formData: FormData) {
   })
   if (error) console.error('[createKursus]', error.message)
   revalidatePath('/admin/kursus')
+  revalidatePath('/kursus')
+  revalidatePath('/dashboard')
 }
 
 export async function updateKursus(id: string, formData: FormData) {
@@ -36,6 +38,8 @@ export async function updateKursus(id: string, formData: FormData) {
     .eq('id', id)
   if (error) console.error('[updateKursus]', error.message)
   revalidatePath('/admin/kursus')
+  revalidatePath('/kursus')
+  revalidatePath('/dashboard')
 }
 
 export async function deleteKursus(id: string) {
@@ -44,4 +48,6 @@ export async function deleteKursus(id: string) {
   const { error } = await supabase.from('courses').delete().eq('id', id)
   if (error) console.error('[deleteKursus]', error.message)
   revalidatePath('/admin/kursus')
+  revalidatePath('/kursus')
+  revalidatePath('/dashboard')
 }
