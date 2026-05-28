@@ -54,7 +54,7 @@ nav {
   box-shadow: var(--shadow-glow);
   max-width: 1100px; margin: 16px auto 0; width: 90%;
 }
-.logo { font-weight: 900; font-size: 20px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; color: #ffffff; letter-spacing: 0.05em; }
+.logo { font-weight: 900; font-size: 20px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; color: #ffffff; letter-spacing: 0.05em; white-space: nowrap; }
 .logo span { color: var(--gold); text-shadow: 0 0 10px rgba(255, 191, 0, 0.5); }
 nav .cta-nav {
   background: var(--gold); color: #000000 !important;
@@ -241,6 +241,20 @@ footer { padding: 40px 5%; background: #000000; border-top: 2px solid var(--bord
 @media (max-width: 1023px) { .matrix-grid { grid-template-columns: 1fr; gap: 30px; } }
 @media (max-width: 768px) {
   .hero-center h1 { font-size: clamp(32px, 5.5vw, 44px); }
+  nav {
+    padding: 12px 16px;
+    width: 92%;
+    top: 10px;
+    margin-top: 10px;
+  }
+  .logo {
+    font-size: 16px;
+    gap: 6px;
+  }
+  .logo i {
+    width: 20px !important;
+    height: 20px !important;
+  }
   nav .cta-nav { display: none; }
   .steps::before { display: none; }
   section { padding: 70px 5%; }
