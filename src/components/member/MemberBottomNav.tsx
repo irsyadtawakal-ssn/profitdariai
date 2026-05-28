@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, BookMarked, User } from 'lucide-react'
+import { LayoutDashboard, BookOpen, BookMarked, ShoppingBag, User } from 'lucide-react'
 
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/kursus', label: 'Kursus', icon: BookOpen },
   { href: '/ebook', label: 'Ebook', icon: BookMarked },
+  { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
   { href: '/profile', label: 'Profil', icon: User },
 ]
 

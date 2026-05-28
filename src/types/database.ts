@@ -204,6 +204,52 @@ export type Database = {
           }
         ]
       }
+      marketplace_products: {
+        Row: {
+          id: string
+          slug: string
+          title: string
+          description: string | null
+          category: string
+          price: number
+          original_price: number | null
+          cover_url: string | null
+          product_url: string
+          is_published: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          title: string
+          description?: string | null
+          category: string
+          price?: number
+          original_price?: number | null
+          cover_url?: string | null
+          product_url: string
+          is_published?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          slug?: string
+          title?: string
+          description?: string | null
+          category?: string
+          price?: number
+          original_price?: number | null
+          cover_url?: string | null
+          product_url?: string
+          is_published?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
