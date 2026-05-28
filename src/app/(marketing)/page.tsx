@@ -51,7 +51,10 @@ export default function LandingPage() {
             <i data-lucide="brain-circuit" style={{ width: 24, height: 24, color: 'var(--gold)', filter: 'drop-shadow(0 0 5px var(--gold))' }} />
             Profit dari <span>AI</span>
           </div>
-          <a href="#pricing" className="cta-nav">DAPATKAN AKSES</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <a href="/login" style={{ fontSize: 13, fontWeight: 600, color: 'var(--gold)', textDecoration: 'none', padding: '8px 18px', border: '1.5px solid var(--gold)', borderRadius: 8, transition: 'all 0.2s', letterSpacing: '0.03em' }}>Masuk</a>
+            <a href="#pricing" className="cta-nav">DAPATKAN AKSES</a>
+          </div>
         </nav>
 
         {/* HERO */}
