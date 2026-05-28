@@ -44,11 +44,20 @@ export function LoginForm() {
       })
 
       if (error) {
-        toast.error('Email atau password salah. Coba lagi.')
+        // AuthApiError: credentials salah, email belum verify, dll.
+        if (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('credentials')) {
+          toast.error('Email atau password salah. Coba lagi.')
+        } else if (error.message.toLowerCase().includes('email not confirmed')) {
+          toast.error('Email belum dikonfirmasi. Cek inbox kamu.')
+        } else {
+          toast.error(error.message || 'Gagal masuk. Coba lagi.')
+        }
         return
       }
 
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: userData } = await supabase.auth.getUser()
+      const user = userData?.user ?? null
+
       const { data: profile } = user
         ? await supabase.from('profiles').select('role').eq('id', user.id).single()
         : { data: null }
@@ -56,8 +65,14 @@ export function LoginForm() {
       toast.success('Berhasil masuk!')
       router.refresh()
       router.push(profile?.role === 'admin' ? '/admin/dashboard' : '/dashboard')
-    } catch {
-      toast.error('Terjadi kesalahan jaringan. Periksa koneksi kamu.')
+    } catch (err) {
+      console.error('[LoginForm] unexpected error:', err)
+      // Cek apakah ini benar-benar network error
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        toast.error('Tidak dapat terhubung ke server. Periksa koneksi internet kamu.')
+      } else {
+        toast.error('Terjadi kesalahan. Silakan coba lagi.')
+      }
     } finally {
       setLoading(false)
     }
