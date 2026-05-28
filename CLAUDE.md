@@ -1,6 +1,6 @@
 # profitdariai
 
-Platform membership kursus & ebook AI Indonesia. **Stack:** Next.js 15 (App Router) + Supabase + Tripay + YouTube Unlisted (video) + Resend + Vercel.
+Platform membership kursus & ebook AI Indonesia. **Stack:** Next.js 16 (App Router) + Supabase + Tripay + YouTube Unlisted (video) + Resend + Vercel.
 
 ## Quick Commands
 
@@ -18,7 +18,13 @@ pnpm typecheck    # tsc --noEmit
 - **`src/app/(member)/`** — Protected member area (dashboard, kursus, ebook, profile)
 - **`src/app/(admin)/`** — Admin CMS (role = 'admin' only)
 - **`src/app/api/`** — API routes (auth callback, Tripay payment + webhook, ebook download)
-- **`src/lib/supabase/`** — `client.ts` (browser), `server.ts` (RSC), `admin.ts` (service_role)
+- **`src/lib/supabase/`** — `client.ts` (browser), `server.ts` (RSC + React `cache()` dedup), `admin.ts` (service_role)
+  - `createServerClient` — wrapped dengan `cache()`, dibuat sekali per request
+  - `getServerUser` — helper cached untuk dapat user tanpa duplikasi `getUser()` call
+- **`src/lib/cache/content.ts`** — `unstable_cache` wrappers untuk data publik (60s TTL):
+  - `getCachedCourses(category?)` — course list untuk member area
+  - `getCachedEbooks(category?)` — ebook list untuk member area
+  - `getCachedCourseCounts()` — stat counts untuk dashboard
 - **`src/lib/tripay/`** — Payment integration (webhook uses `timingSafeEqual`)
 - **`src/lib/auth/requireAdmin.ts`** — Call at top of every admin server action
 - **`src/lib/youtube.ts`** — Extract YouTube ID + generate embed URL
@@ -61,9 +67,20 @@ Semua legal pages ada di `src/app/(marketing)/` dan dapat diakses tanpa login:
   - **Supabase Storage path** (legacy) — signed URL via `createSignedUrl`. Download API di `/api/ebook/download/[id]` handle keduanya secara otomatis.
 - Membership check = `membership_expires_at > NOW()`
 - Brand colors: Obsidian `#0A0A0A`, Gold `#D4AF37`, Ivory `#F5F5F0`
+- Brand fonts: **Geist** (display/heading), **Inter** (body), **JetBrains Mono** (angka/data)
+  - Marketing layout (`src/app/(marketing)/layout.tsx`) load Geist + JetBrains_Mono via `next/font/google`
+  - `landing.css` pakai `var(--font-display)` dan `var(--font-mono-nums)` dari CSS variables
 - UI tone: confident, direct, "kamu" (not "Anda" or "lo")
 - Package manager: **pnpm only**
 - Kata "lifetime" sudah dihapus dari semua marketing copy (landing page, checkout, API) — gunakan "Akses Penuh" atau "Sekali Bayar"
+
+## Performance
+
+- **`unstable_cache`** — courses & ebooks di-cache 60 detik di server memory (`src/lib/cache/content.ts`). Admin actions (`revalidatePath`) bust cache saat konten berubah.
+- **`loading.tsx`** — setiap member route punya skeleton loading yang muncul instan saat navigasi (`dashboard`, `kursus`, `ebook`, `profile`).
+- **Streaming Suspense** — dashboard split: content grid (cached, instant) + `<MemberHeader>` (user-specific, stream in after profile query).
+- **`next/image`** — `CourseCard` dan `EbookCard` pakai `<Image fill>` dengan `sizes` prop untuk lazy load + WebP otomatis.
+- **React `cache()`** — `createServerClient` di-wrap `cache()` sehingga dibuat sekali per request meski dipanggil dari layout dan page.
 
 ## Env Setup
 

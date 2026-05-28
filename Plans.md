@@ -74,6 +74,21 @@
   - Download API support dual mode: GDrive URL redirect langsung, Supabase Storage signed URL
   - File: `src/app/(admin)/admin/ebook/EbookDialog.tsx`, `src/app/api/ebook/download/[id]/route.ts`
 
+### Design System (Done)
+- [x] **Brand token reconciliation** — landing.css: gold `#FFBF00` → `#D4AF37`, Outfit → Geist + Inter + JetBrains Mono
+- [x] **FAQ accordion** — toggle behavior + chevron animation di landing page
+- [x] **Legal pages** — fix border/surface/muted tokens (`#1a1a24`, `#08080c`, `#94a3b8`) ke canonical values
+- [x] **AdminSidebar** — border fix + `border-l-2` gold active indicator (seragam dengan MemberSidebar)
+- [x] **Admin tables** — semua `border-[#1A1A1A]` divider → `border-[#222222]`
+
+### Performance (Done)
+- [x] **Loading skeletons** — `loading.tsx` per member route (dashboard, kursus, ebook, profile) — instant visual feedback
+- [x] **Bottom nav active indicator** — gold bar di atas tab aktif
+- [x] **`unstable_cache`** — `getCachedCourses`, `getCachedEbooks`, `getCachedCourseCounts` (60s TTL) — eliminasi DB roundtrip pada tab switch ke-2+
+- [x] **React `cache()`** — `createServerClient` + `getServerUser` deduplicated per request
+- [x] **`next/image`** — `CourseCard` + `EbookCard`: lazy load, WebP, responsive sizes
+- [x] **Streaming Suspense** — dashboard: content grid (instant) + MemberHeader (stream after profile query)
+
 ### Remaining
 - [ ] QA & bug fixing end-to-end
 - [x] Seed 10 kursus + 15 ebook konten
