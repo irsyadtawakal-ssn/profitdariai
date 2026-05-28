@@ -48,9 +48,14 @@ export function LoginForm() {
         return
       }
 
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data: profile } = user
+        ? await supabase.from('profiles').select('role').eq('id', user.id).single()
+        : { data: null }
+
       toast.success('Berhasil masuk!')
       router.refresh()
-      router.push('/dashboard')
+      router.push(profile?.role === 'admin' ? '/admin/dashboard' : '/dashboard')
     } catch {
       toast.error('Terjadi kesalahan jaringan. Periksa koneksi kamu.')
     } finally {

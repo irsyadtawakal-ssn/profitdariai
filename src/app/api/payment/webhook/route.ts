@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhookSignature, type TripayWebhookPayload } from '@/lib/tripay/webhook'
-import { sendPaymentSuccessEmail } from '@/lib/email/resend'
-import { addYears } from 'date-fns'
+import { sendPaymentSuccessEmail } from '@/lib/email/sender'
+import { MEMBERSHIP_LIFETIME_EXPIRY } from '@/types'
 
 export async function POST(request: Request) {
   const signature = request.headers.get('X-Callback-Signature') ?? ''
@@ -39,25 +39,17 @@ export async function POST(request: Request) {
       .eq('id', tx.user_id)
       .single()
 
-    const baseDate =
-      profile?.membership_expires_at && new Date(profile.membership_expires_at) > new Date()
-        ? new Date(profile.membership_expires_at)
-        : new Date()
-
-    const newExpiry = addYears(baseDate, 1)
-
     await supabase
       .from('profiles')
-      .update({ membership_expires_at: newExpiry.toISOString() })
+      .update({ membership_expires_at: MEMBERSHIP_LIFETIME_EXPIRY })
       .eq('id', tx.user_id)
 
     if (profile?.email) {
-      await sendPaymentSuccessEmail({
-        to: profile.email,
-        name: profile.full_name ?? 'Member',
-        amount: tx.amount,
-        expiresAt: newExpiry,
-      })
+      await sendPaymentSuccessEmail(
+        profile.email,
+        profile.full_name ?? 'Member',
+        MEMBERSHIP_LIFETIME_EXPIRY,
+      )
     }
   }
 

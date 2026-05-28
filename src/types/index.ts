@@ -30,6 +30,6 @@ export const PAYMENT_METHODS: PaymentMethodOption[] = [
   { code: 'BRIVA', name: 'BRI Virtual Account', fee: 'Rp 4.000', type: 'va' },
 ]
 
-export const MEMBERSHIP_PRICE = 399_000
-export const MEMBERSHIP_EARLY_BIRD_PRICE = 299_000
-export const MEMBERSHIP_DURATION_DAYS = 365
+export const MEMBERSHIP_PRICE = 999_000
+export const MEMBERSHIP_EARLY_BIRD_PRICE = 199_000
+export const MEMBERSHIP_LIFETIME_EXPIRY = '2099-12-31T23:59:59.000Z'

@@ -1,59 +1,41 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendRenewalReminderEmail } from '@/lib/email/resend'
+import { sendRenewalReminderEmail } from '@/lib/email/sender'
 
-const WINDOWS = [
-  { daysLeft: 14, label: '14-day' },
-  { daysLeft: 3, label: '3-day' },
-]
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-export async function POST(request: Request) {
-  const authHeader = request.headers.get('Authorization')
-  const cronSecret = process.env.CRON_SECRET
-
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+export async function GET(request: Request) {
+  const authHeader = request.headers.get('authorization')
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const supabase = createAdminClient()
-  const now = new Date()
-  let sent = 0
 
-  for (const { daysLeft } of WINDOWS) {
-    const windowStart = new Date(now)
-    windowStart.setDate(windowStart.getDate() + daysLeft - 1)
-    windowStart.setHours(0, 0, 0, 0)
+  // Members expiring in 7 days (±12 jam window)
+  const from = new Date(Date.now() + 6.5 * 24 * 60 * 60 * 1000).toISOString()
+  const to = new Date(Date.now() + 7.5 * 24 * 60 * 60 * 1000).toISOString()
 
-    const windowEnd = new Date(now)
-    windowEnd.setDate(windowEnd.getDate() + daysLeft)
-    windowEnd.setHours(23, 59, 59, 999)
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('email, full_name, membership_expires_at')
+    .gte('membership_expires_at', from)
+    .lte('membership_expires_at', to)
+    .not('email', 'is', null)
 
-    const { data: members, error } = await supabase
-      .from('profiles')
-      .select('id, full_name, email, membership_expires_at')
-      .eq('role', 'member')
-      .gte('membership_expires_at', windowStart.toISOString())
-      .lte('membership_expires_at', windowEnd.toISOString())
-
-    if (error) {
-      console.error(`[renewal-cron] ${daysLeft}d query error:`, error.message)
-      continue
-    }
-
-    for (const member of members ?? []) {
-      try {
-        await sendRenewalReminderEmail({
-          to: member.email,
-          name: member.full_name ?? 'Member',
-          expiresAt: new Date(member.membership_expires_at!),
-          daysLeft,
-        })
-        sent++
-      } catch (err) {
-        console.error(`[renewal-cron] email failed for ${member.email}:`, err)
-      }
-    }
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ sent })
+  const results = await Promise.allSettled(
+    (profiles ?? []).map((p) =>
+      sendRenewalReminderEmail(p.email!, p.full_name ?? 'Member', p.membership_expires_at!)
+    )
+  )
+
+  const sent = results.filter((r) => r.status === 'fulfilled').length
+  const failed = results.filter((r) => r.status === 'rejected').length
+
+  return NextResponse.json({ sent, failed })
 }

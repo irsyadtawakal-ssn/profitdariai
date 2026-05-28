@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { LogOut } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
   { label: 'Dashboard', href: '/admin/dashboard' },
@@ -12,10 +14,18 @@ const NAV = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
   return (
-    <aside className="w-52 flex-shrink-0 border-r border-[#1A1A1A] min-h-screen p-4">
+    <aside className="w-52 flex-shrink-0 border-r border-[#1A1A1A] min-h-screen p-4 flex flex-col">
       <div className="text-[#D4AF37] font-bold text-sm mb-6 px-2 tracking-widest">ADMIN</div>
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1 flex-1">
         {NAV.map(({ label, href }) => (
           <Link
             key={href}
@@ -30,6 +40,13 @@ export function AdminSidebar() {
           </Link>
         ))}
       </nav>
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[#888888] hover:text-[#EF4444] hover:bg-[#1A1A1A] transition-colors w-full mt-4"
+      >
+        <LogOut size={14} />
+        Logout
+      </button>
     </aside>
   )
 }
