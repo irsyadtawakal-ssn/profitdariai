@@ -5,15 +5,23 @@ import { generateMerchantRef } from '@/lib/utils'
 import { MEMBERSHIP_PRICE } from '@/types'
 
 export async function POST(request: Request) {
+  const { paymentMethod, email, fullName } = await request.json()
+
+  if (!paymentMethod || !email || !fullName) {
+    return NextResponse.json(
+      { error: 'paymentMethod, email, dan fullName wajib diisi' },
+      { status: 400 }
+    )
+  }
+
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Generate merchant ref - use UUID part of user ID if logged in, otherwise use email hash
+  const merchantRef = user
+    ? generateMerchantRef(user.id)
+    : `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-  const { paymentMethod } = await request.json()
-  if (!paymentMethod) return NextResponse.json({ error: 'paymentMethod required' }, { status: 400 })
-
-  const merchantRef = generateMerchantRef(user.id)
   const amount = MEMBERSHIP_PRICE
   const signature = createSignature(merchantRef, amount)
 
@@ -21,8 +29,8 @@ export async function POST(request: Request) {
     method: paymentMethod,
     merchant_ref: merchantRef,
     amount,
-    customer_name: user.user_metadata.full_name ?? user.email!,
-    customer_email: user.email!,
+    customer_name: fullName,
+    customer_email: email,
     order_items: [
       {
         sku: 'PDA-MEMBERSHIP-LIFETIME',
@@ -40,8 +48,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 400 })
   }
 
+  // Save transaction in DB
   await supabase.from('transactions').insert({
-    user_id: user.id,
+    user_id: user?.id ?? null,
+    customer_email: email,
+    customer_name: fullName,
     tripay_reference: result.data.reference,
     merchant_ref: merchantRef,
     amount,
