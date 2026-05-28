@@ -4,8 +4,14 @@ export function verifyWebhookSignature(rawBody: string, signature: string): bool
   const expected = crypto
     .createHmac('sha256', process.env.TRIPAY_PRIVATE_KEY!)
     .update(rawBody)
-    .digest('hex')
-  return expected === signature
+    .digest()
+  try {
+    const sigBuffer = Buffer.from(signature, 'hex')
+    if (sigBuffer.length !== expected.length) return false
+    return crypto.timingSafeEqual(expected, sigBuffer)
+  } catch {
+    return false
+  }
 }
 
 export interface TripayWebhookPayload {

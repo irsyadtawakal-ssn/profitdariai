@@ -2,8 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/auth/requireAdmin'
 
 export async function createEbook(formData: FormData) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const pageCount = formData.get('page_count')
   const { error } = await supabase.from('ebooks').insert({
@@ -24,6 +26,7 @@ export async function createEbook(formData: FormData) {
 }
 
 export async function updateEbook(id: string, formData: FormData) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const pageCount = formData.get('page_count')
   const { error } = await supabase
@@ -48,6 +51,7 @@ export async function updateEbook(id: string, formData: FormData) {
 }
 
 export async function deleteEbook(id: string) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const { error } = await supabase.from('ebooks').delete().eq('id', id)
   if (error) {

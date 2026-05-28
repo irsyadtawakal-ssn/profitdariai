@@ -2,8 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/auth/requireAdmin'
 
 export async function createKursus(formData: FormData) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const { error } = await supabase.from('courses').insert({
     title: formData.get('title') as string,
@@ -18,6 +20,7 @@ export async function createKursus(formData: FormData) {
 }
 
 export async function updateKursus(id: string, formData: FormData) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('courses')
@@ -36,6 +39,7 @@ export async function updateKursus(id: string, formData: FormData) {
 }
 
 export async function deleteKursus(id: string) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const { error } = await supabase.from('courses').delete().eq('id', id)
   if (error) console.error('[deleteKursus]', error.message)

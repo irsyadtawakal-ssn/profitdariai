@@ -2,8 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/auth/requireAdmin'
 
 export async function createModul(courseId: string, formData: FormData) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const duration = formData.get('duration_seconds')
   const { error } = await supabase.from('course_modules').insert({
@@ -21,6 +23,7 @@ export async function createModul(courseId: string, formData: FormData) {
 }
 
 export async function updateModul(courseId: string, modulId: string, formData: FormData) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const duration = formData.get('duration_seconds')
   const { error } = await supabase
@@ -41,6 +44,7 @@ export async function updateModul(courseId: string, modulId: string, formData: F
 }
 
 export async function deleteModul(courseId: string, modulId: string) {
+  await requireAdmin()
   const supabase = createAdminClient()
   const { error } = await supabase.from('course_modules').delete().eq('id', modulId)
   if (error) {

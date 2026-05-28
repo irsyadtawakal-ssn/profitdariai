@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhookSignature, type TripayWebhookPayload } from '@/lib/tripay/webhook'
 import { sendPaymentSuccessEmail } from '@/lib/email/sender'
@@ -28,6 +29,29 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient()
 
+  // Fetch the transaction first to validate it exists and check idempotency
+  const { data: existing } = await supabase
+    .from('transactions')
+    .select()
+    .eq('tripay_reference', reference)
+    .eq('merchant_ref', merchant_ref)
+    .single()
+
+  if (!existing) {
+    return NextResponse.json({ error: 'Transaction not found' }, { status: 404 })
+  }
+
+  // Validate amount before granting membership (defense-in-depth)
+  if (status === 'PAID' && payload.total_amount !== existing.amount) {
+    console.error(`[webhook] Amount mismatch ref=${reference} expected=${existing.amount} got=${payload.total_amount}`)
+    return NextResponse.json({ error: 'Amount mismatch' }, { status: 400 })
+  }
+
+  // Idempotency: if already in the target status, return success without reprocessing
+  if (existing.status === status) {
+    return NextResponse.json({ success: true })
+  }
+
   const { data: tx, error: txError } = await supabase
     .from('transactions')
     .update({
@@ -36,6 +60,7 @@ export async function POST(request: Request) {
     })
     .eq('tripay_reference', reference)
     .eq('merchant_ref', merchant_ref)
+    .eq('status', existing.status)
     .select()
     .single()
 
@@ -51,8 +76,8 @@ export async function POST(request: Request) {
     // If guest checkout (no user_id), create account
     if (!userId && email) {
       try {
-        // Generate temporary password
-        const tempPassword = Math.random().toString(36).slice(-12)
+        // Generate temporary password (CSPRNG — user is directed to reset-password flow)
+        const tempPassword = crypto.randomBytes(16).toString('hex')
 
         // Create auth user with temporary password
         const { data: authUser, error: authError } = await supabase.auth.admin.createUser({

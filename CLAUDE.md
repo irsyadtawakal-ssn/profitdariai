@@ -19,18 +19,20 @@ pnpm typecheck    # tsc --noEmit
 - **`src/app/(admin)/`** — Admin CMS (role = 'admin' only)
 - **`src/app/api/`** — API routes (auth callback, Tripay payment + webhook, ebook download)
 - **`src/lib/supabase/`** — `client.ts` (browser), `server.ts` (RSC), `admin.ts` (service_role)
-- **`src/lib/tripay/`** — Payment integration
+- **`src/lib/tripay/`** — Payment integration (webhook uses `timingSafeEqual`)
+- **`src/lib/auth/requireAdmin.ts`** — Call at top of every admin server action
 - **`src/lib/youtube.ts`** — Extract YouTube ID + generate embed URL
 - **`src/components/member/VideoPlayer.tsx`** — YouTube iframe player
-- **`src/lib/email/`** — Resend email sender
+- **`src/lib/email/`** — SMTP email (mailer, sender, templates)
 - **`src/lib/membership.ts`** — Membership status helpers
-- **`src/middleware.ts`** — Auth gate + membership check
+- **`src/middleware.ts`** — Auth gate + membership check + admin gate
 - **`supabase/migrations/`** — SQL migrations (run in Supabase SQL editor)
 
 ## Key Rules
 
 - **Never** expose `SUPABASE_SERVICE_ROLE_KEY` to the client — admin client is server-only
-- **Always** verify Tripay webhook signature before processing
+- **Always** call `await requireAdmin()` at the top of every `'use server'` admin action
+- **Always** verify Tripay webhook signature before processing (uses `timingSafeEqual`)
 - **RLS enabled** on all Supabase tables
 - **Video:** YouTube Unlisted MVP — `course_modules.video_url` simpan YouTube video ID atau URL. Phase 2+ migrasi ke Bunny.net.
 - Membership check = `membership_expires_at > NOW()`
@@ -51,5 +53,6 @@ Run migrations in order in Supabase SQL editor:
 
 ## Pricing
 
-- Rp 399.000/tahun (launch promo Rp 299.000 untuk 100 member pertama)
-- Konstan di `MEMBERSHIP_PRICE` di `src/types/index.ts`
+- **Lifetime** membership: `MEMBERSHIP_LIFETIME_EXPIRY = '2099-12-31'`
+- Harga: `MEMBERSHIP_EARLY_BIRD_PRICE = 199_000` (aktif sekarang)
+- Konstanta di `src/types/index.ts`
