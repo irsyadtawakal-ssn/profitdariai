@@ -11,8 +11,21 @@ import { createClient } from '@/lib/supabase/client'
 import { createEbook, updateEbook } from './actions'
 import { toast } from 'sonner'
 
-const MAX_PDF_SIZE_MB = 50
 const MAX_COVER_SIZE_MB = 5
+
+/** Konversi berbagai format URL GDrive → direct download URL */
+function parseGdriveUrl(input: string): string | null {
+  input = input.trim()
+  // Format: https://drive.google.com/file/d/FILE_ID/view?...
+  const fileMatch = input.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
+  if (fileMatch) return `https://drive.google.com/uc?export=download&id=${fileMatch[1]}`
+  // Format: https://drive.google.com/open?id=FILE_ID
+  const openMatch = input.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/)
+  if (openMatch) return `https://drive.google.com/uc?export=download&id=${openMatch[1]}`
+  // Sudah dalam format uc?export=download
+  if (input.includes('drive.google.com/uc') && input.includes('export=download')) return input
+  return null
+}
 
 interface Ebook {
   id: string
@@ -41,9 +54,9 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
   const [title, setTitle] = useState(ebook?.title ?? '')
   const [slug, setSlug] = useState(ebook?.slug ?? '')
   const [filePath, setFilePath] = useState(ebook?.file_path ?? '')
+  const [gdriveInput, setGdriveInput] = useState('')
+  const [gdriveValid, setGdriveValid] = useState<boolean | null>(null)
   const [coverUrl, setCoverUrl] = useState(ebook?.cover_url ?? '')
-  const [isPublished, setIsPublished] = useState(ebook?.is_published ?? false)
-  const [uploading, setUploading] = useState(false)
   const [uploadingCover, setUploadingCover] = useState(false)
   const isEdit = !!ebook
 
@@ -53,6 +66,10 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
     setFilePath(ebook?.file_path ?? '')
     setCoverUrl(ebook?.cover_url ?? '')
     setIsPublished(ebook?.is_published ?? false)
+    // Pre-fill GDrive input jika sudah ada file_path berbentuk URL
+    const existing = ebook?.file_path ?? ''
+    setGdriveInput(existing.startsWith('https://') ? existing : '')
+    setGdriveValid(null)
   }, [open, ebook])
 
   async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -89,40 +106,24 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
     if (!isEdit) setSlug(slugify(val))
   }
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const sizeMB = file.size / (1024 * 1024)
-    if (sizeMB > MAX_PDF_SIZE_MB) {
-      toast.error(`File PDF terlalu besar (${sizeMB.toFixed(1)} MB). Maksimal ${MAX_PDF_SIZE_MB} MB.`)
-      e.target.value = ''
+  function handleGdriveChange(val: string) {
+    setGdriveInput(val)
+    if (!val.trim()) {
+      setGdriveValid(null)
+      setFilePath(isEdit ? ebook?.file_path ?? '' : '')
       return
     }
-
-    setUploading(true)
-    try {
-      const supabase = createClient()
-      const ext = file.name.split('.').pop()
-      const baseName = file.name.replace(`.${ext}`, '')
-      const path = `${Date.now()}-${slugify(baseName)}.${ext}`
-      const { error } = await supabase.storage.from('ebooks').upload(path, file, { upsert: false })
-      if (error) {
-        if (error.message?.toLowerCase().includes('size')) {
-          toast.error(`File ditolak server: ukuran melebihi batas yang diizinkan.`)
-        } else {
-          toast.error(`Gagal mengupload PDF: ${error.message}`)
-        }
-        throw error
-      }
-      setFilePath(path)
-      toast.success('PDF berhasil diupload!')
-    } catch (err) {
-      console.error('[EbookDialog upload]', err)
-    } finally {
-      setUploading(false)
+    const converted = parseGdriveUrl(val)
+    if (converted) {
+      setFilePath(converted)
+      setGdriveValid(true)
+    } else {
+      setFilePath('')
+      setGdriveValid(false)
     }
   }
+
+  const [isPublished, setIsPublished] = useState(ebook?.is_published ?? false)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -201,19 +202,23 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label>File PDF</Label>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileChange}
-              className="text-sm text-[#888888] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-[#222222] file:text-[#F5F5F0] file:text-xs file:cursor-pointer hover:file:bg-[#2A2A2A]"
+            <Label htmlFor="ebook_gdrive">Link Google Drive PDF</Label>
+            <Input
+              id="ebook_gdrive"
+              type="url"
+              placeholder="https://drive.google.com/file/d/FILE_ID/view"
+              value={gdriveInput}
+              onChange={(e) => handleGdriveChange(e.target.value)}
+              error={gdriveValid === false}
             />
-            {uploading && <p className="text-xs text-[#D4AF37]">Mengupload...</p>}
-            {filePath && !uploading && (
-              <p className="text-xs text-green-400 truncate">&#10003; {filePath}</p>
+            {gdriveValid === true && (
+              <p className="text-xs text-green-400">&#10003; Link valid — akan otomatis jadi direct download.</p>
             )}
-            {!filePath && !uploading && isEdit && (
-              <p className="text-xs text-[#555555]">Kosongkan jika tidak ingin ganti file.</p>
+            {gdriveValid === false && (
+              <p className="text-xs text-red-400">Link bukan dari Google Drive atau format tidak dikenali.</p>
+            )}
+            {!gdriveInput && isEdit && (
+              <p className="text-xs text-[#555555]">Kosongkan jika tidak ingin ganti link.</p>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -234,7 +239,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
               type="submit"
               variant="primary"
               size="sm"
-              loading={isPending || uploading}
+              loading={isPending}
               disabled={!filePath && !isEdit}
             >
               {isEdit ? 'Simpan' : 'Tambah'}
