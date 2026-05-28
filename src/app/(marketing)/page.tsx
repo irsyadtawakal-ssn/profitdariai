@@ -48,7 +48,7 @@ export default function LandingPage() {
         {/* NAV */}
         <nav>
           <div className="logo">
-            <i data-lucide="brain-circuit" style={{ width: 24, height: 24, color: 'var(--gold)', filter: 'drop-shadow(0 0 5px var(--gold))' }} />
+            <img src="/logo.png" alt="Logo" className="logo-icon" />
             <span style={{ whiteSpace: 'nowrap' }}>Profit dari <span>AI</span></span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
