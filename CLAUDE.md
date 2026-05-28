@@ -35,6 +35,9 @@ pnpm typecheck    # tsc --noEmit
 - **Always** verify Tripay webhook signature before processing (uses `timingSafeEqual`)
 - **RLS enabled** on all Supabase tables
 - **Video:** YouTube Unlisted MVP — `course_modules.video_url` simpan YouTube video ID atau URL. Phase 2+ migrasi ke Bunny.net.
+- **Ebook file source:** `ebooks.file_path` bisa berisi:
+  - **GDrive URL** (`https://drive.google.com/uc?export=download&id=...`) — admin input link share GDrive, auto-convert di `EbookDialog.tsx`
+  - **Supabase Storage path** (legacy) — signed URL via `createSignedUrl`. Download API di `/api/ebook/download/[id]` handle keduanya secara otomatis.
 - Membership check = `membership_expires_at > NOW()`
 - Brand colors: Obsidian `#0A0A0A`, Gold `#D4AF37`, Ivory `#F5F5F0`
 - UI tone: confident, direct, "kamu" (not "Anda" or "lo")

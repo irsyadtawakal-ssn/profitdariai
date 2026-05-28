@@ -1,6 +1,6 @@
 # profitdariai — Build Plan
 
-## Status: Week 8 Polish & Launch (Next Up)
+## Status: Week 8 Polish & Launch (In Progress)
 
 ---
 
@@ -57,10 +57,24 @@
 - [x] Admin dashboard dengan metrics (members, revenue, content count) — `src/app/(admin)/admin/dashboard/page.tsx`
 - [x] Member list (search, filter by status) — `src/app/(admin)/admin/members/page.tsx`
 - [x] CRUD kursus + modul — `src/app/(admin)/admin/kursus/`
-- [x] CRUD ebook (upload PDF ke Supabase Storage) — `src/app/(admin)/admin/ebook/`
+- [x] CRUD ebook — `src/app/(admin)/admin/ebook/`
+  - ~~Upload PDF ke Supabase Storage~~ → diganti Google Drive URL (anti size-limit)
+  - Auto-convert GDrive share link → direct download URL
 
 ## Week 8: Polish & Launch
 
+### Bug Fixes (Done)
+- [x] **Login error toast** — fix TypeError destrukturisasi `{ data: { user } }` saat `getUser()` return null
+  - Improved error handling: bedakan auth error, email belum verify, vs network error
+  - File: `src/components/auth/LoginForm.tsx`
+- [x] **Vercel env vars** — tambah semua env vars production (Supabase, Tripay, SMTP, App URL)
+- [x] **Ebook upload size limit** — validasi ukuran file (PDF max 50MB, cover max 5MB) + toast error
+- [x] **Ebook GDrive URL** — ganti upload Supabase Storage dengan input Google Drive URL
+  - Auto-convert share link → `drive.google.com/uc?export=download&id=...`
+  - Download API support dual mode: GDrive URL redirect langsung, Supabase Storage signed URL
+  - File: `src/app/(admin)/admin/ebook/EbookDialog.tsx`, `src/app/api/ebook/download/[id]/route.ts`
+
+### Remaining
 - [ ] QA & bug fixing end-to-end
 - [ ] Seed 10 kursus + 15 ebook konten
 - [ ] Email transactional final (payment success, renewal reminder)
