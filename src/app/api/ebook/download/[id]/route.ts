@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { isMembershipActive } from '@/lib/membership'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +28,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   if (!ebook) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const { data } = await supabase.storage
+  const adminClient = createAdminClient()
+  const { data } = await adminClient.storage
     .from('ebooks')
     .createSignedUrl(ebook.file_path, 60 * 60) // 1 hour
 
