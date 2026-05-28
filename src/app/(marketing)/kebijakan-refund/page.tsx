@@ -23,95 +23,74 @@ export default function KebijakanRefundPage() {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-6 py-12 space-y-10">
 
-        {/* Highlight box */}
-        <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/40 rounded-xl p-6">
+        {/* No Refund notice */}
+        <div className="bg-[#111111] border border-[#1a1a24] rounded-xl p-6">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">🛡️</span>
+            <span className="text-2xl">⚠️</span>
             <div>
-              <p className="text-[#D4AF37] font-bold text-lg mb-1">Jaminan Kepuasan 7 Hari</p>
+              <p className="text-[#F5F5F0] font-bold text-lg mb-2">Tidak Ada Pengembalian Dana</p>
               <p className="text-[#94a3b8] leading-relaxed">
-                Kami memberikan jaminan kepuasan selama <strong className="text-[#F5F5F0]">7 hari kalender</strong> sejak
-                tanggal pembelian. Jika kamu tidak puas dengan konten kami, ajukan permintaan refund
-                melalui halaman kontak kami dan kami akan memproses pengembalian dana sepenuhnya.
+                Semua pembelian di platform Profit Dari AI bersifat <strong className="text-[#F5F5F0]">final dan tidak dapat dikembalikan</strong>.
+                Dengan melakukan pembelian, kamu menyetujui kebijakan ini sepenuhnya.
               </p>
             </div>
           </div>
         </div>
 
         <section>
-          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">1. Syarat Pengajuan Refund</h2>
+          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">1. Alasan Kebijakan Ini</h2>
           <p className="text-[#94a3b8] leading-relaxed mb-3">
-            Refund dapat diajukan jika memenuhi seluruh syarat berikut:
+            Profit Dari AI menyediakan produk digital berupa kursus video, ebook, dan konten edukatif yang
+            dapat diakses secara langsung setelah pembayaran berhasil dikonfirmasi. Karena sifat produk digital
+            yang tidak dapat &quot;dikembalikan&quot; layaknya barang fisik, kami menerapkan kebijakan
+            <strong className="text-[#F5F5F0]"> tanpa pengembalian dana</strong>.
           </p>
-          <ul className="text-[#94a3b8] leading-relaxed space-y-2 list-disc list-inside">
-            <li>Permintaan diajukan dalam <strong className="text-[#F5F5F0]">7 hari kalender</strong> sejak tanggal transaksi berhasil.</li>
-            <li>Memberikan alasan yang jelas mengapa kamu merasa tidak puas dengan layanan.</li>
-            <li>Akun belum mengakses lebih dari 30% total konten yang tersedia di platform.</li>
-            <li>Transaksi dilakukan secara langsung melalui platform <strong className="text-[#F5F5F0]">profitdariai.com</strong>.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">2. Cara Mengajukan Refund</h2>
-          <ol className="text-[#94a3b8] leading-relaxed space-y-3 list-decimal list-inside">
-            <li>
-              Hubungi kami melalui halaman{' '}
-              <Link href="/kontak" className="text-[#D4AF37] hover:underline">Kontak Support</Link>{' '}
-              atau email ke <strong className="text-[#F5F5F0]">support@profitdariai.com</strong>.
-            </li>
-            <li>Sertakan <strong className="text-[#F5F5F0]">nama lengkap, email akun, nomor referensi transaksi</strong>, dan alasan pengajuan refund.</li>
-            <li>Tim kami akan merespons dalam <strong className="text-[#F5F5F0]">1x24 jam kerja</strong> untuk memverifikasi permintaanmu.</li>
-            <li>Setelah verifikasi disetujui, refund akan diproses dalam <strong className="text-[#F5F5F0]">3-7 hari kerja</strong> ke metode pembayaran asal.</li>
-          </ol>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">3. Kasus yang Tidak Dapat Direfund</h2>
-          <ul className="text-[#94a3b8] leading-relaxed space-y-2 list-disc list-inside">
-            <li>Permintaan diajukan setelah periode 7 hari berakhir.</li>
-            <li>Akun telah mengakses lebih dari 30% konten platform.</li>
-            <li>Terdapat indikasi penyalahgunaan kebijakan refund (pengajuan berulang).</li>
-            <li>Pembayaran dilakukan melalui pihak ketiga yang tidak resmi.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">4. Proses Pengembalian Dana</h2>
-          <p className="text-[#94a3b8] leading-relaxed mb-3">
-            Dana dikembalikan melalui metode pembayaran yang digunakan saat transaksi:
-          </p>
-          <div className="bg-[#111111] border border-[#1a1a24] rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-[#1a1a24]">
-                <tr>
-                  <th className="px-4 py-3 text-left text-[#D4AF37] font-semibold">Metode Pembayaran</th>
-                  <th className="px-4 py-3 text-left text-[#D4AF37] font-semibold">Estimasi Waktu</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#1a1a24]">
-                <tr>
-                  <td className="px-4 py-3 text-[#94a3b8]">QRIS / E-Wallet (OVO, Dana, ShopeePay)</td>
-                  <td className="px-4 py-3 text-[#94a3b8]">1–3 hari kerja</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-[#94a3b8]">Virtual Account (BCA, Mandiri, BNI, BRI)</td>
-                  <td className="px-4 py-3 text-[#94a3b8]">3–7 hari kerja</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p className="text-[#555555] text-xs mt-3">
-            * Waktu pemrosesan dapat bervariasi tergantung kebijakan bank/penyedia e-wallet masing-masing.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">5. Pertanyaan</h2>
           <p className="text-[#94a3b8] leading-relaxed">
-            Jika ada pertanyaan seputar kebijakan refund, jangan ragu menghubungi kami melalui halaman{' '}
-            <Link href="/kontak" className="text-[#D4AF37] hover:underline">Kontak Support</Link>{' '}
-            atau email ke <strong className="text-[#F5F5F0]">support@profitdariai.com</strong>.
-            Tim kami siap membantu kamu.
+            Begitu akses diberikan, konten dapat langsung dinikmati, diunduh, dan digunakan — sehingga
+            tidak dimungkinkan adanya pengembalian seperti pada produk fisik.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">2. Yang Termasuk dalam Pembelian</h2>
+          <p className="text-[#94a3b8] leading-relaxed mb-3">
+            Sebelum melakukan pembelian, pastikan kamu sudah memahami bahwa membership mencakup:
+          </p>
+          <ul className="text-[#94a3b8] leading-relaxed space-y-2 list-disc list-inside">
+            <li>Akses ke semua kursus video AI yang tersedia dan yang akan ditambahkan.</li>
+            <li>Akses ke semua ebook eksklusif dan template.</li>
+            <li>Konten baru yang terus diperbarui setiap bulan.</li>
+            <li>Sekali bayar, tanpa biaya tambahan di kemudian hari.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">3. Pertimbangkan Sebelum Membeli</h2>
+          <p className="text-[#94a3b8] leading-relaxed mb-3">
+            Kami sangat menyarankan kamu untuk:
+          </p>
+          <ul className="text-[#94a3b8] leading-relaxed space-y-2 list-disc list-inside">
+            <li>Membaca deskripsi lengkap konten yang tersedia di halaman utama.</li>
+            <li>Memastikan kamu memahami bahwa ini adalah produk digital.</li>
+            <li>Menghubungi tim kami melalui halaman <Link href="/kontak" className="text-[#D4AF37] hover:underline">Kontak Support</Link> jika ada pertanyaan sebelum membeli.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">4. Masalah Teknis</h2>
+          <p className="text-[#94a3b8] leading-relaxed">
+            Jika kamu mengalami masalah teknis seperti tidak bisa mengakses akun setelah pembayaran berhasil,
+            silakan hubungi tim support kami segera melalui halaman{' '}
+            <Link href="/kontak" className="text-[#D4AF37] hover:underline">Kontak Support</Link>.
+            Kami akan membantu menyelesaikan masalah akses secepatnya.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-[#D4AF37] mb-3">5. Hubungi Kami</h2>
+          <p className="text-[#94a3b8] leading-relaxed">
+            Pertanyaan seputar kebijakan ini dapat disampaikan sebelum melakukan pembelian melalui halaman{' '}
+            <Link href="/kontak" className="text-[#D4AF37] hover:underline">Kontak Support</Link> kami.
           </p>
         </section>
 
