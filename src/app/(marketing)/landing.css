@@ -211,7 +211,21 @@ h1, h2, h3, h4, h5, h6 { font-weight: 900; line-height: 1.05; text-transform: up
 
 .pricing { background: radial-gradient(rgba(255, 191, 0, 0.04) 1.5px, transparent 1.5px) 0 0 / 20px 20px, linear-gradient(180deg, var(--bg-card) 0%, var(--black) 100%); border-top: 2px solid var(--border); }
 .pricing-card { max-width: 520px; margin: 0 auto; background: #050508; border: 3px solid var(--gold); border-radius: 24px; padding: 60px 40px; text-align: center; position: relative; box-shadow: 0 0 35px rgba(255, 191, 0, 0.2); }
-.pricing-badge { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000000 !important; font-size: 11px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; padding: 8px 24px; border-radius: 0 0 12px 12px; border: 2px solid #000000; border-top: none; }
+.pricing-badge {
+  position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+  background: var(--gold);
+  color: #000000 !important;
+  font-size: 11px; font-weight: 900;
+  letter-spacing: .15em; text-transform: uppercase;
+  padding: 8px 24px;
+  border-radius: 0 0 12px 12px;
+  border: 2px solid #000000;
+  border-top: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
 .price-old { font-size: 20px; color: #6b7280; text-decoration: line-through; margin-top: 30px; font-weight: 700; }
 .price-new { font-size: 64px; font-weight: 900; color: #ffffff; line-height: 1; margin-top: 4px; text-shadow: 0 0 15px rgba(255,191,0,0.3); }
 .price-new small { font-size: 28px; color: var(--gold); }

@@ -292,23 +292,21 @@ export default function LandingPage() {
             <h2 style={{ marginBottom: 40 }}>Mulai Perjalananmu <span style={{ color: 'var(--gold)' }}>Sekarang</span></h2>
             <div className="pricing-card">
               <div className="pricing-badge">
-                <i data-lucide="flame" style={{ width: 12, height: 12, fill: 'currentColor', verticalAlign: 'middle', marginRight: 4 }} /> Paling Laris
+                <i data-lucide="flame" style={{ width: 12, height: 12, fill: 'currentColor' }} /> Paling Laris
               </div>
-              <h3 style={{ fontSize: 22, marginTop: 24 }}>Profit dari AI</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 8 }}>Akses penuh semua kursus, ebook & konten baru — selamanya</p>
+              <h3 style={{ fontSize: 22, marginTop: 24 }}>Profit Dari AI</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 8 }}>Akses penuh semua kursus & ebook</p>
               <div className="price-old">Rp 999.000</div>
               <div className="price-new"><small>Rp </small>199.000</div>
               <div className="price-note">Early Bird — Hanya untuk 100 member pertama!</div>
               <ul className="price-features">
                 {[
-                  'Akses penuh semua kursus AI (update terus)',
+                  'Akses penuh semua kursus AI',
                   'Semua ebook & template prompt eksklusif',
                   'Studi kasus nyata: dari nol ke Rp 74Jt',
                   'Framework konten viral + script TikTok',
                   'Panduan FB Ads untuk produk AI',
                   'Workflow buat ebook 100% AI',
-                  'Konten baru ditambahkan setiap bulan',
-                  'Sekali bayar, tanpa biaya bulanan',
                 ].map(f => (
                   <li key={f}>
                     <span className="check"><i data-lucide="check" style={{ width: 16, height: 16 }} /></span> {f}
