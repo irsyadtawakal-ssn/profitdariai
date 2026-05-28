@@ -26,7 +26,7 @@ export default async function CheckoutPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-[#F5F5F0] mb-2">Bergabung Sekarang</h1>
-          <p className="text-[#888888] text-sm">Akses penuh ke semua kursus & ebook — Rp 199.000 Lifetime</p>
+          <p className="text-[#888888] text-sm">Akses penuh ke semua kursus & ebook — Rp 199.000 (Sekali Bayar)</p>
         </div>
         <CheckoutForm />
       </div>

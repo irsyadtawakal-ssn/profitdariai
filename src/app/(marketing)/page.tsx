@@ -41,7 +41,7 @@ export default function LandingPage() {
         <div className="topbar">
           <span>
             <i data-lucide="zap" style={{ width: 14, height: 14, color: 'var(--gold)', fill: 'var(--gold)', verticalAlign: 'middle', marginRight: 4 }} />
-            {' '}<span className="blink">EARLY BIRD</span> — Akses Lifetime Rp 199K — Harga Naik Setelah 100 Member Pertama!
+            {' '}<span className="blink">EARLY BIRD</span> — Akses Penuh Rp 199K — Harga Naik Setelah 100 Member Pertama!
           </span>
         </div>
 
@@ -74,7 +74,7 @@ export default function LandingPage() {
               </a>
             </div>
             <p className="hero-bullets-center">
-              <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Akses lifetime</span>
+              <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Akses penuh</span>
               <span>·</span>
               <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Semua kursus & ebook</span>
               <span>·</span>
@@ -93,21 +93,21 @@ export default function LandingPage() {
           <div className="ticker-track">
             {[
               ['dollar-sign', 'TOTAL OMZET: RP 74.700.000'],
-              ['trending-up', 'LIFETIME ORDERS: 1.494'],
+              ['trending-up', 'TOTAL ORDERS: 1.494'],
               ['zap', 'HIGHEST CONVERSION: 20.53%'],
               ['book-open', '49 HALAMAN PANDUAN LENGKAP'],
               ['layers', '13 BAB STRATEGI PRAKTIS'],
               ['lightbulb', 'TEMPLATE PROMPT SIAP PAKAI'],
               ['eye', 'TOTAL VIEWS: 9.749 VIEWS'],
-              ['download', 'DOWNLOAD INSTAN & AKSES SEUMUR HIDUP'],
+              ['download', 'DOWNLOAD INSTAN & AKSES PENUH'],
               ['dollar-sign', 'TOTAL OMZET: RP 74.700.000'],
-              ['trending-up', 'LIFETIME ORDERS: 1.494'],
+              ['trending-up', 'TOTAL ORDERS: 1.494'],
               ['zap', 'HIGHEST CONVERSION: 20.53%'],
               ['book-open', '49 HALAMAN PANDUAN LENGKAP'],
               ['layers', '13 BAB STRATEGI PRAKTIS'],
               ['lightbulb', 'TEMPLATE PROMPT SIAP PAKAI'],
               ['eye', 'TOTAL VIEWS: 9.749 VIEWS'],
-              ['download', 'DOWNLOAD INSTAN & AKSES SEUMUR HIDUP'],
+              ['download', 'DOWNLOAD INSTAN & AKSES PENUH'],
             ].map(([icon, text], i) => (
               <div key={i} className="ticker-item">
                 <i data-lucide={icon} /> {text}
@@ -125,8 +125,8 @@ export default function LandingPage() {
             </div>
             <div className="proof-numbers">
               {[
-                ['74.7Jt', 'Total lifetime sales dalam IDR'],
-                ['1,494', 'Total lifetime orders'],
+                ['74.7Jt', 'Total penjualan dalam IDR'],
+                ['1,494', 'Total order sukses'],
                 ['20.53%', 'Konversi tertinggi (Gemini Ebook)'],
                 ['9,749', 'Total views dalam 1 bulan'],
               ].map(([big, desc]) => (
@@ -142,7 +142,7 @@ export default function LandingPage() {
                   <span className="dot dot-r" /><span className="dot dot-y" /><span className="dot dot-g" />
                   <span className="mockup-address">belajarpakai.ai/bukti-omzet</span>
                 </div>
-                <img className="mockup-img" src="https://belajarpakai.ai/wp-content/uploads/2026/05/ChatGPT-Image-May-21-2026-01_25_00-PM-1.png" alt="Lifetime Sales Chart Proof" loading="lazy" />
+                <img className="mockup-img" src="https://belajarpakai.ai/wp-content/uploads/2026/05/ChatGPT-Image-May-21-2026-01_25_00-PM-1.png" alt="Sales Chart Proof" loading="lazy" />
               </div>
               <div className="mockup-window">
                 <div className="mockup-header">
@@ -301,14 +301,14 @@ export default function LandingPage() {
               <div className="price-note">Early Bird — Hanya untuk 100 member pertama!</div>
               <ul className="price-features">
                 {[
-                  'Akses lifetime semua kursus AI (update terus)',
+                  'Akses penuh semua kursus AI (update terus)',
                   'Semua ebook & template prompt eksklusif',
                   'Studi kasus nyata: dari nol ke Rp 74Jt',
                   'Framework konten viral + script TikTok',
                   'Panduan FB Ads untuk produk AI',
                   'Workflow buat ebook 100% AI',
                   'Konten baru ditambahkan setiap bulan',
-                  'Sekali bayar, akses seumur hidup',
+                  'Sekali bayar, tanpa biaya bulanan',
                 ].map(f => (
                   <li key={f}>
                     <span className="check"><i data-lucide="check" style={{ width: 16, height: 16 }} /></span> {f}
@@ -316,7 +316,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <a href="/checkout" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 18, padding: '20px' }}>
-                🚀 Dapatkan Akses Lifetime — Rp 199.000
+                🚀 Dapatkan Akses Sekarang — Rp 199.000
               </a>
               <div className="guarantee">
                 <span className="shield"><i data-lucide="shield-check" style={{ width: 24, height: 24 }} /></span>
@@ -359,12 +359,12 @@ export default function LandingPage() {
           <h2>Siap Ubah Ilmu AI<br />Jadi <span style={{ color: 'var(--gold-light)' }}>Cuan Nyata?</span></h2>
           <p>Satu keputusan hari ini bisa mengubah segalanya. Bergabunglah dengan creator yang sudah membuktikan bahwa AI bisa menghasilkan pendapatan nyata — bukan sekadar wacana.</p>
           <a href="/checkout" className="btn-primary" style={{ fontSize: 18, padding: '20px 44px' }}>
-            🚀 Mulai Sekarang — Rp 199.000 Lifetime
+            🚀 Mulai Sekarang — Rp 199.000
           </a>
           <p style={{ fontSize: 13, color: 'var(--gold-light)', marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Akses langsung setelah bayar</span>
             <span>·</span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Lifetime — sekali bayar</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Sekali bayar — tanpa biaya bulanan</span>
             <span>·</span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Konten terus diupdate</span>
           </p>
