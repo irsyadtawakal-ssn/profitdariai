@@ -102,12 +102,18 @@
 
 ## Phase 2+: Migrasi ke Hostinger VPS
 
-> Lakukan setelah MVP stabil dan ada revenue. Shared hosting Hostinger tidak support Next.js.
+> Lakukan setelah MVP stabil dan ada revenue. Panduan lengkap: **`docs/vps-migration.md`**
 
-- [ ] Upgrade Hostinger ke VPS plan
-- [ ] Install Node.js, PM2, Nginx di VPS
-- [ ] Set up `output: 'standalone'` di `next.config.ts`
-- [ ] GitHub Actions CI/CD untuk auto-deploy ke VPS
-- [ ] Konfigurasi SSL (Let's Encrypt via Certbot)
-- [ ] Point DNS dari Vercel ke VPS IP
-- [ ] Smoke test semua routes (API, auth, webhook)
+- [ ] `next.config.ts` → tambah `output: 'standalone'`
+- [ ] Beli & setup VPS Hostinger (Ubuntu 22.04, min 1GB RAM)
+- [ ] Install Node.js 20 (nvm), pnpm, PM2, Nginx
+- [ ] Setup SSH key untuk GitHub Actions
+- [ ] Deploy manual pertama + PM2 ecosystem config
+- [ ] Nginx reverse proxy config
+- [ ] SSL via Certbot (Let's Encrypt)
+- [ ] GitHub Actions CI/CD (`deploy.yml`) — auto-deploy on push to main
+- [ ] Ganti Vercel Cron → system crontab untuk renewal-reminder
+- [ ] Update Tripay whitelist IP → IP statis VPS (solusi permanen)
+- [ ] Migrasi DNS (A record → IP VPS)
+- [ ] Smoke test checklist (lihat `docs/vps-migration.md` Fase 9)
+- [ ] Cleanup Vercel setelah stabil 1–2 minggu
