@@ -158,7 +158,9 @@ export type Database = {
       transactions: {
         Row: {
           id: string
-          user_id: string
+          user_id: string | null
+          customer_email: string | null
+          customer_name: string | null
           tripay_reference: string
           merchant_ref: string
           amount: number
@@ -172,7 +174,9 @@ export type Database = {
         }
         Insert: {
           id?: string
-          user_id: string
+          user_id?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
           tripay_reference: string
           merchant_ref: string
           amount: number
@@ -185,6 +189,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          user_id?: string | null
           status?: 'UNPAID' | 'PAID' | 'EXPIRED' | 'FAILED' | 'REFUND'
           paid_at?: string | null
           metadata?: Json | null
