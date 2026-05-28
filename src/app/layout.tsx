@@ -10,26 +10,26 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Cuan Dari AI',
-    template: '%s | Cuan Dari AI',
+    default: 'Profit Dari AI',
+    template: '%s | Profit Dari AI',
   },
   description:
     'Platform membership eksklusif untuk kursus & ebook monetisasi AI. Bergabung dengan ribuan member yang sudah cuan dari AI.',
   keywords: ['AI', 'kursus AI', 'ebook AI', 'monetisasi AI', 'side income', 'Indonesia'],
-  authors: [{ name: 'Cuan Dari AI' }],
+  authors: [{ name: 'Profit Dari AI' }],
   openGraph: {
     type: 'website',
     locale: 'id_ID',
     url: 'https://profitdariai.com',
-    siteName: 'Cuan Dari AI',
-    title: 'Cuan Dari AI',
+    siteName: 'Profit Dari AI',
+    title: 'Profit Dari AI',
     description:
       'Platform membership eksklusif untuk kursus & ebook monetisasi AI di Indonesia.',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cuan Dari AI',
+    title: 'Profit Dari AI',
     description: 'Platform membership eksklusif untuk kursus & ebook monetisasi AI di Indonesia.',
     images: ['/og-image.png'],
   },
