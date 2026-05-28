@@ -16,19 +16,29 @@ export function DownloadButton({ ebookId }: DownloadButtonProps) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/ebook/download/${ebookId}`, { redirect: 'follow' })
-      if (!res.ok) {
+      // Cek auth + membership dulu tanpa follow redirect ke GDrive (hindari CORS)
+      const res = await fetch(`/api/ebook/download/${ebookId}`, {
+        redirect: 'manual', // jangan follow redirect — kita hanya mau cek statusnya
+      })
+
+      // opaque response (status 0) = redirect berhasil → artinya user authorized
+      // status 401/403 = unauthorized / no membership
+      if (res.status === 401) {
+        setError('Kamu harus login untuk mengunduh.')
+        return
+      }
+      if (res.status === 403) {
+        setError('Membership diperlukan untuk mengunduh ebook ini.')
+        return
+      }
+      if (res.status !== 0 && !res.ok) {
         const data = await res.json().catch(() => ({}))
         setError(data.error ?? 'Gagal mengunduh, coba lagi.')
         return
       }
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'ebook.pdf'
-      a.click()
-      URL.revokeObjectURL(url)
+
+      // Authorized → buka URL download di tab baru (browser handle redirect ke GDrive)
+      window.open(`/api/ebook/download/${ebookId}`, '_blank')
     } catch {
       setError('Gagal mengunduh, coba lagi.')
     } finally {
