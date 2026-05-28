@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { MEMBERSHIP_PRICE } from '@/types'
+import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
 
 const PAYMENT_METHODS = [
   { code: 'QRIS', label: 'QRIS (Semua e-wallet & m-banking)', group: 'qris' },
@@ -51,7 +51,7 @@ export function CheckoutForm() {
     }
   }
 
-  const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(MEMBERSHIP_PRICE)
+  const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(MEMBERSHIP_EARLY_BIRD_PRICE)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">

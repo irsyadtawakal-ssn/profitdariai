@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
 import { createSignature, createTransaction } from '@/lib/tripay/client'
 import { generateMerchantRef } from '@/lib/utils'
-import { MEMBERSHIP_PRICE } from '@/types'
+import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
 
 export async function POST(request: Request) {
   const { paymentMethod, email, fullName } = await request.json()
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     ? generateMerchantRef(user.id)
     : `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-  const amount = MEMBERSHIP_PRICE
+  const amount = MEMBERSHIP_EARLY_BIRD_PRICE
   const signature = createSignature(merchantRef, amount)
 
   const result = await createTransaction({
