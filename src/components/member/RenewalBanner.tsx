@@ -12,11 +12,11 @@ interface RenewalBannerProps {
 }
 
 export function RenewalBanner({ expiresAt }: RenewalBannerProps) {
-  const [dismissed, setDismissed] = useState(true)
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    if (sessionStorage.getItem(DISMISSED_KEY) !== 'true') {
-      setDismissed(false)
+    if (sessionStorage.getItem(DISMISSED_KEY) === 'true') {
+      setDismissed(true)
     }
   }, [])
 

@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { isMembershipActive } from '@/lib/membership'
 import { CourseCard } from '@/components/member/CourseCard'
 import { EbookCard } from '@/components/member/EbookCard'
+import { RenewalBanner } from '@/components/member/RenewalBanner'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
@@ -41,6 +42,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+      {profile?.membership_expires_at && <RenewalBanner expiresAt={profile.membership_expires_at} />}
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#F5F5F0] mb-1">
           Halo, {profile?.full_name ?? 'Member'}!
