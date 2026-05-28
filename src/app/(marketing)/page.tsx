@@ -374,9 +374,13 @@ export default function LandingPage() {
         {/* FOOTER */}
         <footer>
           <div>© 2026 Profit dari AI — Hak cipta dilindungi undang-undang.</div>
-          <div style={{ display: 'flex', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href="/login" style={{ color: 'inherit' }}>Masuk</a>
             <a href="/checkout" style={{ color: 'inherit' }}>Daftar</a>
+            <a href="/ketentuan-layanan" style={{ color: 'inherit' }}>Ketentuan Layanan</a>
+            <a href="/kebijakan-privasi" style={{ color: 'inherit' }}>Kebijakan Privasi</a>
+            <a href="/kebijakan-refund" style={{ color: 'inherit' }}>Kebijakan Refund</a>
+            <a href="/kontak" style={{ color: 'inherit' }}>Kontak</a>
           </div>
         </footer>
       </div>
