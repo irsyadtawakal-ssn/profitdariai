@@ -9,6 +9,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 import { createEbook, updateEbook } from './actions'
+import { toast } from 'sonner'
+
+const MAX_PDF_SIZE_MB = 50
+const MAX_COVER_SIZE_MB = 5
 
 interface Ebook {
   id: string
@@ -54,6 +58,14 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
   async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    const sizeMB = file.size / (1024 * 1024)
+    if (sizeMB > MAX_COVER_SIZE_MB) {
+      toast.error(`Cover terlalu besar (${sizeMB.toFixed(1)} MB). Maksimal ${MAX_COVER_SIZE_MB} MB.`)
+      e.target.value = ''
+      return
+    }
+
     setUploadingCover(true)
     try {
       const supabase = createClient()
@@ -63,8 +75,10 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
       if (error) throw error
       const { data } = supabase.storage.from('image').getPublicUrl(path)
       setCoverUrl(data.publicUrl)
+      toast.success('Cover berhasil diupload!')
     } catch (err) {
       console.error('[EbookDialog cover upload]', err)
+      toast.error('Gagal mengupload cover. Coba lagi.')
     } finally {
       setUploadingCover(false)
     }
@@ -78,6 +92,14 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    const sizeMB = file.size / (1024 * 1024)
+    if (sizeMB > MAX_PDF_SIZE_MB) {
+      toast.error(`File PDF terlalu besar (${sizeMB.toFixed(1)} MB). Maksimal ${MAX_PDF_SIZE_MB} MB.`)
+      e.target.value = ''
+      return
+    }
+
     setUploading(true)
     try {
       const supabase = createClient()
@@ -85,8 +107,16 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
       const baseName = file.name.replace(`.${ext}`, '')
       const path = `${Date.now()}-${slugify(baseName)}.${ext}`
       const { error } = await supabase.storage.from('ebooks').upload(path, file, { upsert: false })
-      if (error) throw error
+      if (error) {
+        if (error.message?.toLowerCase().includes('size')) {
+          toast.error(`File ditolak server: ukuran melebihi batas yang diizinkan.`)
+        } else {
+          toast.error(`Gagal mengupload PDF: ${error.message}`)
+        }
+        throw error
+      }
       setFilePath(path)
+      toast.success('PDF berhasil diupload!')
     } catch (err) {
       console.error('[EbookDialog upload]', err)
     } finally {
