@@ -49,7 +49,7 @@ export function CheckoutForm() {
       <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-6">
         <h2 className="text-[#F5F5F0] font-semibold mb-1">Ringkasan Pesanan</h2>
         <div className="flex justify-between items-center mt-3">
-          <span className="text-[#888888] text-sm">profitdariai Membership 1 Tahun</span>
+          <span className="text-[#888888] text-sm">profitdariai Membership Lifetime</span>
           <span className="text-[#D4AF37] font-bold">{formatted}</span>
         </div>
       </div>

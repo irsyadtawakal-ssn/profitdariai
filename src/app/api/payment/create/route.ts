@@ -25,8 +25,8 @@ export async function POST(request: Request) {
     customer_email: user.email!,
     order_items: [
       {
-        sku: 'PDA-MEMBERSHIP-1Y',
-        name: 'profitdariai Membership 1 Tahun',
+        sku: 'PDA-MEMBERSHIP-LIFETIME',
+        name: 'profitdariai Membership Lifetime',
         price: amount,
         quantity: 1,
       },
