@@ -19,7 +19,25 @@ export default function LandingPage() {
     }, { threshold: 0.12 })
     document.querySelectorAll('.fade-up').forEach(el => obs.observe(el))
 
-    return () => window.removeEventListener('scroll', handleScroll)
+    const faqItems = document.querySelectorAll('.faq-item')
+    const handleFaqClick = (item: Element) => () => {
+      const isOpen = item.classList.contains('open')
+      faqItems.forEach(fi => fi.classList.remove('open'))
+      if (!isOpen) item.classList.add('open')
+    }
+    const cleanups: (() => void)[] = []
+    faqItems.forEach(item => {
+      const q = item.querySelector('.faq-q')
+      if (!q) return
+      const handler = handleFaqClick(item)
+      q.addEventListener('click', handler)
+      cleanups.push(() => q.removeEventListener('click', handler))
+    })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      cleanups.forEach(fn => fn())
+    }
   }, [])
 
   return (
@@ -341,7 +359,10 @@ export default function LandingPage() {
                 ['Apakah harga bisa naik?', 'Ya. Harga Rp 199.000 adalah harga early bird untuk 100 member pertama. Setelah kuota penuh, harga akan naik. Daftar sekarang untuk kunci harga terbaik.'],
               ].map(([q, a]) => (
                 <div key={q} className="faq-item">
-                  <div className="faq-q">{q}</div>
+                  <div className="faq-q">
+                    {q}
+                    <i data-lucide="chevron-down" style={{ width: 18, height: 18, color: 'var(--gold)', flexShrink: 0, transition: 'transform 200ms' }} />
+                  </div>
                   <div className="faq-a">{a}</div>
                 </div>
               ))}

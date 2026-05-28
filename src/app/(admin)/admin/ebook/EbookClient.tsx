@@ -39,7 +39,7 @@ export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
       <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1A1A1A]">
+            <tr className="border-b border-[#222222]">
               {['Judul', 'Kategori', 'Hal.', 'Status', 'Aksi'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
@@ -47,7 +47,7 @@ export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
           </thead>
           <tbody>
             {ebooks.map((e) => (
-              <tr key={e.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+              <tr key={e.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
                 <td className="px-4 py-3 text-[#F5F5F0] font-medium">{e.title}</td>
                 <td className="px-4 py-3 text-[#888888]">{e.category}</td>
                 <td className="px-4 py-3 text-[#888888]">{e.page_count ?? '—'}</td>

@@ -47,7 +47,7 @@ export function KursusClient({ courses }: { courses: Course[] }) {
       <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1A1A1A]">
+            <tr className="border-b border-[#222222]">
               {['Judul', 'Kategori', 'Modul', 'Status', 'Aksi'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
@@ -55,7 +55,7 @@ export function KursusClient({ courses }: { courses: Course[] }) {
           </thead>
           <tbody>
             {courses.map((c) => (
-              <tr key={c.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+              <tr key={c.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
                 <td className="px-4 py-3 text-[#F5F5F0] font-medium">{c.title}</td>
                 <td className="px-4 py-3 text-[#888888]">{c.category}</td>
                 <td className="px-4 py-3 text-[#888888]">{c.moduleCount}</td>

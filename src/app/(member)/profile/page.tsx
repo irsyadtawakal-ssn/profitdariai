@@ -80,7 +80,7 @@ export default async function ProfilePage() {
           <h2 className="text-[#F5F5F0] font-semibold mb-4">Riwayat Transaksi</h2>
           <div className="flex flex-col gap-3">
             {transactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between py-2 border-b border-[#1A1A1A] last:border-0">
+              <div key={tx.id} className="flex items-center justify-between py-2 border-b border-[#222222] last:border-0">
                 <div>
                   <p className="text-[#F5F5F0] text-sm font-medium">
                     {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(tx.amount)}

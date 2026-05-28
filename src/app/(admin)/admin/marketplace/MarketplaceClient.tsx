@@ -49,7 +49,7 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
       <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1A1A1A]">
+            <tr className="border-b border-[#222222]">
               {['Produk', 'Kategori', 'Harga', 'Status', 'Aksi'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
@@ -57,7 +57,7 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+              <tr key={p.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
                 <td className="px-4 py-3 text-[#F5F5F0] font-medium">{p.title}</td>
                 <td className="px-4 py-3 text-[#888888]">{p.category}</td>
                 <td className="px-4 py-3">

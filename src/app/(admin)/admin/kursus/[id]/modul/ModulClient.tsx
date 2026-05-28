@@ -51,7 +51,7 @@ export function ModulClient({ courseId, courseTitle, modules }: {
       <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1A1A1A]">
+            <tr className="border-b border-[#222222]">
               {['#', 'Judul', 'Video URL', 'Durasi', 'Aksi'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
@@ -59,7 +59,7 @@ export function ModulClient({ courseId, courseTitle, modules }: {
           </thead>
           <tbody>
             {modules.map((m, i) => (
-              <tr key={m.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+              <tr key={m.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
                 <td className="px-4 py-3 text-[#555555] font-mono text-xs">{i + 1}</td>
                 <td className="px-4 py-3 text-[#F5F5F0]">{m.title}</td>
                 <td className="px-4 py-3 text-[#888888] max-w-xs truncate">{m.video_url}</td>

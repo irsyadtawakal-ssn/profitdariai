@@ -61,7 +61,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
       <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1A1A1A]">
+            <tr className="border-b border-[#222222]">
               {['Nama', 'Email', 'Status', 'Expires', 'Join'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
@@ -71,7 +71,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
             {members?.map((m) => {
               const isActive = !!m.membership_expires_at && new Date(m.membership_expires_at) > new Date()
               return (
-                <tr key={m.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+                <tr key={m.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
                   <td className="px-4 py-3 text-[#F5F5F0]">{m.full_name ?? '—'}</td>
                   <td className="px-4 py-3 text-[#888888]">{m.email}</td>
                   <td className="px-4 py-3">
