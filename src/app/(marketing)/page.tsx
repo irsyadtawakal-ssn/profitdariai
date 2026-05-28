@@ -66,7 +66,7 @@ export default function LandingPage() {
             </h1>
             <p className="sub-center">Buat sekali, jual berkali-kali, cuan mengalir. Panduan langkah-demi-langkah dari nol hingga punya penghasilan pasif nyata dengan bantuan AI — tanpa skill teknis, tanpa modal besar.</p>
             <div className="hero-btns-center">
-              <a href="/signup" className="btn-primary">
+              <a href="/member/checkout" className="btn-primary">
                 <i data-lucide="sparkles" style={{ width: 18, height: 18 }} /> Ya, Saya Mau Mulai Sekarang!
               </a>
             </div>
@@ -312,7 +312,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <a href="/signup" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 18, padding: '20px' }}>
+              <a href="/member/checkout" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 18, padding: '20px' }}>
                 🚀 Dapatkan Akses Lifetime — Rp 199.000
               </a>
               <div className="guarantee">
@@ -355,7 +355,7 @@ export default function LandingPage() {
           </div>
           <h2>Siap Ubah Ilmu AI<br />Jadi <span style={{ color: 'var(--gold-light)' }}>Cuan Nyata?</span></h2>
           <p>Satu keputusan hari ini bisa mengubah segalanya. Bergabunglah dengan creator yang sudah membuktikan bahwa AI bisa menghasilkan pendapatan nyata — bukan sekadar wacana.</p>
-          <a href="/signup" className="btn-primary" style={{ fontSize: 18, padding: '20px 44px' }}>
+          <a href="/member/checkout" className="btn-primary" style={{ fontSize: 18, padding: '20px 44px' }}>
             🚀 Mulai Sekarang — Rp 199.000 Lifetime
           </a>
           <p style={{ fontSize: 13, color: 'var(--gold-light)', marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -375,7 +375,7 @@ export default function LandingPage() {
           <div>© 2026 Profit dari AI — Hak cipta dilindungi undang-undang.</div>
           <div style={{ display: 'flex', gap: 16 }}>
             <a href="/login" style={{ color: 'inherit' }}>Masuk</a>
-            <a href="/signup" style={{ color: 'inherit' }}>Daftar</a>
+            <a href="/member/checkout" style={{ color: 'inherit' }}>Daftar</a>
           </div>
         </footer>
       </div>
