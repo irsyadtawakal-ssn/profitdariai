@@ -294,7 +294,7 @@ export default function LandingPage() {
               <div className="pricing-badge">
                 <i data-lucide="flame" style={{ width: 12, height: 12, fill: 'currentColor', verticalAlign: 'middle', marginRight: 4 }} /> Paling Laris
               </div>
-              <h3 style={{ fontSize: 22, marginTop: 24 }}>Membership Lifetime — Profit dari AI</h3>
+              <h3 style={{ fontSize: 22, marginTop: 24 }}>Profit dari AI</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 8 }}>Akses penuh semua kursus, ebook & konten baru — selamanya</p>
               <div className="price-old">Rp 999.000</div>
               <div className="price-new"><small>Rp </small>199.000</div>
