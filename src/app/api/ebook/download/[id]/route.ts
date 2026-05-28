@@ -24,6 +24,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .from('ebooks')
     .select('file_path, title')
     .eq('id', id)
+    .eq('is_published', true)
     .single()
 
   if (!ebook) return NextResponse.json({ error: 'Not found' }, { status: 404 })

@@ -73,13 +73,12 @@ export async function POST(request: Request) {
     const email = tx.customer_email || ''
     const fullName = tx.customer_name || 'Member'
 
-    // If guest checkout (no user_id), create account
+    // If guest checkout (no user_id), create or find account
     if (!userId && email) {
       try {
         // Generate temporary password (CSPRNG — user is directed to reset-password flow)
         const tempPassword = crypto.randomBytes(16).toString('hex')
 
-        // Create auth user with temporary password
         const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
           email,
           password: tempPassword,
@@ -88,13 +87,19 @@ export async function POST(request: Request) {
         })
 
         if (authError) {
-          throw new Error(`Failed to create user: ${authError.message}`)
-        }
-
-        if (authUser?.user) {
+          // Email may already exist — look up the existing user and link them
+          const { data: existingUsers } = await supabase.auth.admin.listUsers()
+          const existingUser = existingUsers?.users?.find((u) => u.email === email)
+          if (existingUser) {
+            userId = existingUser.id
+            console.log(`[webhook] Linked existing user ${userId} to guest transaction ${tx.id}`)
+          } else {
+            // Truly failed — log prominently so admin can manually fix
+            console.error(`[webhook] CRITICAL: Cannot create or find account for ${email} ref=${reference}. Manual intervention required.`)
+          }
+        } else if (authUser?.user) {
           userId = authUser.user.id
 
-          // Create profile with lifetime membership
           await supabase.from('profiles').insert({
             id: userId,
             email,
@@ -109,11 +114,25 @@ export async function POST(request: Request) {
             .update({ user_id: userId })
             .eq('id', tx.id)
 
-          // Send welcome email with password setup instructions
+          await sendGuestWelcomeEmail(email, fullName)
+        }
+
+        // Grant membership to linked existing user (account already existed)
+        if (userId && authError) {
+          await supabase
+            .from('profiles')
+            .update({ membership_expires_at: MEMBERSHIP_LIFETIME_EXPIRY })
+            .eq('id', userId)
+
+          await supabase
+            .from('transactions')
+            .update({ user_id: userId })
+            .eq('id', tx.id)
+
           await sendGuestWelcomeEmail(email, fullName)
         }
       } catch (error) {
-        console.error('Failed to create guest account:', error)
+        console.error('[webhook] CRITICAL: Guest account creation threw:', error)
       }
     } else if (userId) {
       // Existing user - update membership and send confirmation
