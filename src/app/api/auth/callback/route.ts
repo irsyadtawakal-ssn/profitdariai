@@ -10,8 +10,9 @@ export async function GET(request: Request) {
     const supabase = await createServerClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // If next is explicitly provided, respect it
-      if (next) return NextResponse.redirect(`${origin}${next}`)
+      // Validate next is a safe relative path (not //evil.com or external URL)
+      const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null
+      if (safeNext) return NextResponse.redirect(`${origin}${safeNext}`)
 
       // Otherwise redirect based on role
       const { data: { user } } = await supabase.auth.getUser()

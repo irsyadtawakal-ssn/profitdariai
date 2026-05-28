@@ -5,13 +5,25 @@ import { generateMerchantRef } from '@/lib/utils'
 import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
 
 export async function POST(request: Request) {
-  const { paymentMethod, email, fullName } = await request.json()
+  const body = await request.json()
+  const { paymentMethod, email, fullName } = body
 
   if (!paymentMethod || !email || !fullName) {
     return NextResponse.json(
       { error: 'paymentMethod, email, dan fullName wajib diisi' },
       { status: 400 }
     )
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    return NextResponse.json({ error: 'Format email tidak valid' }, { status: 400 })
+  }
+
+  // Validate fullName length
+  if (typeof fullName !== 'string' || fullName.trim().length < 2 || fullName.length > 100) {
+    return NextResponse.json({ error: 'Nama tidak valid' }, { status: 400 })
   }
 
   const supabase = await createServerClient()

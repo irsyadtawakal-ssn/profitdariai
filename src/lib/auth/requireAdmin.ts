@@ -5,11 +5,11 @@ export async function requireAdmin(): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
-  if (profile?.role !== 'admin') throw new Error('Forbidden')
+  if (error || profile?.role !== 'admin') throw new Error('Forbidden')
 }
