@@ -25,10 +25,13 @@ export function MemberBottomNav() {
           <Link
             key={href}
             href={href}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
+            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors relative ${
               active ? 'text-[#D4AF37]' : 'text-[#F5F5F0]/50 hover:text-[#F5F5F0]'
             }`}
           >
+            {active && (
+              <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#D4AF37] rounded-full" />
+            )}
             <Icon size={20} />
             {label}
           </Link>
