@@ -28,7 +28,7 @@ export default function KontakPage() {
 
           {/* WhatsApp */}
           <a
-            href="https://wa.me/6281234567890"
+            href="https://wa.me/628212638792"
             target="_blank"
             rel="noopener noreferrer"
             className="group bg-[#111111] border border-[#1a1a24] rounded-xl p-6 hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/5 transition-all"
@@ -41,13 +41,13 @@ export default function KontakPage() {
 
           {/* Email */}
           <a
-            href="mailto:support@profitdariai.com"
+            href="mailto:adimin@profitdariai.com"
             className="group bg-[#111111] border border-[#1a1a24] rounded-xl p-6 hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/5 transition-all"
           >
             <div className="text-3xl mb-3">📧</div>
             <h2 className="text-[#F5F5F0] font-bold text-lg mb-1 group-hover:text-[#D4AF37] transition-colors">Email</h2>
             <p className="text-[#94a3b8] text-sm mb-3">Untuk pertanyaan detail, pengajuan refund, atau laporan masalah akun.</p>
-            <span className="text-[#D4AF37] text-sm font-semibold">support@profitdariai.com</span>
+            <span className="text-[#D4AF37] text-sm font-semibold">adimin@profitdariai.com</span>
           </a>
 
         </div>
@@ -78,7 +78,7 @@ export default function KontakPage() {
           <p className="text-[#94a3b8] text-sm leading-relaxed">
             <strong className="text-[#D4AF37]">Estimasi waktu respons:</strong>{' '}
             WhatsApp biasanya direspons dalam 1–3 jam di jam kerja. Email biasanya direspons dalam 1x24 jam kerja.
-            Untuk pengajuan refund, sertakan nama, email akun, dan nomor referensi transaksi agar proses lebih cepat.
+            Untuk pertanyaan atau masalah akun, sertakan nama dan email akun kamu agar tim kami bisa membantu lebih cepat.
           </p>
         </div>
 
