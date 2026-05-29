@@ -198,7 +198,7 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
       const json = await res.json()
       if (res.ok && json.data) {
         // Ambil customer fee langsung dari Tripay response
-        setAdminFee(json.data.total_fee.customer)
+        setAdminFee(json.data?.total_fee?.customer ?? 0)
       }
     } catch {
       setAdminFee(null)

@@ -16,5 +16,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Gagal mengambil biaya admin' }, { status: 400 })
   }
 
-  return NextResponse.json({ data: result.data })
+  const feeData = Array.isArray(result.data) ? result.data[0] : result.data
+  return NextResponse.json({ data: feeData })
 }

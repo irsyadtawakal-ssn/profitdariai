@@ -38,8 +38,9 @@ export async function POST(request: Request) {
 
   // Hitung total dengan biaya admin dari Tripay
   const feeRes = await getFeeCalculator(paymentMethod, baseAmount)
-  const totalAmount = feeRes.success
-    ? calculateTotal(baseAmount, feeRes.data)
+  const feeData = feeRes.success && Array.isArray(feeRes.data) ? feeRes.data[0] : null
+  const totalAmount = feeData
+    ? calculateTotal(baseAmount, feeData)
     : baseAmount
 
   const signature = createSignature(merchantRef, totalAmount)

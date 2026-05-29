@@ -62,7 +62,7 @@ export interface TripayFeeData {
 export async function getFeeCalculator(
   code: string,
   amount: number
-): Promise<{ success: boolean; data: TripayFeeData }> {
+): Promise<{ success: boolean; data: TripayFeeData[] }> {
   const params = new URLSearchParams({ code, amount: String(amount) })
   const res = await fetch(`${getBaseUrl()}/merchant/fee-calculator?${params}`, {
     headers: getHeaders(),
@@ -73,12 +73,12 @@ export async function getFeeCalculator(
 
 /** Hitung total yang harus dibayar customer (base + fee customer dari Tripay) */
 export function calculateTotal(amount: number, fee: TripayFeeData): number {
-  return amount + fee.total_fee.customer
+  return amount + (fee?.total_fee?.customer ?? 0)
 }
 
 /** Hitung nilai fee customer saja */
 export function calculateFee(amount: number, fee: TripayFeeData): number {
-  return fee.total_fee.customer
+  return fee?.total_fee?.customer ?? 0
 }
 
 export interface TripayCreatePayload {
