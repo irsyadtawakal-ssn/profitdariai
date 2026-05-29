@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
+import { Turnstile } from '@marsidev/react-turnstile'
 
 const loginSchema = z.object({
   email: z.string().email('Email tidak valid'),
@@ -26,6 +27,7 @@ export function LoginForm() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const {
     register,
@@ -41,6 +43,7 @@ export function LoginForm() {
       const { error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
+        options: captchaToken ? { captchaToken } : undefined,
       })
 
       if (error) {
@@ -128,6 +131,15 @@ export function LoginForm() {
           Lupa password?
         </Link>
       </div>
+
+      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+        <Turnstile
+          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+          onSuccess={setCaptchaToken}
+          onExpire={() => setCaptchaToken(null)}
+          options={{ theme: 'dark' }}
+        />
+      )}
 
       <Button type="submit" size="lg" loading={loading} className="w-full">
         Masuk
