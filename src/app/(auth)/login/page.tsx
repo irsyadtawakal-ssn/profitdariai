@@ -10,7 +10,7 @@ export default function LoginPage() {
     <div className="w-full max-w-sm mx-auto">
       <div className="text-center mb-8">
         <Logo size="lg" className="mb-6 inline-block" />
-        <h1 className="text-2xl font-bold text-[#F5F5F0] tracking-tight">
+        <h1 className="text-2xl font-bold text-[#F5F5F0] tracking-tight font-[family-name:var(--font-geist)]">
           Masuk ke akunmu
         </h1>
         <p className="mt-2 text-sm text-[#888888]">
