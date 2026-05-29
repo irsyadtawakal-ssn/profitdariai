@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
-import { createSignature, createTransaction } from '@/lib/tripay/client'
+import { createSignature, createTransaction, getFeeCalculator, calculateTotal } from '@/lib/tripay/client'
 import { generateMerchantRef } from '@/lib/utils'
 import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
 
@@ -34,20 +34,27 @@ export async function POST(request: Request) {
     ? generateMerchantRef(user.id)
     : `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-  const amount = MEMBERSHIP_EARLY_BIRD_PRICE
-  const signature = createSignature(merchantRef, amount)
+  const baseAmount = MEMBERSHIP_EARLY_BIRD_PRICE
+
+  // Hitung total dengan biaya admin dari Tripay
+  const feeRes = await getFeeCalculator(paymentMethod, baseAmount)
+  const totalAmount = feeRes.success
+    ? calculateTotal(baseAmount, feeRes.data)
+    : baseAmount
+
+  const signature = createSignature(merchantRef, totalAmount)
 
   const result = await createTransaction({
     method: paymentMethod,
     merchant_ref: merchantRef,
-    amount,
+    amount: totalAmount,
     customer_name: fullName,
     customer_email: email,
     order_items: [
       {
         sku: 'PDA-MEMBERSHIP-LIFETIME',
         name: 'profitdariai Membership',
-        price: amount,
+        price: baseAmount,
         quantity: 1,
       },
     ],
@@ -67,7 +74,7 @@ export async function POST(request: Request) {
     customer_name: fullName,
     tripay_reference: result.data.reference,
     merchant_ref: merchantRef,
-    amount,
+    amount: totalAmount,
     payment_method: paymentMethod,
     status: 'UNPAID',
     expires_at: new Date(result.data.expired_time * 1000).toISOString(),

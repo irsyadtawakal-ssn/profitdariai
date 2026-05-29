@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import Image from 'next/image'
 import { ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 
 type PaymentMethod = {
   code: string
@@ -181,9 +184,38 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
   const [selected, setSelected] = useState('QRIS')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [feeLoading, setFeeLoading] = useState(false)
+  const [adminFee, setAdminFee] = useState<number | null>(null)
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: { email: '', fullName: '' }
   })
+
+  const fetchFee = useCallback(async (code: string) => {
+    setFeeLoading(true)
+    setAdminFee(null)
+    try {
+      const res = await fetch(`/api/payment/fee?code=${code}`)
+      const json = await res.json()
+      if (res.ok && json.data) {
+        const { total_fee, minimum_fee, maximum_fee } = json.data
+        const base = MEMBERSHIP_EARLY_BIRD_PRICE
+        const pct = Math.ceil(base * (parseFloat(total_fee.percent) / 100))
+        const flat = total_fee.flat
+        let fee = pct + flat
+        if (minimum_fee) fee = Math.max(fee, minimum_fee)
+        if (maximum_fee) fee = Math.min(fee, maximum_fee)
+        setAdminFee(fee)
+      }
+    } catch {
+      setAdminFee(null)
+    } finally {
+      setFeeLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchFee(selected)
+  }, [selected, fetchFee])
 
   async function onSubmit(formData: { email: string; fullName: string }) {
     setLoading(true)
@@ -211,17 +243,34 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
     }
   }
 
-  const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(MEMBERSHIP_EARLY_BIRD_PRICE)
   const selectedMethod = PAYMENT_GROUPS.flatMap(g => g.methods).find(m => m.code === selected)
+  const base = MEMBERSHIP_EARLY_BIRD_PRICE
+  const total = adminFee !== null ? base + adminFee : base
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">
       {/* Order summary */}
       <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-4">
-        <h2 className="text-[#F5F5F0] font-semibold mb-1">Ringkasan Pesanan</h2>
-        <div className="flex justify-between items-center mt-3">
-          <span className="text-[#888888] text-sm">profitdariai Membership</span>
-          <span className="text-[#D4AF37] font-bold">{formatted}</span>
+        <h2 className="text-[#F5F5F0] font-semibold mb-3">Ringkasan Pesanan</h2>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <span className="text-[#888888] text-sm">profitdariai Membership</span>
+            <span className="text-[#F5F5F0] text-sm font-medium">{fmt(base)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[#888888] text-sm">Biaya Admin</span>
+            {feeLoading ? (
+              <span className="text-[#555555] text-xs">Menghitung...</span>
+            ) : adminFee !== null ? (
+              <span className="text-[#888888] text-sm">{adminFee === 0 ? 'Gratis' : fmt(adminFee)}</span>
+            ) : (
+              <span className="text-[#555555] text-xs">—</span>
+            )}
+          </div>
+          <div className="border-t border-[#222222] pt-2 mt-1 flex justify-between items-center">
+            <span className="text-[#F5F5F0] text-sm font-semibold">Total</span>
+            <span className="text-[#D4AF37] font-bold text-base">{fmt(total)}</span>
+          </div>
         </div>
       </div>
 
@@ -296,7 +345,7 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
             )}
           </div>
           <span className="text-[#F5F5F0] text-sm flex-1">{selectedMethod.label}</span>
-          <span className="text-[#D4AF37] font-bold text-sm">{formatted}</span>
+          <span className="text-[#D4AF37] font-bold text-sm">{fmt(total)}</span>
         </div>
       )}
 
