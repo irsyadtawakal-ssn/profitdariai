@@ -8,7 +8,7 @@ export default function PricingPage() {
           Satu Harga. Akses Penuh.
         </h1>
         <p className="text-[#888888] text-lg">
-          Semua kursus & ebook AI dalam satu membership tahunan.
+          Semua kursus & ebook AI — sekali bayar, akses selamanya.
         </p>
       </div>
 
@@ -18,9 +18,9 @@ export default function PricingPage() {
         </div>
 
         <div className="text-center mb-8">
-          <div className="text-[#888888] text-sm line-through mb-1">Rp 399.000/tahun</div>
-          <div className="text-5xl font-bold text-[#D4AF37]">Rp 299.000</div>
-          <div className="text-[#888888] text-sm mt-1">per tahun</div>
+          <div className="text-[#888888] text-sm line-through mb-1">Rp 399.000</div>
+          <div className="text-5xl font-bold text-[#D4AF37]">Rp 199.000</div>
+          <div className="text-[#888888] text-sm mt-1">Sekali Bayar</div>
         </div>
 
         <ul className="space-y-3 mb-8">
@@ -46,7 +46,7 @@ export default function PricingPage() {
         </Link>
 
         <p className="text-center text-[#555555] text-xs mt-4">
-          SSL Aman · 7 Hari Uang Kembali · Diproses via Tripay
+          SSL Aman · Diproses via Tripay
         </p>
       </div>
 

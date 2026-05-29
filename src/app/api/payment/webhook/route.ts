@@ -3,18 +3,8 @@ import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhookSignature, type TripayWebhookPayload } from '@/lib/tripay/webhook'
 import { sendPaymentSuccessEmail } from '@/lib/email/sender'
+import { transporter, MAIL_FROM } from '@/lib/email/mailer'
 import { MEMBERSHIP_LIFETIME_EXPIRY } from '@/types'
-import nodemailer from 'nodemailer'
-
-const mailer = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '465'),
-  secure: process.env.SMTP_PORT === '465',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-})
 
 export async function POST(request: Request) {
   const signature = request.headers.get('X-Callback-Signature') ?? ''
@@ -161,7 +151,7 @@ export async function POST(request: Request) {
 }
 
 async function sendGuestWelcomeEmail(email: string, name: string) {
-  const resetLink = `${process.env.NEXTAUTH_URL || 'https://profitdariai.com'}/auth/reset-password?email=${encodeURIComponent(email)}`
+  const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://profitdariai.com'}/reset-password?email=${encodeURIComponent(email)}`
 
   const html = `
 <!DOCTYPE html>
@@ -201,8 +191,8 @@ async function sendGuestWelcomeEmail(email: string, name: string) {
 </html>`
 
   try {
-    await mailer.sendMail({
-      from: process.env.SMTP_USER,
+    await transporter.sendMail({
+      from: MAIL_FROM,
       to: email,
       subject: '🔐 Set Password & Akses Membership Kamu — Profit dari AI',
       html,

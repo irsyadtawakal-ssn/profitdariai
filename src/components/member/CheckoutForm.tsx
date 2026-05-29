@@ -135,7 +135,7 @@ export function CheckoutForm() {
       </Button>
 
       <p className="text-[#888888] text-xs text-center mt-4">
-        🔒 SSL Aman · 7 Hari Uang Kembali · Diproses via Tripay
+        🔒 SSL Aman · Diproses via Tripay
       </p>
     </form>
   )
