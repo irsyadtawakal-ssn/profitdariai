@@ -197,14 +197,8 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
       const res = await fetch(`/api/payment/fee?code=${code}`)
       const json = await res.json()
       if (res.ok && json.data) {
-        const { total_fee, minimum_fee, maximum_fee } = json.data
-        const base = MEMBERSHIP_EARLY_BIRD_PRICE
-        const pct = Math.ceil(base * (parseFloat(total_fee.percent) / 100))
-        const flat = total_fee.flat
-        let fee = pct + flat
-        if (minimum_fee) fee = Math.max(fee, minimum_fee)
-        if (maximum_fee) fee = Math.min(fee, maximum_fee)
-        setAdminFee(fee)
+        // Ambil customer fee langsung dari Tripay response
+        setAdminFee(json.data.total_fee.customer)
       }
     } catch {
       setAdminFee(null)

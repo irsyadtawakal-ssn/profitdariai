@@ -53,13 +53,10 @@ export async function getPaymentChannels(): Promise<{ success: boolean; data: Tr
 }
 
 export interface TripayFeeData {
-  name: string
   code: string
-  fee_merchant: { flat: number; percent: string }
-  fee_customer: { flat: number; percent: string }
-  total_fee: { flat: number; percent: string }
-  minimum_fee: number
-  maximum_fee: number | null
+  name: string
+  fee: { flat: number; percent: string; min: number | null; max: number | null }
+  total_fee: { merchant: number; customer: number }
 }
 
 export async function getFeeCalculator(
@@ -74,19 +71,14 @@ export async function getFeeCalculator(
   return res.json()
 }
 
-/** Hitung total yang harus dibayar customer (base + fee customer) */
+/** Hitung total yang harus dibayar customer (base + fee customer dari Tripay) */
 export function calculateTotal(amount: number, fee: TripayFeeData): number {
-  const percentFee = Math.ceil(amount * (parseFloat(fee.total_fee.percent) / 100))
-  const flatFee = fee.total_fee.flat
-  const rawFee = percentFee + flatFee
-  const finalFee = fee.minimum_fee ? Math.max(rawFee, fee.minimum_fee) : rawFee
-  const capped = fee.maximum_fee ? Math.min(finalFee, fee.maximum_fee) : finalFee
-  return amount + capped
+  return amount + fee.total_fee.customer
 }
 
-/** Hitung nilai fee saja */
+/** Hitung nilai fee customer saja */
 export function calculateFee(amount: number, fee: TripayFeeData): number {
-  return calculateTotal(amount, fee) - amount
+  return fee.total_fee.customer
 }
 
 export interface TripayCreatePayload {
