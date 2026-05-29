@@ -1,6 +1,6 @@
 # profitdariai — Build Plan
 
-## Status: Week 8 — Security ✅ | QA & Launch Remaining
+## Status: Week 8 MVP ✅ | Phase 2 (VPS) In Progress
 
 ---
 
@@ -112,14 +112,14 @@
 
 > Lakukan setelah MVP stabil dan ada revenue. Panduan lengkap: **`docs/vps-migration.md`**
 
-- [ ] `next.config.ts` → tambah `output: 'standalone'`
+- [x] `next.config.ts` → tambah `output: 'standalone'` (commit 8e0a3f4)
 - [ ] Beli & setup VPS Hostinger (Ubuntu 22.04, min 1GB RAM)
 - [ ] Install Node.js 20 (nvm), pnpm, PM2, Nginx
 - [ ] Setup SSH key untuk GitHub Actions
-- [ ] Deploy manual pertama + PM2 ecosystem config
+- [x] Deploy manual pertama + PM2 ecosystem config (ecosystem.config.js created)
 - [ ] Nginx reverse proxy config
 - [ ] SSL via Certbot (Let's Encrypt)
-- [ ] GitHub Actions CI/CD (`deploy.yml`) — auto-deploy on push to main
+- [x] GitHub Actions CI/CD (`deploy.yml`) — auto-deploy on push to main (commit 8e0a3f4)
 - [ ] Ganti Vercel Cron → system crontab untuk renewal-reminder
 - [ ] Update Tripay whitelist IP → IP statis VPS (solusi permanen)
 - [ ] Migrasi DNS (A record → IP VPS)
