@@ -1,6 +1,6 @@
 # profitdariai — Build Plan
 
-## Status: Week 8 MVP ✅ | Phase 2 (VPS) In Progress
+## Status: MVP ✅ | VPS Live ✅ | Monitoring Period (target cleanup Vercel ~12 Jun 2026)
 
 ---
 
@@ -108,20 +108,24 @@
 - [ ] Soft launch (50 member)
 - [ ] Public launch (IG/TikTok ads)
 
-## Phase 2+: Migrasi ke Hostinger VPS
+## Phase 2+: Migrasi ke Hostinger VPS ✅ SELESAI (29 May 2026)
 
-> Lakukan setelah MVP stabil dan ada revenue. Panduan lengkap: **`docs/vps-migration.md`**
+> VPS: Biznet GIO NEO Lite SS 2.2 — IP `103.93.163.183` — Live: **https://profitdariai.com**
 
-- [x] `next.config.ts` → tambah `output: 'standalone'` (commit 8e0a3f4)
-- [ ] Beli & setup VPS Hostinger (Ubuntu 22.04, min 1GB RAM)
-- [ ] Install Node.js 20 (nvm), pnpm, PM2, Nginx
-- [ ] Setup SSH key untuk GitHub Actions
-- [x] Deploy manual pertama + PM2 ecosystem config (ecosystem.config.js created)
-- [ ] Nginx reverse proxy config
-- [ ] SSL via Certbot (Let's Encrypt)
-- [x] GitHub Actions CI/CD (`deploy.yml`) — auto-deploy on push to main (commit 8e0a3f4)
-- [ ] Ganti Vercel Cron → system crontab untuk renewal-reminder
-- [ ] Update Tripay whitelist IP → IP statis VPS (solusi permanen)
-- [ ] Migrasi DNS (A record → IP VPS)
-- [ ] Smoke test checklist (lihat `docs/vps-migration.md` Fase 9)
-- [ ] Cleanup Vercel setelah stabil 1–2 minggu
+- [x] `next.config.ts` → tambah `output: 'standalone'`
+- [x] Beli & setup VPS — Biznet GIO NEO Lite SS 2.2 (2 vCPU, 2GB RAM, 60GB SSD)
+- [x] Install Node.js 20 (nvm), pnpm, PM2, Nginx
+- [x] Setup SSH key untuk GitHub Actions
+- [x] Deploy manual pertama + PM2 ecosystem config (`ecosystem.config.js`)
+- [x] Nginx reverse proxy config (localhost:3000)
+- [x] SSL via Certbot (Let's Encrypt) — expires 2026-08-27, auto-renew ✅
+- [x] GitHub Actions CI/CD (`deploy.yml`) — auto-deploy on push to main
+- [x] Ganti Vercel Cron → system crontab untuk renewal-reminder
+- [x] Update Tripay whitelist IP → `103.93.163.183` (solusi permanen)
+- [x] Migrasi DNS (A record → IP VPS via Niagahoster)
+- [x] Smoke test checklist — landing, auth, member, admin, payment ✅
+- [ ] Cleanup Vercel setelah stabil 1–2 minggu (target: ~12 June 2026)
+
+### Bug Fixes VPS (29 May 2026)
+- [x] **CSS/JS tidak load** — rebuild setelah `.env.production` lengkap agar `NEXT_PUBLIC_*` ter-bake ke bundle
+- [x] **Payment 500 error** — fix Tripay `fee-calculator` mengembalikan array, bukan single object (`client.ts`, `fee/route.ts`, `CheckoutForm.tsx`)

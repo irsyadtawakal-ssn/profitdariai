@@ -1,15 +1,16 @@
 # Panduan Migrasi: Vercel → VPS
 
-> **Status:** ✅ **MIGRASI SELESAI (29 May 2026)**
+> **Status:** ✅ **MIGRASI SELESAI + PRODUCTION LIVE (29 May 2026)**
 > - VPS: Biznet GIO NEO Lite SS 2.2 (2 vCPU, 2GB RAM, 60GB SSD) @ IP `103.93.163.183`
-> - App: Live di `http://103.93.163.183` via Nginx + PM2 ✅
-> - Env Vars: `.env.local` loaded ✅
-> - GitHub Actions: Secrets configured ✅
-> - Tripay IP Whitelist: Updated ✅
-> - DNS: Pending propagation (TTL 300, ~1 jam)
-> - SSL: Pending DNS propagation → Certbot
-> 
-> **Next:** Tunggu DNS propagate (~30-60 min), lalu setup SSL dengan Certbot.
+> - App: Live di **https://profitdariai.com** via Nginx + PM2 + SSL ✅
+> - Env Vars: `.env.production` loaded ✅
+> - GitHub Actions: Auto-deploy on push to main ✅
+> - Tripay IP Whitelist: Updated → `103.93.163.183` ✅
+> - DNS: Propagated via Niagahoster (ns1.idwebhost.id, ns2.idwebhost.id) ✅
+> - SSL: Certbot issued, expires 2026-08-27, auto-renew enabled ✅
+> - Payment flow: End-to-end tested (BSI VA, QRIS, dll) ✅
+>
+> **Next:** Monitor 1-2 minggu, lalu cleanup Vercel (~12 Jun 2026)
 
 ---
 
@@ -650,11 +651,16 @@ pm2 set pm2-logrotate:retain 7
 - ✅ **SSL:** Pending (waiting for DNS propagation)
 - ⏳ **DNS:** Propagating (~30-60 min estimated)
 
-### Outstanding Tasks
-- ⏳ **DNS Propagation:** Monitor with `dig profitdariai.com +short`
-- ⏳ **SSL Setup:** Run Certbot after DNS is live
-- ⏳ **Smoke Test:** Full feature test via domain (when DNS ready)
-- ⏳ **Vercel Cleanup:** Keep Vercel for 1-2 weeks, then delete
+### Post-Deploy Bug Fixes
+- ✅ **CSS/JS tidak load** — `NEXT_PUBLIC_*` vars harus tersedia saat `pnpm build` agar ter-bake ke client bundle. Solusi: pastikan `.env.production` ada sebelum build, lalu rebuild ulang.
+- ✅ **Payment 500 error** — Tripay `fee-calculator` API mengembalikan **array** `TripayFeeData[]`, bukan single object. Fix: `getFeeCalculator` type diupdate ke array, payment route ambil `data[0]`, `CheckoutForm` gunakan optional chaining.
+
+### Final Status (29 May 2026 ~20:00 WIB)
+- ✅ **DNS:** Propagated → `103.93.163.183`
+- ✅ **SSL:** Certbot issued, HTTPS aktif
+- ✅ **Smoke Test:** Landing, auth, member area, admin, payment flow — semua ✅
+- ✅ **Payment E2E:** BSI Virtual Account checkout berhasil redirect ke Tripay
+- ⏳ **Vercel Cleanup:** Target ~12 Juni 2026 setelah monitoring stabil
 
 ### Quick Commands (VPS)
 ```bash
