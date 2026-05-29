@@ -278,9 +278,9 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
       {selectedMethod && (
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 mb-4">
           <div className="w-10 h-6 relative shrink-0">
-            {channelIcons[selectedMethod.code] ? (
+            {selectedMethod.localIcon || channelIcons[selectedMethod.code] ? (
               <Image
-                src={channelIcons[selectedMethod.code]}
+                src={selectedMethod.localIcon || channelIcons[selectedMethod.code]!}
                 alt={selectedMethod.label}
                 fill
                 className="object-contain object-left"
