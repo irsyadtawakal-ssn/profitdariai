@@ -85,6 +85,15 @@ Semua legal pages ada di `src/app/(marketing)/` dan dapat diakses tanpa login:
 - **Ebook download** — cek auth + active membership + `is_published = true` sebelum serve URL
 - **Admin actions** — semua server actions wajib `await requireAdmin()` di baris pertama (pakai `.maybeSingle()`)
 - **RLS** — enabled di semua tabel Supabase
+- **Cloudflare Turnstile (CAPTCHA)** — opsional, dikontrol via `NEXT_PUBLIC_TURNSTILE_SITE_KEY`:
+  - Kalau env var **diset** → widget Turnstile muncul di login & signup, token wajib ada sebelum submit
+  - Kalau env var **kosong/tidak ada** → form berjalan tanpa CAPTCHA
+  - **Saat ini: CAPTCHA di-disable** (env var tidak diset di Vercel, Supabase CAPTCHA protection off)
+  - **Cara aktifkan kembali:**
+    1. Buat site di [Cloudflare Turnstile](https://dash.cloudflare.com) → tambahkan domain `profitdariai.com`
+    2. Copy **Site Key** → set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` di Vercel env vars
+    3. Copy **Secret Key** → masukkan ke Supabase: Authentication → Sign In/Up → Bot and Abuse Protection → CAPTCHA → enable → paste secret key
+    4. Redeploy Vercel
 
 ## Performance
 
