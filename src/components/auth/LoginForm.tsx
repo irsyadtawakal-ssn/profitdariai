@@ -36,6 +36,12 @@ export function LoginForm() {
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) })
 
   async function onSubmit(data: LoginFormData) {
+    // Block submission if Turnstile is configured but token not yet received
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
+      toast.error('Selesaikan verifikasi CAPTCHA terlebih dahulu.')
+      return
+    }
+
     setLoading(true)
     try {
       const supabase = createClient()
