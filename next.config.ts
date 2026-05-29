@@ -34,6 +34,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.supabase.in' },
       { protocol: 'https', hostname: 'belajarpakai.ai' },
       { protocol: 'https', hostname: 'drive.google.com' },
+      { protocol: 'https', hostname: 'tripay.co.id' },
     ],
   },
 }

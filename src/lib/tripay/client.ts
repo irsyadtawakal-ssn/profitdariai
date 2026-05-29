@@ -35,9 +35,19 @@ export async function createTransaction(payload: TripayCreatePayload) {
   return res.json() as Promise<TripayCreateResponse>
 }
 
-export async function getPaymentChannels() {
+export interface TripayChannel {
+  group: string
+  code: string
+  name: string
+  type: string
+  icon_url: string
+  active: boolean
+}
+
+export async function getPaymentChannels(): Promise<{ success: boolean; data: TripayChannel[] }> {
   const res = await fetch(`${getBaseUrl()}/merchant/payment-channel`, {
     headers: getHeaders(),
+    next: { revalidate: 3600 },
   })
   return res.json()
 }

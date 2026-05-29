@@ -2,22 +2,180 @@
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import Image from 'next/image'
+import { ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
 
-const PAYMENT_METHODS = [
-  { code: 'QRIS', label: 'QRIS (Semua e-wallet & m-banking)', group: 'qris' },
-  { code: 'OVO', label: 'OVO', group: 'ewallet' },
-  { code: 'DANA', label: 'Dana', group: 'ewallet' },
-  { code: 'SHOPEEPAY', label: 'ShopeePay', group: 'ewallet' },
-  { code: 'BCAVA', label: 'BCA Virtual Account', group: 'va' },
-  { code: 'MANDIRIVA', label: 'Mandiri Virtual Account', group: 'va' },
-  { code: 'BNIVA', label: 'BNI Virtual Account', group: 'va' },
-  { code: 'BRIVA', label: 'BRI Virtual Account', group: 'va' },
+type PaymentMethod = {
+  code: string
+  label: string
+  shortLabel: string
+  sublabel: string
+  color: string
+  bg: string
+  textColor: string
+}
+
+type PaymentGroup = {
+  id: string
+  label: string
+  methods: PaymentMethod[]
+}
+
+const PAYMENT_GROUPS: PaymentGroup[] = [
+  {
+    id: 'qris',
+    label: 'QRIS',
+    methods: [
+      { code: 'QRIS', label: 'QRIS', shortLabel: 'QRIS', sublabel: 'Semua m-banking & e-wallet', color: '#E31837', bg: '#2a0a0e', textColor: '#ff6b7a' },
+    ],
+  },
+  {
+    id: 'ewallet',
+    label: 'E-Wallet',
+    methods: [
+      { code: 'OVO',       label: 'OVO',       shortLabel: 'OVO',  sublabel: 'Proses Otomatis', color: '#4C3494', bg: '#160e2a', textColor: '#9d7ef5' },
+      { code: 'DANA',      label: 'DANA',      shortLabel: 'DANA', sublabel: 'Proses Otomatis', color: '#118EEA', bg: '#041525', textColor: '#5bb8ff' },
+      { code: 'SHOPEEPAY', label: 'ShopeePay', shortLabel: 'SPay', sublabel: 'Proses Otomatis', color: '#EE4D2D', bg: '#2a0f08', textColor: '#ff8066' },
+    ],
+  },
+  {
+    id: 'va',
+    label: 'Virtual Account',
+    methods: [
+      { code: 'BCAVA',       label: 'BCA Virtual Account',               shortLabel: 'BCA',  sublabel: 'Proses Otomatis', color: '#1657A0', bg: '#041020', textColor: '#5b9fd9' },
+      { code: 'MANDIRIVA',   label: 'Mandiri Virtual Account',           shortLabel: 'MDR',  sublabel: 'Proses Otomatis', color: '#F7941D', bg: '#271500', textColor: '#ffb85c' },
+      { code: 'BNIVA',       label: 'BNI Virtual Account',               shortLabel: 'BNI',  sublabel: 'Proses Otomatis', color: '#F05A22', bg: '#231008', textColor: '#ff9265' },
+      { code: 'BRIVA',       label: 'BRI Virtual Account',               shortLabel: 'BRI',  sublabel: 'Proses Otomatis', color: '#00529B', bg: '#040f1e', textColor: '#4d9de0' },
+      { code: 'MYBVA',       label: 'Maybank Virtual Account',           shortLabel: 'MYB',  sublabel: 'Proses Otomatis', color: '#FBBD00', bg: '#221b00', textColor: '#ffd84d' },
+      { code: 'PERMATAVA',   label: 'Permata Virtual Account',           shortLabel: 'PRM',  sublabel: 'Proses Otomatis', color: '#00A651', bg: '#001a0d', textColor: '#33cc77' },
+      { code: 'SMSVA',       label: 'Sinarmas Virtual Account',          shortLabel: 'SMS',  sublabel: 'Proses Otomatis', color: '#005BAA', bg: '#04101e', textColor: '#4d8fd9' },
+      { code: 'MUAMALATVA',  label: 'Muamalat Virtual Account',          shortLabel: 'MML',  sublabel: 'Proses Otomatis', color: '#006633', bg: '#001508', textColor: '#33994d' },
+      { code: 'CIMBVA',      label: 'CIMB Niaga Virtual Account',        shortLabel: 'CIMB', sublabel: 'Proses Otomatis', color: '#BB0000', bg: '#1e0000', textColor: '#ee4444' },
+      { code: 'SAMPOERNAVA', label: 'Sahabat Sampoerna Virtual Account', shortLabel: 'SMPR', sublabel: 'Proses Otomatis', color: '#009999', bg: '#001a1a', textColor: '#33cccc' },
+    ],
+  },
 ]
 
-export function CheckoutForm() {
+function MethodLogo({ method, iconUrl }: { method: PaymentMethod; iconUrl?: string }) {
+  if (iconUrl) {
+    return (
+      <div className="w-full h-8 relative flex items-center">
+        <Image
+          src={iconUrl}
+          alt={method.label}
+          fill
+          className="object-contain object-left"
+          sizes="80px"
+        />
+      </div>
+    )
+  }
+  return (
+    <span
+      className="inline-flex items-center justify-center rounded-lg px-2 py-1 text-xs font-bold tracking-wide leading-none"
+      style={{ background: method.bg, color: method.textColor, border: `1px solid ${method.color}22` }}
+    >
+      {method.shortLabel}
+    </span>
+  )
+}
+
+function PaymentCard({
+  method,
+  iconUrl,
+  selected,
+  onSelect,
+}: {
+  method: PaymentMethod
+  iconUrl?: string
+  selected: boolean
+  onSelect: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`relative flex flex-col gap-2 p-3 rounded-xl border cursor-pointer transition-all text-left w-full ${
+        selected
+          ? 'border-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.25)]'
+          : 'border-[#252525] hover:border-[#383838]'
+      }`}
+      style={{ background: selected ? 'rgba(212,175,55,0.06)' : '#161616' }}
+    >
+      {selected && (
+        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#D4AF37]" />
+      )}
+      <MethodLogo method={method} iconUrl={iconUrl} />
+      <span className="text-[#F5F5F0] text-xs font-medium leading-tight">{method.label}</span>
+      <span className="text-[#4ade80] text-[10px] font-medium">{method.sublabel}</span>
+    </button>
+  )
+}
+
+function CollapsibleGroup({
+  group,
+  selected,
+  onSelect,
+  defaultOpen,
+  channelIcons,
+}: {
+  group: PaymentGroup
+  selected: string
+  onSelect: (code: string) => void
+  defaultOpen: boolean
+  channelIcons: Record<string, string>
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  const hasSelected = group.methods.some(m => m.code === selected)
+  const selectedMethod = group.methods.find(m => m.code === selected)
+
+  return (
+    <div className="border border-[#222222] rounded-xl overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${
+          hasSelected ? 'bg-[#D4AF37]/8' : 'bg-[#151515] hover:bg-[#1a1a1a]'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          {hasSelected && (
+            <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
+          )}
+          <span className={`text-sm font-semibold ${hasSelected ? 'text-[#D4AF37]' : 'text-[#F5F5F0]'}`}>
+            {group.label}
+          </span>
+          {hasSelected && selectedMethod && (
+            <span className="text-[10px] text-[#888888]">· {selectedMethod.label}</span>
+          )}
+        </div>
+        {open
+          ? <ChevronUp className="w-4 h-4 text-[#666666]" />
+          : <ChevronDown className="w-4 h-4 text-[#666666]" />
+        }
+      </button>
+
+      {open && (
+        <div className="p-3 bg-[#0f0f0f] grid grid-cols-3 gap-2">
+          {group.methods.map(method => (
+            <PaymentCard
+              key={method.code}
+              method={method}
+              iconUrl={channelIcons[method.code]}
+              selected={selected === method.code}
+              onSelect={() => onSelect(method.code)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<string, string> }) {
   const [selected, setSelected] = useState('QRIS')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,10 +210,12 @@ export function CheckoutForm() {
   }
 
   const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(MEMBERSHIP_EARLY_BIRD_PRICE)
+  const selectedMethod = PAYMENT_GROUPS.flatMap(g => g.methods).find(m => m.code === selected)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">
-      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-6">
+      {/* Order summary */}
+      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-4">
         <h2 className="text-[#F5F5F0] font-semibold mb-1">Ringkasan Pesanan</h2>
         <div className="flex justify-between items-center mt-3">
           <span className="text-[#888888] text-sm">profitdariai Membership</span>
@@ -63,7 +223,8 @@ export function CheckoutForm() {
         </div>
       </div>
 
-      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-6">
+      {/* Buyer info */}
+      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-4">
         <h2 className="text-[#F5F5F0] font-semibold mb-4">Data Pembeli</h2>
         <div className="flex flex-col gap-4">
           <div>
@@ -94,31 +255,48 @@ export function CheckoutForm() {
         </div>
       </div>
 
-      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-6">
-        <h2 className="text-[#F5F5F0] font-semibold mb-4">Metode Pembayaran</h2>
+      {/* Payment method selection */}
+      <div className="mb-4">
+        <h2 className="text-[#F5F5F0] font-semibold mb-3">Metode Pembayaran</h2>
         <div className="flex flex-col gap-2">
-          {PAYMENT_METHODS.map(({ code, label }) => (
-            <label
-              key={code}
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                selected === code
-                  ? 'border-[#D4AF37]/60 bg-[#D4AF37]/5'
-                  : 'border-[#222222] hover:border-[#333333]'
-              }`}
-            >
-              <input
-                type="radio"
-                name="paymentMethod"
-                value={code}
-                checked={selected === code}
-                onChange={() => setSelected(code)}
-                className="accent-[#D4AF37]"
-              />
-              <span className="text-[#F5F5F0] text-sm">{label}</span>
-            </label>
+          {PAYMENT_GROUPS.map((group, i) => (
+            <CollapsibleGroup
+              key={group.id}
+              group={group}
+              selected={selected}
+              onSelect={setSelected}
+              defaultOpen={i === 0}
+              channelIcons={channelIcons}
+            />
           ))}
         </div>
       </div>
+
+      {/* Selected method summary */}
+      {selectedMethod && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 mb-4">
+          <div className="w-10 h-6 relative shrink-0">
+            {channelIcons[selectedMethod.code] ? (
+              <Image
+                src={channelIcons[selectedMethod.code]}
+                alt={selectedMethod.label}
+                fill
+                className="object-contain object-left"
+                sizes="40px"
+              />
+            ) : (
+              <span
+                className="inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[10px] font-bold"
+                style={{ background: selectedMethod.bg, color: selectedMethod.textColor }}
+              >
+                {selectedMethod.shortLabel}
+              </span>
+            )}
+          </div>
+          <span className="text-[#F5F5F0] text-sm flex-1">{selectedMethod.label}</span>
+          <span className="text-[#D4AF37] font-bold text-sm">{formatted}</span>
+        </div>
+      )}
 
       {error && (
         <p role="alert" className="text-red-400 text-sm mb-4 text-center">
@@ -134,9 +312,10 @@ export function CheckoutForm() {
         Bayar Sekarang
       </Button>
 
-      <p className="text-[#888888] text-xs text-center mt-4">
-        🔒 SSL Aman · Diproses via Tripay
-      </p>
+      <div className="flex items-center justify-center gap-1.5 mt-4">
+        <ShieldCheck className="w-3.5 h-3.5 text-[#555555]" />
+        <p className="text-[#888888] text-xs">SSL Aman · Diproses via Tripay</p>
+      </div>
     </form>
   )
 }
