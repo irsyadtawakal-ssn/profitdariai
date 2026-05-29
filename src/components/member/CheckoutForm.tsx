@@ -16,6 +16,7 @@ type PaymentMethod = {
   color: string
   bg: string
   textColor: string
+  localIcon?: string
 }
 
 type PaymentGroup = {
@@ -29,42 +30,43 @@ const PAYMENT_GROUPS: PaymentGroup[] = [
     id: 'qris',
     label: 'QRIS',
     methods: [
-      { code: 'QRIS', label: 'QRIS', shortLabel: 'QRIS', sublabel: 'Semua m-banking & e-wallet', color: '#E31837', bg: '#2a0a0e', textColor: '#ff6b7a' },
+      { code: 'QRIS', label: 'QRIS', shortLabel: 'QRIS', sublabel: 'Semua m-banking & e-wallet', color: '#E31837', bg: '#2a0a0e', textColor: '#ff6b7a', localIcon: '/payment/qris.webp' },
     ],
   },
   {
     id: 'ewallet',
     label: 'E-Wallet',
     methods: [
-      { code: 'OVO',       label: 'OVO',       shortLabel: 'OVO',  sublabel: 'Proses Otomatis', color: '#4C3494', bg: '#160e2a', textColor: '#9d7ef5' },
-      { code: 'DANA',      label: 'DANA',      shortLabel: 'DANA', sublabel: 'Proses Otomatis', color: '#118EEA', bg: '#041525', textColor: '#5bb8ff' },
-      { code: 'SHOPEEPAY', label: 'ShopeePay', shortLabel: 'SPay', sublabel: 'Proses Otomatis', color: '#EE4D2D', bg: '#2a0f08', textColor: '#ff8066' },
+      { code: 'OVO',       label: 'OVO',       shortLabel: 'OVO',  sublabel: 'Proses Otomatis', color: '#4C3494', bg: '#160e2a', textColor: '#9d7ef5', localIcon: '/payment/ovo.webp' },
+      { code: 'DANA',      label: 'DANA',      shortLabel: 'DANA', sublabel: 'Proses Otomatis', color: '#118EEA', bg: '#041525', textColor: '#5bb8ff', localIcon: '/payment/dana.webp' },
+      { code: 'SHOPEEPAY', label: 'ShopeePay', shortLabel: 'SPay', sublabel: 'Proses Otomatis', color: '#EE4D2D', bg: '#2a0f08', textColor: '#ff8066', localIcon: '/payment/shoopepay.webp' },
     ],
   },
   {
     id: 'va',
     label: 'Virtual Account',
     methods: [
-      { code: 'BCAVA',       label: 'BCA Virtual Account',               shortLabel: 'BCA',  sublabel: 'Proses Otomatis', color: '#1657A0', bg: '#041020', textColor: '#5b9fd9' },
-      { code: 'MANDIRIVA',   label: 'Mandiri Virtual Account',           shortLabel: 'MDR',  sublabel: 'Proses Otomatis', color: '#F7941D', bg: '#271500', textColor: '#ffb85c' },
-      { code: 'BNIVA',       label: 'BNI Virtual Account',               shortLabel: 'BNI',  sublabel: 'Proses Otomatis', color: '#F05A22', bg: '#231008', textColor: '#ff9265' },
-      { code: 'BRIVA',       label: 'BRI Virtual Account',               shortLabel: 'BRI',  sublabel: 'Proses Otomatis', color: '#00529B', bg: '#040f1e', textColor: '#4d9de0' },
-      { code: 'MYBVA',       label: 'Maybank Virtual Account',           shortLabel: 'MYB',  sublabel: 'Proses Otomatis', color: '#FBBD00', bg: '#221b00', textColor: '#ffd84d' },
-      { code: 'PERMATAVA',   label: 'Permata Virtual Account',           shortLabel: 'PRM',  sublabel: 'Proses Otomatis', color: '#00A651', bg: '#001a0d', textColor: '#33cc77' },
-      { code: 'SMSVA',       label: 'Sinarmas Virtual Account',          shortLabel: 'SMS',  sublabel: 'Proses Otomatis', color: '#005BAA', bg: '#04101e', textColor: '#4d8fd9' },
-      { code: 'MUAMALATVA',  label: 'Muamalat Virtual Account',          shortLabel: 'MML',  sublabel: 'Proses Otomatis', color: '#006633', bg: '#001508', textColor: '#33994d' },
-      { code: 'CIMBVA',      label: 'CIMB Niaga Virtual Account',        shortLabel: 'CIMB', sublabel: 'Proses Otomatis', color: '#BB0000', bg: '#1e0000', textColor: '#ee4444' },
-      { code: 'SAMPOERNAVA', label: 'Sahabat Sampoerna Virtual Account', shortLabel: 'SMPR', sublabel: 'Proses Otomatis', color: '#009999', bg: '#001a1a', textColor: '#33cccc' },
+      { code: 'BCAVA',      label: 'BCA Virtual Account',      shortLabel: 'BCA',  sublabel: 'Proses Otomatis', color: '#1657A0', bg: '#041020', textColor: '#5b9fd9', localIcon: '/payment/bca.webp' },
+      { code: 'MANDIRIVA',  label: 'Mandiri Virtual Account',  shortLabel: 'MDR',  sublabel: 'Proses Otomatis', color: '#F7941D', bg: '#271500', textColor: '#ffb85c', localIcon: '/payment/mandiri.webp' },
+      { code: 'BNIVA',      label: 'BNI Virtual Account',      shortLabel: 'BNI',  sublabel: 'Proses Otomatis', color: '#F05A22', bg: '#231008', textColor: '#ff9265', localIcon: '/payment/bni.webp' },
+      { code: 'BRIVA',      label: 'BRI Virtual Account',      shortLabel: 'BRI',  sublabel: 'Proses Otomatis', color: '#00529B', bg: '#040f1e', textColor: '#4d9de0', localIcon: '/payment/briva.webp' },
+      { code: 'PERMATAVA',  label: 'Permata Virtual Account',  shortLabel: 'PRM',  sublabel: 'Proses Otomatis', color: '#00A651', bg: '#001a0d', textColor: '#33cc77', localIcon: '/payment/permata.webp' },
+      { code: 'MUAMALATVA', label: 'Muamalat Virtual Account', shortLabel: 'MML',  sublabel: 'Proses Otomatis', color: '#006633', bg: '#001508', textColor: '#33994d', localIcon: '/payment/muamalat.webp' },
+      { code: 'CIMBVA',     label: 'CIMB Niaga Virtual Account', shortLabel: 'CIMB', sublabel: 'Proses Otomatis', color: '#BB0000', bg: '#1e0000', textColor: '#ee4444', localIcon: '/payment/cimb.webp' },
+      { code: 'BSIVA',      label: 'BSI Virtual Account',      shortLabel: 'BSI',  sublabel: 'Proses Otomatis', color: '#00704A', bg: '#001510', textColor: '#33cc88', localIcon: '/payment/bsi.webp' },
+      { code: 'OCBCVA',     label: 'OCBC Virtual Account',     shortLabel: 'OCBC', sublabel: 'Proses Otomatis', color: '#E60026', bg: '#1e0007', textColor: '#ff4466', localIcon: '/payment/ocbc.webp' },
+      { code: 'DANAMONVA',  label: 'Danamon Virtual Account',  shortLabel: 'DNM',  sublabel: 'Proses Otomatis', color: '#D80027', bg: '#1e0008', textColor: '#ff3355', localIcon: '/payment/danamion.webp' },
     ],
   },
 ]
 
 function MethodLogo({ method, iconUrl }: { method: PaymentMethod; iconUrl?: string }) {
-  if (iconUrl) {
+  const src = method.localIcon ?? iconUrl
+  if (src) {
     return (
-      <div className="w-full h-8 relative flex items-center">
+      <div className="w-full h-8 relative">
         <Image
-          src={iconUrl}
+          src={src}
           alt={method.label}
           fill
           className="object-contain object-left"
