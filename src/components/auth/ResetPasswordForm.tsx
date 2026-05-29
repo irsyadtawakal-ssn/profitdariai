@@ -1,7 +1,8 @@
 // src/components/auth/ResetPasswordForm.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -23,12 +24,19 @@ type ResetFormData = z.infer<typeof resetSchema>
 export function ResetPasswordForm() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const searchParams = useSearchParams()
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ResetFormData>({ resolver: zodResolver(resetSchema) })
+
+  useEffect(() => {
+    const email = searchParams.get('email')
+    if (email) setValue('email', email)
+  }, [searchParams, setValue])
 
   async function onSubmit(data: ResetFormData) {
     setLoading(true)

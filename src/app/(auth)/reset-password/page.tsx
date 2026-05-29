@@ -1,4 +1,5 @@
 // src/app/(auth)/reset-password/page.tsx
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { Logo } from '@/components/shared/Logo'
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
@@ -19,7 +20,9 @@ export default function ResetPasswordPage() {
       </div>
 
       <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-8">
-        <ResetPasswordForm />
+        <Suspense>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   )

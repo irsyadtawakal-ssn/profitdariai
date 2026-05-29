@@ -165,14 +165,8 @@ async function sendGuestWelcomeEmail(email: string, name: string) {
     <div style="padding:32px">
       <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px">Hei ${name}! 🎉</h2>
       <p style="color:#AAAAAA;line-height:1.6;margin:0 0 24px">
-        Pembayaran kamu sudah diterima! Sekarang kamu tinggal set password untuk akun kamu, lalu akses semua kursus dan ebook selamanya.
+        Akses kamu sudah aktif. Klik tombol di bawah untuk set password dan langsung masuk ke semua kursus & ebook.
       </p>
-      <div style="background:#1A1A1A;border-radius:8px;padding:20px;margin-bottom:24px;border-left:3px solid #D4AF37">
-        <p style="color:#888888;font-size:13px;margin:0 0 8px">📧 Email kamu</p>
-        <p style="color:#F5F5F0;font-size:14px;font-weight:600;margin:0 0 16px">${email}</p>
-        <p style="color:#888888;font-size:13px;margin:0 0 4px">✅ Membership</p>
-        <p style="color:#D4AF37;font-size:14px;font-weight:600;margin:0">Seumur Hidup</p>
-      </div>
       <a href="${resetLink}"
         style="display:block;background:#D4AF37;color:#0A0A0A;text-align:center;padding:14px 24px;border-radius:8px;font-weight:700;text-decoration:none;font-size:16px;margin-bottom:16px">
         Set Password & Login →
@@ -194,7 +188,7 @@ async function sendGuestWelcomeEmail(email: string, name: string) {
     await transporter.sendMail({
       from: MAIL_FROM,
       to: email,
-      subject: '🔐 Set Password & Akses Membership Kamu — Profit dari AI',
+      subject: '🎉 Selamat datang di Profit dari AI',
       html,
     })
   } catch (error) {
