@@ -1,4 +1,19 @@
-# Panduan Migrasi: Vercel → Hostinger VPS
+# Panduan Migrasi: Vercel → VPS
+
+> **Status:** ✅ **MIGRASI SELESAI (29 May 2026)**
+> - VPS: Biznet GIO NEO Lite SS 2.2 (2 vCPU, 2GB RAM, 60GB SSD) @ IP `103.93.163.183`
+> - App: Live di `http://103.93.163.183` via Nginx + PM2 ✅
+> - Env Vars: `.env.local` loaded ✅
+> - GitHub Actions: Secrets configured ✅
+> - Tripay IP Whitelist: Updated ✅
+> - DNS: Pending propagation (TTL 300, ~1 jam)
+> - SSL: Pending DNS propagation → Certbot
+> 
+> **Next:** Tunggu DNS propagate (~30-60 min), lalu setup SSL dengan Certbot.
+
+---
+
+## Panduan Referensi (Sudah Dijalankan)
 
 > **Kapan dilakukan:** Setelah MVP stabil dan ada revenue. Lakukan di luar jam ramai (malam).  
 > **Estimasi downtime:** 0–5 menit (jika pakai strategi blue-green DNS).  
@@ -595,4 +610,80 @@ Setup PM2 log rotation agar tidak memenuhi disk:
 pm2 install pm2-logrotate
 pm2 set pm2-logrotate:max_size 10M
 pm2 set pm2-logrotate:retain 7
+```
+
+---
+
+## ✅ MIGRASI COMPLETION LOG (29 May 2026)
+
+### VPS & Infrastructure
+- ✅ **VPS Ordered:** Biznet GIO NEO Lite SS 2.2 (2 vCPU, 2GB RAM, 60GB SSD)
+- ✅ **IP Static:** `103.93.163.183`
+- ✅ **OS:** Ubuntu 22.04 LTS
+- ✅ **SSH Key:** ED25519 key generated & imported
+- ✅ **Firewall:** UFW configured (80, 443, 22 allowed)
+
+### Software Stack
+- ✅ **Node.js:** v20.20.2 via nvm
+- ✅ **pnpm:** Global installed
+- ✅ **PM2:** Installed, startup configured
+- ✅ **Nginx:** Configured as reverse proxy (localhost:3000)
+- ✅ **Certbot:** Installed, pending DNS propagation
+
+### Application Deployment
+- ✅ **Code:** Repository cloned from GitHub
+- ✅ **Dependencies:** `pnpm install --frozen-lockfile` ✓
+- ✅ **Build:** `pnpm build` ✓ (standalone output)
+- ✅ **PM2:** Started via `ecosystem.config.js`
+- ✅ **Env Vars:** `.env.local` loaded in `.next/standalone/`
+- ✅ **Static Files:** Copied to `.next/standalone/`
+
+### Integration & Security
+- ✅ **GitHub Actions:** VPS secrets configured (VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_PORT)
+- ✅ **Tripay Webhook:** IP whitelist updated (103.93.163.183)
+- ✅ **Auto-Deploy:** GitHub workflow ready (push → auto deploy via SSH)
+
+### Status & Testing
+- ✅ **Landing Page:** Live via `http://103.93.163.183`
+- ✅ **Checkout Page:** Live via `http://103.93.163.183/checkout`
+- ✅ **Nginx Proxy:** Working correctly (PM2 app ← → Nginx)
+- ✅ **SSL:** Pending (waiting for DNS propagation)
+- ⏳ **DNS:** Propagating (~30-60 min estimated)
+
+### Outstanding Tasks
+- ⏳ **DNS Propagation:** Monitor with `dig profitdariai.com +short`
+- ⏳ **SSL Setup:** Run Certbot after DNS is live
+- ⏳ **Smoke Test:** Full feature test via domain (when DNS ready)
+- ⏳ **Vercel Cleanup:** Keep Vercel for 1-2 weeks, then delete
+
+### Quick Commands (VPS)
+```bash
+# SSH into VPS
+ssh -i ~/.ssh/id_ed25519 profitdariai@103.93.163.183
+
+# Check app status
+pm2 status
+pm2 logs profitdariai
+
+# Restart app
+pm2 restart profitdariai
+
+# View env vars
+cat /var/www/profitdariai/.env.local
+
+# Check Nginx
+sudo systemctl status nginx
+sudo tail -f /var/log/nginx/error.log
+```
+
+### DNS & SSL (Next Steps)
+```bash
+# Check DNS propagation (run every 10 min)
+dig profitdariai.com +short
+
+# Once DNS is live, setup SSL
+sudo certbot --nginx -d profitdariai.com -d www.profitdariai.com
+
+# Check SSL auto-renewal
+certbot renew --dry-run
 ```
