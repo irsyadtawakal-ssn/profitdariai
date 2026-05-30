@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { extractYouTubeId, getYouTubeEmbedUrl } from '@/lib/youtube'
 
 export type VideoItem = {
@@ -14,6 +14,14 @@ interface MateriVideoPlayerProps {
 
 export function MateriVideoPlayer({ videos }: MateriVideoPlayerProps) {
   const [activeIndex, setActiveIndex] = useState(0)
+
+  if (!videos.length) return null
+
+  useEffect(() => {
+    if (activeIndex >= videos.length) {
+      setActiveIndex(Math.max(0, videos.length - 1))
+    }
+  }, [videos.length, activeIndex])
 
   const activeVideo = videos[activeIndex]
   const videoId = extractYouTubeId(activeVideo.url)
@@ -51,8 +59,10 @@ export function MateriVideoPlayer({ videos }: MateriVideoPlayerProps) {
       <div className="flex flex-col gap-2">
         {videos.map((video, index) => (
           <button
-            key={index}
+            key={video.url}
             onClick={() => setActiveIndex(index)}
+            aria-label={`Putar video: ${video.title}`}
+            aria-current={index === activeIndex ? 'true' : undefined}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-left w-full transition-colors ${
               index === activeIndex
                 ? 'bg-[#D4AF37]/10 border border-[#D4AF37]/30'
