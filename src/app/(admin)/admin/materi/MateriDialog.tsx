@@ -13,21 +13,22 @@ import { toast } from 'sonner'
 
 const MAX_COVER_SIZE_MB = 5
 
-/** Konversi berbagai format URL GDrive → direct download URL */
 function parseGdriveUrl(input: string): string | null {
   input = input.trim()
-  // Format: https://drive.google.com/file/d/FILE_ID/view?...
   const fileMatch = input.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
   if (fileMatch) return `https://drive.google.com/uc?export=download&id=${fileMatch[1]}`
-  // Format: https://drive.google.com/open?id=FILE_ID
   const openMatch = input.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/)
   if (openMatch) return `https://drive.google.com/uc?export=download&id=${openMatch[1]}`
-  // Sudah dalam format uc?export=download
   if (input.includes('drive.google.com/uc') && input.includes('export=download')) return input
   return null
 }
 
-interface Ebook {
+interface VideoItem {
+  title: string
+  url: string
+}
+
+interface Materi {
   id: string
   title: string
   slug: string
@@ -37,52 +38,56 @@ interface Ebook {
   file_path: string
   page_count: number | null
   is_published: boolean
+  is_featured: boolean | null
+  videos: VideoItem[] | null
 }
 
 interface MateriDialogProps {
   open: boolean
   onClose: () => void
-  ebook?: Ebook
+  materi?: Materi
 }
 
 function slugify(str: string) {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 }
 
-export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
+export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
   const [isPending, startTransition] = useTransition()
-  const [title, setTitle] = useState(ebook?.title ?? '')
-  const [slug, setSlug] = useState(ebook?.slug ?? '')
-  const [filePath, setFilePath] = useState(ebook?.file_path ?? '')
+  const [title, setTitle] = useState(materi?.title ?? '')
+  const [slug, setSlug] = useState(materi?.slug ?? '')
+  const [filePath, setFilePath] = useState(materi?.file_path ?? '')
   const [gdriveInput, setGdriveInput] = useState('')
   const [gdriveValid, setGdriveValid] = useState<boolean | null>(null)
-  const [coverUrl, setCoverUrl] = useState(ebook?.cover_url ?? '')
+  const [coverUrl, setCoverUrl] = useState(materi?.cover_url ?? '')
   const [uploadingCover, setUploadingCover] = useState(false)
-  const isEdit = !!ebook
+  const [isPublished, setIsPublished] = useState(materi?.is_published ?? false)
+  const [isFeatured, setIsFeatured] = useState(materi?.is_featured ?? false)
+  const [videos, setVideos] = useState<VideoItem[]>(materi?.videos ?? [])
+  const isEdit = !!materi
 
   useEffect(() => {
-    setTitle(ebook?.title ?? '')
-    setSlug(ebook?.slug ?? '')
-    setFilePath(ebook?.file_path ?? '')
-    setCoverUrl(ebook?.cover_url ?? '')
-    setIsPublished(ebook?.is_published ?? false)
-    // Pre-fill GDrive input jika sudah ada file_path berbentuk URL
-    const existing = ebook?.file_path ?? ''
+    setTitle(materi?.title ?? '')
+    setSlug(materi?.slug ?? '')
+    setFilePath(materi?.file_path ?? '')
+    setCoverUrl(materi?.cover_url ?? '')
+    setIsPublished(materi?.is_published ?? false)
+    setIsFeatured(materi?.is_featured ?? false)
+    setVideos(materi?.videos ?? [])
+    const existing = materi?.file_path ?? ''
     setGdriveInput(existing.startsWith('https://') ? existing : '')
     setGdriveValid(null)
-  }, [open, ebook])
+  }, [open, materi])
 
   async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-
     const sizeMB = file.size / (1024 * 1024)
     if (sizeMB > MAX_COVER_SIZE_MB) {
       toast.error(`Cover terlalu besar (${sizeMB.toFixed(1)} MB). Maksimal ${MAX_COVER_SIZE_MB} MB.`)
       e.target.value = ''
       return
     }
-
     setUploadingCover(true)
     try {
       const supabase = createClient()
@@ -110,28 +115,30 @@ export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
     setGdriveInput(val)
     if (!val.trim()) {
       setGdriveValid(null)
-      setFilePath(isEdit ? ebook?.file_path ?? '' : '')
+      setFilePath(isEdit ? materi?.file_path ?? '' : '')
       return
     }
     const converted = parseGdriveUrl(val)
-    if (converted) {
-      setFilePath(converted)
-      setGdriveValid(true)
-    } else {
-      setFilePath('')
-      setGdriveValid(false)
-    }
+    if (converted) { setFilePath(converted); setGdriveValid(true) }
+    else { setFilePath(''); setGdriveValid(false) }
   }
 
-  const [isPublished, setIsPublished] = useState(ebook?.is_published ?? false)
+  function addVideo() { setVideos([...videos, { title: '', url: '' }]) }
+  function removeVideo(index: number) { setVideos(videos.filter((_, i) => i !== index)) }
+  function updateVideo(index: number, field: 'title' | 'url', value: string) {
+    setVideos(videos.map((v, i) => i === index ? { ...v, [field]: value } : v))
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     formData.set('file_path', filePath)
+    formData.set('is_featured', isFeatured ? 'true' : 'false')
+    const validVideos = videos.filter(v => v.title.trim() && v.url.trim())
+    formData.set('videos', validVideos.length > 0 ? JSON.stringify(validVideos) : '')
     startTransition(async () => {
       if (isEdit) {
-        await updateEbook(ebook.id, formData)
+        await updateEbook(materi.id, formData)
       } else {
         await createEbook(formData)
       }
@@ -141,7 +148,7 @@ export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-[#F5F5F0]">
             {isEdit ? 'Edit Materi' : 'Tambah Materi'}
@@ -149,19 +156,19 @@ export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_title">Judul</Label>
-            <Input id="ebook_title" name="title" value={title} onChange={(e) => handleTitleChange(e.target.value)} required />
+            <Label htmlFor="m_title">Judul</Label>
+            <Input id="m_title" name="title" value={title} onChange={(e) => handleTitleChange(e.target.value)} required />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_slug">Slug</Label>
-            <Input id="ebook_slug" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
+            <Label htmlFor="m_slug">Slug</Label>
+            <Input id="m_slug" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_category">Kategori</Label>
+            <Label htmlFor="m_category">Kategori</Label>
             <select
-              id="ebook_category"
+              id="m_category"
               name="category"
-              defaultValue={ebook?.category ?? ''}
+              defaultValue={materi?.category ?? ''}
               required
               className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] focus:outline-none focus:border-[#D4AF37]"
             >
@@ -170,15 +177,16 @@ export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
               <option value="Freelancing">Freelancing</option>
               <option value="Konten">Konten</option>
               <option value="Otomasi">Otomasi</option>
+              <option value="Prompt">Prompt</option>
               <option value="Lainnya">Lainnya</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_description">Deskripsi</Label>
+            <Label htmlFor="m_description">Deskripsi</Label>
             <textarea
-              id="ebook_description"
+              id="m_description"
               name="description"
-              defaultValue={ebook?.description ?? ''}
+              defaultValue={materi?.description ?? ''}
               rows={2}
               className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] placeholder:text-[#555555] focus:outline-none focus:border-[#D4AF37] resize-none"
             />
@@ -197,51 +205,70 @@ export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
               <input type="hidden" name="cover_url" value={coverUrl} />
             </div>
             <div className="flex flex-col gap-1.5 w-28">
-              <Label htmlFor="ebook_page_count">Jumlah Hal.</Label>
-              <Input id="ebook_page_count" name="page_count" type="number" defaultValue={ebook?.page_count ?? ''} />
+              <Label htmlFor="m_page_count">Jumlah Hal.</Label>
+              <Input id="m_page_count" name="page_count" type="number" defaultValue={materi?.page_count ?? ''} />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_gdrive">Link Google Drive PDF</Label>
+            <Label htmlFor="m_gdrive">Link Google Drive PDF</Label>
             <Input
-              id="ebook_gdrive"
+              id="m_gdrive"
               type="url"
               placeholder="https://drive.google.com/file/d/FILE_ID/view"
               value={gdriveInput}
               onChange={(e) => handleGdriveChange(e.target.value)}
               error={gdriveValid === false}
             />
-            {gdriveValid === true && (
-              <p className="text-xs text-green-400">&#10003; Link valid — akan otomatis jadi direct download.</p>
-            )}
-            {gdriveValid === false && (
-              <p className="text-xs text-red-400">Link bukan dari Google Drive atau format tidak dikenali.</p>
-            )}
-            {!gdriveInput && isEdit && (
-              <p className="text-xs text-[#555555]">Kosongkan jika tidak ingin ganti link.</p>
-            )}
+            {gdriveValid === true && <p className="text-xs text-green-400">&#10003; Link valid — akan otomatis jadi direct download.</p>}
+            {gdriveValid === false && <p className="text-xs text-red-400">Link bukan dari Google Drive atau format tidak dikenali.</p>}
+            {!gdriveInput && isEdit && <p className="text-xs text-[#555555]">Kosongkan jika tidak ingin ganti link.</p>}
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="is_published"
-              value="true"
-              id="ebook_published"
-              checked={isPublished}
-              onChange={(e) => setIsPublished(e.target.checked)}
-              className="accent-[#D4AF37] w-4 h-4"
-            />
-            <Label htmlFor="ebook_published">Published</Label>
+
+          {/* VIDEO SECTION */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <Label>Video YouTube (opsional)</Label>
+              <button type="button" onClick={addVideo} className="text-xs text-[#D4AF37] hover:underline">
+                + Tambah Video
+              </button>
+            </div>
+            {videos.length === 0 && (
+              <p className="text-xs text-[#444]">Belum ada video. Klik &quot;+ Tambah Video&quot; untuk menambahkan.</p>
+            )}
+            {videos.map((video, index) => (
+              <div key={index} className="flex flex-col gap-2 bg-[#111] border border-[#222] rounded-lg p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-[#555] font-medium">Video {index + 1}</span>
+                  <button type="button" onClick={() => removeVideo(index)} className="text-xs text-red-500 hover:text-red-400">Hapus</button>
+                </div>
+                <Input
+                  placeholder="Judul video (misal: Pengenalan Prompt)"
+                  value={video.title}
+                  onChange={(e) => updateVideo(index, 'title', e.target.value)}
+                />
+                <Input
+                  placeholder="YouTube URL atau video ID (misal: dQw4w9WgXcQ)"
+                  value={video.url}
+                  onChange={(e) => updateVideo(index, 'url', e.target.value)}
+                />
+              </div>
+            ))}
           </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="m_featured" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
+              <Label htmlFor="m_featured">Jadikan Materi Pilihan (★ Featured di Dashboard)</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" name="is_published" value="true" id="m_published" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
+              <Label htmlFor="m_published">Published</Label>
+            </div>
+          </div>
+
           <div className="flex gap-2 justify-end pt-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>Batal</Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="sm"
-              loading={isPending}
-              disabled={!filePath && !isEdit}
-            >
+            <Button type="submit" variant="primary" size="sm" loading={isPending} disabled={!filePath && !isEdit}>
               {isEdit ? 'Simpan' : 'Tambah'}
             </Button>
           </div>

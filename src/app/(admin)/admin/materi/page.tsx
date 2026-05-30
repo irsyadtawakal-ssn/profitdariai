@@ -1,8 +1,23 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { MateriClient } from './MateriClient'
 
+interface Materi {
+  id: string
+  title: string
+  slug: string
+  description: string | null
+  category: string
+  cover_url: string | null
+  file_path: string
+  page_count: number | null
+  is_published: boolean
+  is_featured: boolean | null
+  videos: { title: string; url: string }[] | null
+}
+
 export default async function AdminMateriPage() {
-  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createAdminClient() as any
   const { data: ebooks } = await supabase
     .from('ebooks')
     .select('id, slug, title, description, category, cover_url, file_path, page_count, is_published, is_featured, videos')
@@ -10,7 +25,7 @@ export default async function AdminMateriPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <MateriClient ebooks={ebooks ?? []} />
+      <MateriClient ebooks={(ebooks ?? []) as Materi[]} />
     </div>
   )
 }
