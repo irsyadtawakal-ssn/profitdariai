@@ -8,6 +8,17 @@ interface MateriDetailPageProps {
   params: Promise<{ slug: string }>
 }
 
+interface MateriData {
+  id: string
+  slug: string
+  title: string
+  description: string | null
+  category: string
+  cover_url: string | null
+  page_count: number | null
+  videos: unknown
+}
+
 export default async function MateriDetailPage({ params }: MateriDetailPageProps) {
   const { slug } = await params
   const supabase = await createServerClient()
@@ -19,10 +30,10 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
     .eq('is_published', true)
     .single()
 
-  const materi = data as any
+  const materi = data as MateriData | null
   if (!materi) notFound()
 
-  const videos = (materi?.videos as VideoItem[] | null) ?? null
+  const videos = Array.isArray(materi.videos) ? (materi.videos as VideoItem[]) : null
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
