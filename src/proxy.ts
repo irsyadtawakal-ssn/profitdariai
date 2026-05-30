@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
-  const isProtected = ['/dashboard', '/kursus', '/ebook', '/profile', '/admin'].some(
+  const isProtected = ['/dashboard', '/materi', '/ebook', '/profile', '/admin'].some(
     (p) => pathname.startsWith(p)
   )
 
@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && (pathname.startsWith('/kursus/') || pathname.startsWith('/ebook/'))) {
+  if (user && (pathname.startsWith('/materi/') || pathname.startsWith('/ebook/'))) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('membership_expires_at')
@@ -64,7 +64,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/kursus/:path*',
+    '/materi/:path*',
     '/ebook/:path*',
     '/profile/:path*',
     '/admin/:path*',
