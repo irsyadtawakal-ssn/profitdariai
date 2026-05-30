@@ -28,6 +28,11 @@ interface VideoItem {
   url: string
 }
 
+interface DocumentItem {
+  title: string
+  url: string
+}
+
 interface Materi {
   id: string
   title: string
@@ -40,6 +45,7 @@ interface Materi {
   is_published: boolean
   is_featured: boolean | null
   videos: VideoItem[] | null
+  documents: DocumentItem[] | null
 }
 
 interface MateriDialogProps {
@@ -64,6 +70,7 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
   const [isPublished, setIsPublished] = useState(materi?.is_published ?? false)
   const [isFeatured, setIsFeatured] = useState(materi?.is_featured ?? false)
   const [videos, setVideos] = useState<VideoItem[]>(materi?.videos ?? [])
+  const [documents, setDocuments] = useState<DocumentItem[]>(materi?.documents ?? [])
   const isEdit = !!materi
 
   useEffect(() => {
@@ -74,6 +81,7 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     setIsPublished(materi?.is_published ?? false)
     setIsFeatured(materi?.is_featured ?? false)
     setVideos(materi?.videos ?? [])
+    setDocuments(materi?.documents ?? [])
     const existing = materi?.file_path ?? ''
     setGdriveInput(existing.startsWith('https://') ? existing : '')
     setGdriveValid(null)
@@ -129,6 +137,12 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     setVideos(videos.map((v, i) => i === index ? { ...v, [field]: value } : v))
   }
 
+  function addDocument() { setDocuments([...documents, { title: '', url: '' }]) }
+  function removeDocument(index: number) { setDocuments(documents.filter((_, i) => i !== index)) }
+  function updateDocument(index: number, field: 'title' | 'url', value: string) {
+    setDocuments(documents.map((d, i) => i === index ? { ...d, [field]: value } : d))
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -136,6 +150,8 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     formData.set('is_featured', isFeatured ? 'true' : 'false')
     const validVideos = videos.filter(v => v.title.trim() && v.url.trim())
     formData.set('videos', validVideos.length > 0 ? JSON.stringify(validVideos) : '')
+    const validDocs = documents.filter(d => d.title.trim() && d.url.trim())
+    formData.set('documents', validDocs.length > 0 ? JSON.stringify(validDocs) : '')
     startTransition(async () => {
       if (isEdit) {
         await updateEbook(materi.id, formData)
@@ -250,6 +266,37 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
                   placeholder="YouTube URL atau video ID (misal: dQw4w9WgXcQ)"
                   value={video.url}
                   onChange={(e) => updateVideo(index, 'url', e.target.value)}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* DOKUMEN TAMBAHAN */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <Label>Dokumen Tambahan (opsional)</Label>
+              <button type="button" onClick={addDocument} className="text-xs text-[#D4AF37] hover:underline">
+                + Tambah Dokumen
+              </button>
+            </div>
+            {documents.length === 0 && (
+              <p className="text-xs text-[#444]">Belum ada dokumen. Klik &quot;+ Tambah Dokumen&quot; untuk menambahkan.</p>
+            )}
+            {documents.map((doc, index) => (
+              <div key={index} className="flex flex-col gap-2 bg-[#111] border border-[#222] rounded-lg p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-[#555] font-medium">Dokumen {index + 1}</span>
+                  <button type="button" onClick={() => removeDocument(index)} className="text-xs text-red-500 hover:text-red-400">Hapus</button>
+                </div>
+                <Input
+                  placeholder="Judul dokumen (misal: Slide Presentasi)"
+                  value={doc.title}
+                  onChange={(e) => updateDocument(index, 'title', e.target.value)}
+                />
+                <Input
+                  placeholder="Google Drive URL (https://drive.google.com/file/d/...)"
+                  value={doc.url}
+                  onChange={(e) => updateDocument(index, 'url', e.target.value)}
                 />
               </div>
             ))}
