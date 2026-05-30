@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Update admin panel — rename Ebook→Materi, tambah field `is_featured` (checkbox) dan `videos` (dynamic YouTube URL rows) di form edit/tambah materi.
+**Goal:** Rename admin route `/admin/ebook` → `/admin/materi`, rename semua label Ebook→Materi, tambah field `is_featured` dan `videos` (dynamic YouTube rows) di form materi.
 
-**Architecture:** 5 file diubah: AdminSidebar (rename nav), page.tsx (update query), EbookClient (rename + is_featured badge), EbookDialog (is_featured + dynamic video rows), actions.ts (handle new fields + revalidate /materi). Tidak ada komponen baru — semua perubahan di file yang sudah ada.
+**Architecture:** Task 1 rename folder + files via `git mv`. Task 2 update AdminSidebar href. Task 3-5 update konten file (query, client table, dialog form, actions). Tidak ada komponen baru.
 
 **Tech Stack:** Next.js 16 App Router, Supabase, Tailwind CSS, React useState
 
@@ -12,52 +12,111 @@
 
 ## File Map
 
-| File | Action | Keterangan |
-|---|---|---|
-| `src/components/admin/AdminSidebar.tsx` | Modify | Rename "Ebook" → "Materi" di NAV |
-| `src/app/(admin)/admin/ebook/page.tsx` | Modify | Tambah `is_featured`, `videos` ke select query |
-| `src/app/(admin)/admin/ebook/EbookClient.tsx` | Modify | Rename labels, update interface, badge Featured |
-| `src/app/(admin)/admin/ebook/EbookDialog.tsx` | Modify | Rename labels, add is_featured, add dynamic video rows |
-| `src/app/(admin)/admin/ebook/actions.ts` | Modify | Handle is_featured, videos di CRUD, revalidate /materi |
+| File | Action |
+|---|---|
+| `src/app/(admin)/admin/ebook/` → `src/app/(admin)/admin/materi/` | `git mv` folder |
+| `EbookClient.tsx` → `MateriClient.tsx` | `git mv` + update imports |
+| `EbookDialog.tsx` → `MateriDialog.tsx` | `git mv` + update imports |
+| `src/components/admin/AdminSidebar.tsx` | Update href + label |
+| `src/app/(admin)/admin/materi/page.tsx` | Add `is_featured`, `videos` to query |
+| `src/app/(admin)/admin/materi/MateriClient.tsx` | Rename labels, interface, Featured badge, video count |
+| `src/app/(admin)/admin/materi/MateriDialog.tsx` | Rename labels, add is_featured, dynamic video rows |
+| `src/app/(admin)/admin/materi/actions.ts` | Handle is_featured, videos, revalidate `/admin/materi` |
 
 ---
 
-## Task 1: AdminSidebar — Rename Ebook→Materi
+## Task 1: Rename Folder + Files
+
+**Files:**
+- Rename: `src/app/(admin)/admin/ebook/` → `src/app/(admin)/admin/materi/`
+- Rename: `EbookClient.tsx` → `MateriClient.tsx`
+- Rename: `EbookDialog.tsx` → `MateriDialog.tsx`
+
+- [ ] **Step 1: git mv folder dan files**
+
+```bash
+git mv "src/app/(admin)/admin/ebook" "src/app/(admin)/admin/materi"
+git mv "src/app/(admin)/admin/materi/EbookClient.tsx" "src/app/(admin)/admin/materi/MateriClient.tsx"
+git mv "src/app/(admin)/admin/materi/EbookDialog.tsx" "src/app/(admin)/admin/materi/MateriDialog.tsx"
+```
+
+- [ ] **Step 2: Update import di page.tsx**
+
+Buka `src/app/(admin)/admin/materi/page.tsx`, ganti:
+```ts
+// SEBELUM
+import { EbookClient } from './EbookClient'
+// SESUDAH
+import { MateriClient } from './MateriClient'
+```
+
+Dan ganti `<EbookClient ebooks={ebooks ?? []} />` → `<MateriClient ebooks={ebooks ?? []} />`.
+
+- [ ] **Step 3: Update import di MateriClient.tsx**
+
+Buka `src/app/(admin)/admin/materi/MateriClient.tsx`, ganti:
+```ts
+// SEBELUM
+import { EbookDialog } from './EbookDialog'
+// SESUDAH
+import { MateriDialog } from './MateriDialog'
+```
+
+Dan ganti `<EbookDialog ...>` → `<MateriDialog ...>`.
+
+- [ ] **Step 4: Update nama fungsi export di MateriClient.tsx**
+
+Ganti `export function EbookClient` → `export function MateriClient`.
+
+- [ ] **Step 5: Update nama fungsi export di MateriDialog.tsx**
+
+Ganti `export function EbookDialog` → `export function MateriDialog`.
+Ganti props type `EbookDialogProps` → `MateriDialogProps`.
+Ganti interface `Ebook` → `Materi` dan props `ebook?: Ebook` → `materi?: Materi`.
+
+- [ ] **Step 6: Typecheck dan commit**
+
+```bash
+pnpm typecheck
+git add -A
+git commit -m "feat(admin): rename ebook folder/files to materi"
+```
+
+---
+
+## Task 2: AdminSidebar — Update href dan label
 
 **Files:**
 - Modify: `src/components/admin/AdminSidebar.tsx`
 
-- [ ] **Step 1: Ganti label "Ebook" di NAV array**
+- [ ] **Step 1: Ganti label dan href**
 
-Ubah baris:
 ```ts
+// SEBELUM
 { label: 'Ebook', href: '/admin/ebook' },
-```
-Menjadi:
-```ts
-{ label: 'Materi', href: '/admin/ebook' },
+// SESUDAH
+{ label: 'Materi', href: '/admin/materi' },
 ```
 
-Hanya label yang berubah. href `/admin/ebook` tetap (tidak perlu rename route admin).
-
-- [ ] **Step 2: Typecheck dan commit**
+- [ ] **Step 2: Commit**
 
 ```bash
 pnpm typecheck
 git add src/components/admin/AdminSidebar.tsx
-git commit -m "feat(admin): rename Ebook→Materi in sidebar nav"
+git commit -m "feat(admin): sidebar nav Ebook→Materi with /admin/materi href"
 ```
 
 ---
 
-## Task 2: Update Query — Tambah is_featured dan videos
+## Task 3: Update Query + MateriClient Table
 
 **Files:**
-- Modify: `src/app/(admin)/admin/ebook/page.tsx`
+- Modify: `src/app/(admin)/admin/materi/page.tsx`
+- Modify: `src/app/(admin)/admin/materi/MateriClient.tsx`
 
-- [ ] **Step 1: Tambah is_featured dan videos ke select**
+- [ ] **Step 1: Update select query di page.tsx**
 
-Ubah dari:
+Ganti:
 ```ts
 .select('id, slug, title, description, category, cover_url, file_path, page_count, is_published')
 ```
@@ -66,29 +125,14 @@ Menjadi:
 .select('id, slug, title, description, category, cover_url, file_path, page_count, is_published, is_featured, videos')
 ```
 
-- [ ] **Step 2: Typecheck dan commit**
-
-```bash
-pnpm typecheck
-git add "src/app/(admin)/admin/ebook/page.tsx"
-git commit -m "feat(admin): include is_featured and videos in ebook query"
-```
-
----
-
-## Task 3: EbookClient — Rename + is_featured Badge
-
-**Files:**
-- Modify: `src/app/(admin)/admin/ebook/EbookClient.tsx`
-
-- [ ] **Step 1: Ganti seluruh isi file**
+- [ ] **Step 2: Ganti seluruh isi MateriClient.tsx**
 
 ```tsx
 'use client'
 
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { EbookDialog } from './EbookDialog'
+import { MateriDialog } from './MateriDialog'
 import { deleteEbook } from './actions'
 
 interface VideoItem {
@@ -96,7 +140,7 @@ interface VideoItem {
   url: string
 }
 
-interface Ebook {
+interface Materi {
   id: string
   title: string
   slug: string
@@ -110,13 +154,13 @@ interface Ebook {
   videos: VideoItem[] | null
 }
 
-export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
+export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<Ebook | undefined>()
+  const [editTarget, setEditTarget] = useState<Materi | undefined>()
   const [, startTransition] = useTransition()
 
   function openAdd() { setEditTarget(undefined); setDialogOpen(true) }
-  function openEdit(e: Ebook) { setEditTarget(e); setDialogOpen(true) }
+  function openEdit(m: Materi) { setEditTarget(m); setDialogOpen(true) }
   function handleDelete(id: string) {
     if (!confirm('Hapus materi ini?')) return
     startTransition(() => deleteEbook(id))
@@ -139,40 +183,38 @@ export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
             </tr>
           </thead>
           <tbody>
-            {ebooks.map((e) => (
-              <tr key={e.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+            {materis.map((m) => (
+              <tr key={m.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
                 <td className="px-4 py-3 text-[#F5F5F0] font-medium">
                   <div className="flex items-center gap-2">
-                    {e.is_featured && (
-                      <span className="text-[#D4AF37] text-[10px] font-bold">★</span>
-                    )}
-                    {e.title}
+                    {m.is_featured && <span className="text-[#D4AF37] text-[10px] font-bold">★</span>}
+                    {m.title}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-[#888888]">{e.category}</td>
-                <td className="px-4 py-3 text-[#888888]">{e.page_count ?? '—'}</td>
+                <td className="px-4 py-3 text-[#888888]">{m.category}</td>
+                <td className="px-4 py-3 text-[#888888]">{m.page_count ?? '—'}</td>
                 <td className="px-4 py-3 text-[#888888]">
-                  {e.videos && e.videos.length > 0
-                    ? <span className="text-[#D4AF37] text-xs">{e.videos.length} video</span>
+                  {m.videos && m.videos.length > 0
+                    ? <span className="text-[#D4AF37] text-xs">{m.videos.length} video</span>
                     : <span className="text-[#333]">—</span>
                   }
                 </td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    e.is_published ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-[#1A1A1A] text-[#555555]'
+                    m.is_published ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-[#1A1A1A] text-[#555555]'
                   }`}>
-                    {e.is_published ? 'Aktif' : 'Draft'}
+                    {m.is_published ? 'Aktif' : 'Draft'}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
-                    <button onClick={() => openEdit(e)} className="text-xs text-[#888888] hover:text-[#D4AF37] transition-colors">Edit</button>
-                    <button onClick={() => handleDelete(e.id)} className="text-xs text-red-500 hover:text-red-400 transition-colors">Hapus</button>
+                    <button onClick={() => openEdit(m)} className="text-xs text-[#888888] hover:text-[#D4AF37] transition-colors">Edit</button>
+                    <button onClick={() => handleDelete(m.id)} className="text-xs text-red-500 hover:text-red-400 transition-colors">Hapus</button>
                   </div>
                 </td>
               </tr>
             ))}
-            {ebooks.length === 0 && (
+            {materis.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-[#555555]">Belum ada materi.</td>
               </tr>
@@ -181,28 +223,28 @@ export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
         </table>
       </div>
 
-      <EbookDialog open={dialogOpen} onClose={() => setDialogOpen(false)} ebook={editTarget} />
+      <MateriDialog open={dialogOpen} onClose={() => setDialogOpen(false)} materi={editTarget} />
     </>
   )
 }
 ```
 
-- [ ] **Step 2: Typecheck dan commit**
+- [ ] **Step 3: Commit**
 
 ```bash
 pnpm typecheck
-git add "src/app/(admin)/admin/ebook/EbookClient.tsx"
-git commit -m "feat(admin): rename Ebook→Materi, add video count and featured badge in table"
+git add "src/app/(admin)/admin/materi/page.tsx" "src/app/(admin)/admin/materi/MateriClient.tsx"
+git commit -m "feat(admin): update query + MateriClient table with featured badge and video count"
 ```
 
 ---
 
-## Task 4: EbookDialog — is_featured + Dynamic Video Rows
+## Task 4: MateriDialog — is_featured + Dynamic Video Rows
 
 **Files:**
-- Modify: `src/app/(admin)/admin/ebook/EbookDialog.tsx`
+- Modify: `src/app/(admin)/admin/materi/MateriDialog.tsx`
 
-- [ ] **Step 1: Ganti seluruh isi file**
+- [ ] **Step 1: Ganti seluruh isi MateriDialog.tsx**
 
 ```tsx
 'use client'
@@ -235,7 +277,7 @@ interface VideoItem {
   url: string
 }
 
-interface Ebook {
+interface Materi {
   id: string
   title: string
   slug: string
@@ -249,42 +291,42 @@ interface Ebook {
   videos: VideoItem[] | null
 }
 
-interface EbookDialogProps {
+interface MateriDialogProps {
   open: boolean
   onClose: () => void
-  ebook?: Ebook
+  materi?: Materi
 }
 
 function slugify(str: string) {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 }
 
-export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
+export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
   const [isPending, startTransition] = useTransition()
-  const [title, setTitle] = useState(ebook?.title ?? '')
-  const [slug, setSlug] = useState(ebook?.slug ?? '')
-  const [filePath, setFilePath] = useState(ebook?.file_path ?? '')
+  const [title, setTitle] = useState(materi?.title ?? '')
+  const [slug, setSlug] = useState(materi?.slug ?? '')
+  const [filePath, setFilePath] = useState(materi?.file_path ?? '')
   const [gdriveInput, setGdriveInput] = useState('')
   const [gdriveValid, setGdriveValid] = useState<boolean | null>(null)
-  const [coverUrl, setCoverUrl] = useState(ebook?.cover_url ?? '')
+  const [coverUrl, setCoverUrl] = useState(materi?.cover_url ?? '')
   const [uploadingCover, setUploadingCover] = useState(false)
-  const [isPublished, setIsPublished] = useState(ebook?.is_published ?? false)
-  const [isFeatured, setIsFeatured] = useState(ebook?.is_featured ?? false)
-  const [videos, setVideos] = useState<VideoItem[]>(ebook?.videos ?? [])
-  const isEdit = !!ebook
+  const [isPublished, setIsPublished] = useState(materi?.is_published ?? false)
+  const [isFeatured, setIsFeatured] = useState(materi?.is_featured ?? false)
+  const [videos, setVideos] = useState<VideoItem[]>(materi?.videos ?? [])
+  const isEdit = !!materi
 
   useEffect(() => {
-    setTitle(ebook?.title ?? '')
-    setSlug(ebook?.slug ?? '')
-    setFilePath(ebook?.file_path ?? '')
-    setCoverUrl(ebook?.cover_url ?? '')
-    setIsPublished(ebook?.is_published ?? false)
-    setIsFeatured(ebook?.is_featured ?? false)
-    setVideos(ebook?.videos ?? [])
-    const existing = ebook?.file_path ?? ''
+    setTitle(materi?.title ?? '')
+    setSlug(materi?.slug ?? '')
+    setFilePath(materi?.file_path ?? '')
+    setCoverUrl(materi?.cover_url ?? '')
+    setIsPublished(materi?.is_published ?? false)
+    setIsFeatured(materi?.is_featured ?? false)
+    setVideos(materi?.videos ?? [])
+    const existing = materi?.file_path ?? ''
     setGdriveInput(existing.startsWith('https://') ? existing : '')
     setGdriveValid(null)
-  }, [open, ebook])
+  }, [open, materi])
 
   async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -306,7 +348,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
       setCoverUrl(data.publicUrl)
       toast.success('Cover berhasil diupload!')
     } catch (err) {
-      console.error('[EbookDialog cover upload]', err)
+      console.error('[MateriDialog cover upload]', err)
       toast.error('Gagal mengupload cover. Coba lagi.')
     } finally {
       setUploadingCover(false)
@@ -322,27 +364,16 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
     setGdriveInput(val)
     if (!val.trim()) {
       setGdriveValid(null)
-      setFilePath(isEdit ? ebook?.file_path ?? '' : '')
+      setFilePath(isEdit ? materi?.file_path ?? '' : '')
       return
     }
     const converted = parseGdriveUrl(val)
-    if (converted) {
-      setFilePath(converted)
-      setGdriveValid(true)
-    } else {
-      setFilePath('')
-      setGdriveValid(false)
-    }
+    if (converted) { setFilePath(converted); setGdriveValid(true) }
+    else { setFilePath(''); setGdriveValid(false) }
   }
 
-  function addVideo() {
-    setVideos([...videos, { title: '', url: '' }])
-  }
-
-  function removeVideo(index: number) {
-    setVideos(videos.filter((_, i) => i !== index))
-  }
-
+  function addVideo() { setVideos([...videos, { title: '', url: '' }]) }
+  function removeVideo(index: number) { setVideos(videos.filter((_, i) => i !== index)) }
   function updateVideo(index: number, field: 'title' | 'url', value: string) {
     setVideos(videos.map((v, i) => i === index ? { ...v, [field]: value } : v))
   }
@@ -356,7 +387,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
     formData.set('videos', validVideos.length > 0 ? JSON.stringify(validVideos) : '')
     startTransition(async () => {
       if (isEdit) {
-        await updateEbook(ebook.id, formData)
+        await updateEbook(materi.id, formData)
       } else {
         await createEbook(formData)
       }
@@ -374,19 +405,19 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_title">Judul</Label>
-            <Input id="ebook_title" name="title" value={title} onChange={(e) => handleTitleChange(e.target.value)} required />
+            <Label htmlFor="m_title">Judul</Label>
+            <Input id="m_title" name="title" value={title} onChange={(e) => handleTitleChange(e.target.value)} required />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_slug">Slug</Label>
-            <Input id="ebook_slug" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
+            <Label htmlFor="m_slug">Slug</Label>
+            <Input id="m_slug" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_category">Kategori</Label>
+            <Label htmlFor="m_category">Kategori</Label>
             <select
-              id="ebook_category"
+              id="m_category"
               name="category"
-              defaultValue={ebook?.category ?? ''}
+              defaultValue={materi?.category ?? ''}
               required
               className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] focus:outline-none focus:border-[#D4AF37]"
             >
@@ -400,11 +431,11 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_description">Deskripsi</Label>
+            <Label htmlFor="m_description">Deskripsi</Label>
             <textarea
-              id="ebook_description"
+              id="m_description"
               name="description"
-              defaultValue={ebook?.description ?? ''}
+              defaultValue={materi?.description ?? ''}
               rows={2}
               className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] placeholder:text-[#555555] focus:outline-none focus:border-[#D4AF37] resize-none"
             />
@@ -423,14 +454,14 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
               <input type="hidden" name="cover_url" value={coverUrl} />
             </div>
             <div className="flex flex-col gap-1.5 w-28">
-              <Label htmlFor="ebook_page_count">Jumlah Hal.</Label>
-              <Input id="ebook_page_count" name="page_count" type="number" defaultValue={ebook?.page_count ?? ''} />
+              <Label htmlFor="m_page_count">Jumlah Hal.</Label>
+              <Input id="m_page_count" name="page_count" type="number" defaultValue={materi?.page_count ?? ''} />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="ebook_gdrive">Link Google Drive PDF</Label>
+            <Label htmlFor="m_gdrive">Link Google Drive PDF</Label>
             <Input
-              id="ebook_gdrive"
+              id="m_gdrive"
               type="url"
               placeholder="https://drive.google.com/file/d/FILE_ID/view"
               value={gdriveInput}
@@ -446,11 +477,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <Label>Video YouTube (opsional)</Label>
-              <button
-                type="button"
-                onClick={addVideo}
-                className="text-xs text-[#D4AF37] hover:underline"
-              >
+              <button type="button" onClick={addVideo} className="text-xs text-[#D4AF37] hover:underline">
                 + Tambah Video
               </button>
             </div>
@@ -461,13 +488,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
               <div key={index} className="flex flex-col gap-2 bg-[#111] border border-[#222] rounded-lg p-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-[#555] font-medium">Video {index + 1}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeVideo(index)}
-                    className="text-xs text-red-500 hover:text-red-400"
-                  >
-                    Hapus
-                  </button>
+                  <button type="button" onClick={() => removeVideo(index)} className="text-xs text-red-500 hover:text-red-400">Hapus</button>
                 </div>
                 <Input
                   placeholder="Judul video (misal: Pengenalan Prompt)"
@@ -483,41 +504,20 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
             ))}
           </div>
 
-          {/* IS_FEATURED + IS_PUBLISHED */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="ebook_featured"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                className="accent-[#D4AF37] w-4 h-4"
-              />
-              <Label htmlFor="ebook_featured">Jadikan Materi Pilihan (⭐ Featured di Dashboard)</Label>
+              <input type="checkbox" id="m_featured" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
+              <Label htmlFor="m_featured">Jadikan Materi Pilihan (★ Featured di Dashboard)</Label>
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="is_published"
-                value="true"
-                id="ebook_published"
-                checked={isPublished}
-                onChange={(e) => setIsPublished(e.target.checked)}
-                className="accent-[#D4AF37] w-4 h-4"
-              />
-              <Label htmlFor="ebook_published">Published</Label>
+              <input type="checkbox" name="is_published" value="true" id="m_published" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
+              <Label htmlFor="m_published">Published</Label>
             </div>
           </div>
 
           <div className="flex gap-2 justify-end pt-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>Batal</Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="sm"
-              loading={isPending}
-              disabled={!filePath && !isEdit}
-            >
+            <Button type="submit" variant="primary" size="sm" loading={isPending} disabled={!filePath && !isEdit}>
               {isEdit ? 'Simpan' : 'Tambah'}
             </Button>
           </div>
@@ -528,22 +528,22 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
 }
 ```
 
-- [ ] **Step 2: Typecheck dan commit**
+- [ ] **Step 2: Commit**
 
 ```bash
 pnpm typecheck
-git add "src/app/(admin)/admin/ebook/EbookDialog.tsx"
-git commit -m "feat(admin): add is_featured toggle and dynamic video rows to materi dialog"
+git add "src/app/(admin)/admin/materi/MateriDialog.tsx"
+git commit -m "feat(admin): MateriDialog — is_featured toggle + dynamic YouTube video rows"
 ```
 
 ---
 
-## Task 5: actions.ts — Handle is_featured, videos, revalidate /materi
+## Task 5: actions.ts — Handle is_featured, videos, revalidate /admin/materi
 
 **Files:**
-- Modify: `src/app/(admin)/admin/ebook/actions.ts`
+- Modify: `src/app/(admin)/admin/materi/actions.ts`
 
-- [ ] **Step 1: Ganti seluruh isi file**
+- [ ] **Step 1: Ganti seluruh isi actions.ts**
 
 ```ts
 'use server'
@@ -573,7 +573,7 @@ export async function createEbook(formData: FormData) {
     console.error('[createEbook]', error.message)
     throw new Error(error.message)
   }
-  revalidatePath('/admin/ebook')
+  revalidatePath('/admin/materi')
   revalidatePath('/materi')
   revalidatePath('/dashboard')
 }
@@ -603,7 +603,7 @@ export async function updateEbook(id: string, formData: FormData) {
     console.error('[updateEbook]', error.message)
     throw new Error(error.message)
   }
-  revalidatePath('/admin/ebook')
+  revalidatePath('/admin/materi')
   revalidatePath('/materi')
   revalidatePath('/dashboard')
 }
@@ -616,24 +616,19 @@ export async function deleteEbook(id: string) {
     console.error('[deleteEbook]', error.message)
     throw new Error(error.message)
   }
-  revalidatePath('/admin/ebook')
+  revalidatePath('/admin/materi')
   revalidatePath('/materi')
   revalidatePath('/dashboard')
 }
 ```
 
-- [ ] **Step 2: Typecheck + build + commit**
+- [ ] **Step 2: Typecheck + build + push**
 
 ```bash
 pnpm typecheck
 pnpm build
-git add "src/app/(admin)/admin/ebook/actions.ts"
-git commit -m "feat(admin): handle is_featured and videos in ebook CRUD actions"
-```
-
-- [ ] **Step 3: Push ke production**
-
-```bash
+git add "src/app/(admin)/admin/materi/actions.ts"
+git commit -m "feat(admin): handle is_featured, videos in CRUD, revalidate /admin/materi"
 git push
 ```
 
@@ -641,12 +636,13 @@ git push
 
 ## Verification Checklist
 
-- [ ] Admin sidebar: "Materi" (bukan "Ebook")
-- [ ] Admin `/admin/ebook` — tabel header "Materi", kolom video count dan ★ featured
-- [ ] Klik "+ Tambah" → dialog "Tambah Materi"
-- [ ] Dialog: checkbox "Jadikan Materi Pilihan" ada
-- [ ] Dialog: "+ Tambah Video" bisa klik, muncul baris input Judul + URL
-- [ ] Bisa tambah multiple video, bisa hapus per baris
-- [ ] Simpan materi → `is_featured` dan `videos` tersimpan di Supabase
-- [ ] Set is_featured=true → dashboard user menampilkan "Materi Pilihan" card
+- [ ] `/admin/materi` — route baru berfungsi (tidak 404)
+- [ ] Sidebar: "Materi" link ke `/admin/materi`
+- [ ] Tabel: heading "Materi", kolom Video count, ★ featured badge
+- [ ] Dialog "Tambah Materi" / "Edit Materi"
+- [ ] Checkbox "Jadikan Materi Pilihan" berfungsi
+- [ ] "+ Tambah Video" muncul baris input Judul + YouTube URL
+- [ ] Bisa add/remove multiple video
+- [ ] Simpan → data tersimpan di Supabase (`is_featured`, `videos` kolom)
+- [ ] Set is_featured=true → dashboard user menampilkan ★ Materi Pilihan
 - [ ] `pnpm build` → success
