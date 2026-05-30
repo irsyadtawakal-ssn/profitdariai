@@ -19,10 +19,21 @@ export const getCachedCourses = unstable_cache(
   { revalidate: 60 }
 )
 
+export type CachedEbook = {
+  id: string
+  slug: string
+  title: string
+  category: string
+  cover_url: string | null
+  description: string | null
+  is_featured: boolean | null
+}
+
 export const getCachedEbooks = unstable_cache(
-  async (category?: string) => {
+  async (category?: string): Promise<CachedEbook[]> => {
     const supabase = createAdminClient()
-    let query = supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase as any)
       .from('ebooks')
       .select('id, slug, title, category, cover_url, description, is_featured')
       .eq('is_published', true)
@@ -31,7 +42,7 @@ export const getCachedEbooks = unstable_cache(
     if (category) query = query.eq('category', category)
 
     const { data } = await query
-    return data ?? []
+    return (data ?? []) as CachedEbook[]
   },
   ['ebooks-published'],
   { revalidate: 60 }
