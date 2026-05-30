@@ -56,7 +56,7 @@ async function MemberHero() {
           </span>
           <span className="text-[#444] text-xs hidden sm:block">|</span>
           <span className="text-[#888] text-xs">
-            Akses ke seluruh materi tersedia
+            {isActive ? 'Akses ke seluruh materi tersedia' : 'Perpanjang akses kamu'}
           </span>
         </div>
       </div>
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   ])
 
   const featuredMateri = allMateris.find((m) => m.is_featured) ?? null
-  const recentMateris = allMateris.filter((m) => !m.is_featured).slice(0, 3)
+  const recentMateris = allMateris.filter((m) => m.id !== featuredMateri?.id).slice(0, 3)
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
