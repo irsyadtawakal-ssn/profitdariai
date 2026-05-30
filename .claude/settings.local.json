@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(python -c ' *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(Select-String -Path \"src\\\\app\\\\\\(marketing\\)\\\\landing.css\" -Pattern \"ffbf00|255, 191, 0|Outfit\")",
+      "Bash(Select-Object -First 20)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\MIT\\\\CLAUDE CODE PROJECT\\\\PROFIT DARI AI\\\\profitdariai\\\\src\" -Recurse -Filter \"route.ts\")",
+      "Bash(Select-Object FullName)",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell(git add \"src/app/\\(auth\\)/layout.tsx\" \"src/app/\\(auth\\)/login/page.tsx\")",
+      "Bash(Remove-Item \"D:\\\\MIT\\\\CLAUDE CODE PROJECT\\\\PROFIT DARI AI\\\\profitdariai\\\\src\\\\middleware.ts\")",
+      "PowerShell(Remove-Item \"D:\\\\MIT\\\\CLAUDE CODE PROJECT\\\\PROFIT DARI AI\\\\profitdariai\\\\src\\\\middleware.ts\" -Confirm:$false)",
+      "Bash(Remove-Item \"D:\\\\MIT\\\\CLAUDE CODE PROJECT\\\\PROFIT DARI AI\\\\profitdariai\\\\src\\\\lib\\\\email\\\\resend.ts\")",
+      "PowerShell(Remove-Item \"D:\\\\MIT\\\\CLAUDE CODE PROJECT\\\\PROFIT DARI AI\\\\profitdariai\\\\src\\\\lib\\\\email\\\\resend.ts\" -Confirm:$false)",
+      "WebFetch(domain:tripay.co.id)",
+      "Bash(vercel env *)",
+      "Bash(vercel --prod)",
+      "Bash(pnpm build *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(git commit -m 'docs: complete VPS migration log \\(29 May 2026\\) *)",
+      "Bash(dig profitdariai.com +short)",
+      "Bash(nslookup profitdariai.com)",
+      "Bash(curl -I http://profitdariai.com)",
+      "PowerShell(Resolve-DnsName profitdariai.com -Type A)",
+      "PowerShell(ipconfig /flushdns)",
+      "Bash(ssh -i ~/.ssh/id_ed25519 root@103.93.163.183 \"curl https://profitdariai.com 2>&1 | head -20\")",
+      "Bash(git commit *)",
+      "Bash(ls /mnt/c/Users/lu.DESKTOP-HRO3RNS/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/scripts/)",
+      "Read(//mnt/c/Users/lu.DESKTOP-HRO3RNS/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/**)",
+      "Bash(bash \"/mnt/c/Users/lu.DESKTOP-HRO3RNS/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/start-server.sh\" --project-dir \"/mnt/d/MIT/CLAUDE CODE PROJECT/PROFIT DARI AI/profitdariai\")",
+      "Bash(bash \"C:/Users/lu.DESKTOP-HRO3RNS/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/start-server.sh\" --project-dir \"D:/MIT/CLAUDE CODE PROJECT/PROFIT DARI AI/profitdariai\")",
+      "Bash(gh run *)",
+      "Bash(git remote *)"
+    ]
+  }
+}

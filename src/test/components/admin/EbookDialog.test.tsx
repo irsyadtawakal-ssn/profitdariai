@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import { EbookDialog } from '@/app/(admin)/admin/ebook/EbookDialog'
+import { MateriDialog } from '@/app/(admin)/admin/materi/MateriDialog'
 
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
@@ -12,15 +12,15 @@ vi.mock('@/lib/supabase/client', () => ({
   }),
 }))
 
-vi.mock('@/app/(admin)/admin/ebook/actions', () => ({
+vi.mock('@/app/(admin)/admin/materi/actions', () => ({
   createEbook: vi.fn().mockResolvedValue(undefined),
   updateEbook: vi.fn().mockResolvedValue(undefined),
 }))
 
-describe('EbookDialog', () => {
+describe('MateriDialog', () => {
   it('renders add form', () => {
-    render(<EbookDialog open={true} onClose={vi.fn()} />)
-    expect(screen.getByText('Tambah Ebook')).toBeInTheDocument()
+    render(<MateriDialog open={true} onClose={vi.fn()} />)
+    expect(screen.getByText('Tambah Materi')).toBeInTheDocument()
   })
 
   it('renders edit form with prefilled data', () => {
@@ -29,15 +29,15 @@ describe('EbookDialog', () => {
       description: null, category: 'AI', cover_url: null,
       file_path: 'ebooks/test.pdf', page_count: 50, is_published: true,
     }
-    render(<EbookDialog open={true} onClose={vi.fn()} ebook={ebook} />)
-    expect(screen.getByText('Edit Ebook')).toBeInTheDocument()
+    render(<MateriDialog open={true} onClose={vi.fn()} ebook={ebook} />)
+    expect(screen.getByText('Edit Materi')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Panduan AI')).toBeInTheDocument()
     expect(screen.getByText(/ebooks\/test\.pdf/)).toBeInTheDocument()
   })
 
   it('calls onClose on Batal', () => {
     const onClose = vi.fn()
-    render(<EbookDialog open={true} onClose={onClose} />)
+    render(<MateriDialog open={true} onClose={onClose} />)
     fireEvent.click(screen.getByRole('button', { name: /batal/i }))
     expect(onClose).toHaveBeenCalled()
   })

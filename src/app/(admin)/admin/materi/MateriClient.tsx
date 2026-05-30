@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { EbookDialog } from './EbookDialog'
+import { MateriDialog } from './MateriDialog'
 import { deleteEbook } from './actions'
 
 interface Ebook {
@@ -17,7 +17,7 @@ interface Ebook {
   is_published: boolean
 }
 
-export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
+export function MateriClient({ ebooks }: { ebooks: Ebook[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Ebook | undefined>()
   const [, startTransition] = useTransition()
@@ -25,14 +25,14 @@ export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
   function openAdd() { setEditTarget(undefined); setDialogOpen(true) }
   function openEdit(e: Ebook) { setEditTarget(e); setDialogOpen(true) }
   function handleDelete(id: string) {
-    if (!confirm('Hapus ebook ini?')) return
+    if (!confirm('Hapus materi ini?')) return
     startTransition(() => deleteEbook(id))
   }
 
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#F5F5F0]">Ebook</h1>
+        <h1 className="text-2xl font-bold text-[#F5F5F0]">Materi</h1>
         <Button variant="primary" size="sm" onClick={openAdd}>+ Tambah</Button>
       </div>
 
@@ -68,14 +68,14 @@ export function EbookClient({ ebooks }: { ebooks: Ebook[] }) {
             ))}
             {ebooks.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-[#555555]">Belum ada ebook.</td>
+                <td colSpan={5} className="px-4 py-8 text-center text-[#555555]">Belum ada materi.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      <EbookDialog open={dialogOpen} onClose={() => setDialogOpen(false)} ebook={editTarget} />
+      <MateriDialog open={dialogOpen} onClose={() => setDialogOpen(false)} ebook={editTarget} />
     </>
   )
 }

@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import { EbookClient } from './EbookClient'
+import { MateriClient } from './MateriClient'
 
-export default async function AdminEbookPage() {
+export default async function AdminMateriPage() {
   const supabase = createAdminClient()
   const { data: ebooks } = await supabase
     .from('ebooks')
@@ -10,7 +10,7 @@ export default async function AdminEbookPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <EbookClient ebooks={ebooks ?? []} />
+      <MateriClient ebooks={ebooks ?? []} />
     </div>
   )
 }

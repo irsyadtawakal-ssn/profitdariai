@@ -39,7 +39,7 @@ interface Ebook {
   is_published: boolean
 }
 
-interface EbookDialogProps {
+interface MateriDialogProps {
   open: boolean
   onClose: () => void
   ebook?: Ebook
@@ -49,7 +49,7 @@ function slugify(str: string) {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 }
 
-export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
+export function MateriDialog({ open, onClose, ebook }: MateriDialogProps) {
   const [isPending, startTransition] = useTransition()
   const [title, setTitle] = useState(ebook?.title ?? '')
   const [slug, setSlug] = useState(ebook?.slug ?? '')
@@ -94,7 +94,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
       setCoverUrl(data.publicUrl)
       toast.success('Cover berhasil diupload!')
     } catch (err) {
-      console.error('[EbookDialog cover upload]', err)
+      console.error('[MateriDialog cover upload]', err)
       toast.error('Gagal mengupload cover. Coba lagi.')
     } finally {
       setUploadingCover(false)
@@ -144,7 +144,7 @@ export function EbookDialog({ open, onClose, ebook }: EbookDialogProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-[#F5F5F0]">
-            {isEdit ? 'Edit Ebook' : 'Tambah Ebook'}
+            {isEdit ? 'Edit Materi' : 'Tambah Materi'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">

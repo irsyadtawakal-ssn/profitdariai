@@ -22,7 +22,7 @@ export async function createEbook(formData: FormData) {
     console.error('[createEbook]', error.message)
     throw new Error(error.message)
   }
-  revalidatePath('/admin/ebook')
+  revalidatePath('/admin/materi')
   revalidatePath('/ebook')
   revalidatePath('/dashboard')
 }
@@ -49,7 +49,7 @@ export async function updateEbook(id: string, formData: FormData) {
     console.error('[updateEbook]', error.message)
     throw new Error(error.message)
   }
-  revalidatePath('/admin/ebook')
+  revalidatePath('/admin/materi')
   revalidatePath('/ebook')
   revalidatePath('/dashboard')
 }
@@ -62,7 +62,7 @@ export async function deleteEbook(id: string) {
     console.error('[deleteEbook]', error.message)
     throw new Error(error.message)
   }
-  revalidatePath('/admin/ebook')
+  revalidatePath('/admin/materi')
   revalidatePath('/ebook')
   revalidatePath('/dashboard')
 }
