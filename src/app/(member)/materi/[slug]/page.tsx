@@ -17,6 +17,7 @@ interface MateriData {
   cover_url: string | null
   page_count: number | null
   videos: unknown
+  documents: unknown
 }
 
 export default async function MateriDetailPage({ params }: MateriDetailPageProps) {
@@ -25,7 +26,7 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
 
   const { data } = await supabase
     .from('ebooks')
-    .select('id, slug, title, description, category, cover_url, page_count, videos')
+    .select('id, slug, title, description, category, cover_url, page_count, videos, documents')
     .eq('slug', slug)
     .eq('is_published', true)
     .single()
@@ -34,6 +35,8 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
   if (!materi) notFound()
 
   const videos = Array.isArray(materi.videos) ? (materi.videos as VideoItem[]) : null
+  type DocumentItem = { title: string; url: string }
+  const documents = Array.isArray(materi.documents) ? (materi.documents as DocumentItem[]) : null
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -98,12 +101,47 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
 
       {/* ③ Video */}
       {videos && videos.length > 0 && (
-        <section>
+        <section className="mb-6">
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
             Video Penjelasan
           </p>
           <div className="bg-[#0E0E0E] border border-[#1A1A1A] rounded-xl p-5 md:p-6">
             <MateriVideoPlayer videos={videos} />
+          </div>
+        </section>
+      )}
+
+      {/* ④ Dokumen Tambahan */}
+      {documents && documents.length > 0 && (
+        <section className="mt-6">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
+            Dokumen Tambahan
+          </p>
+          <div className="bg-[#0E0E0E] border border-[#1A1A1A] rounded-xl p-5 md:p-6">
+            <div className="flex flex-col gap-3">
+              {documents.map((doc, index) => (
+                <a
+                  key={index}
+                  href={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#111] border border-[#1E1E1E] hover:border-[#D4AF37]/30 transition-colors group"
+                >
+                  <svg className="w-5 h-5 text-[#D4AF37] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                  </svg>
+                  <span className="text-[#F5F5F0] text-sm font-medium flex-1 group-hover:text-[#D4AF37] transition-colors">
+                    {doc.title}
+                  </span>
+                  <svg className="w-4 h-4 text-[#555] group-hover:text-[#D4AF37] transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                  </svg>
+                </a>
+              ))}
+            </div>
           </div>
         </section>
       )}
