@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, BookMarked, ShoppingBag, User } from 'lucide-react'
+import { LayoutDashboard, BookMarked, ShoppingBag, User } from 'lucide-react'
 import { Logo } from '@/components/shared/Logo'
 import { isMembershipActive } from '@/lib/membership'
 import { format } from 'date-fns'
@@ -10,8 +10,7 @@ import { id } from 'date-fns/locale'
 
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/kursus', label: 'Kursus', icon: BookOpen },
-  { href: '/ebook', label: 'Ebook', icon: BookMarked },
+  { href: '/materi', label: 'Materi', icon: BookMarked },
   { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
   { href: '/profile', label: 'Profil', icon: User },
 ]
