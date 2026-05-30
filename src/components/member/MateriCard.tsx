@@ -12,7 +12,7 @@ interface MateriCardProps {
 export function MateriCard({ slug, title, category, cover_url }: MateriCardProps) {
   return (
     <Link href={`/materi/${slug}`} className="block group">
-      <div className="rounded-xl overflow-hidden bg-[#0E0E0E] border border-[#1A1A1A] hover:border-[#D4AF37]/30 transition-all hover:-translate-y-0.5 duration-200">
+      <div className="rounded-xl overflow-hidden bg-[#111111] border border-[#222222] hover:border-[#D4AF37]/40 transition-all hover:-translate-y-0.5 duration-200">
         <div className="aspect-[3/2] bg-[#161616] relative overflow-hidden">
           {cover_url ? (
             <Image
@@ -35,7 +35,7 @@ export function MateriCard({ slug, title, category, cover_url }: MateriCardProps
           )}
         </div>
         <div className="p-3">
-          <Badge variant="gold" className="mb-2 text-[10px]">
+          <Badge variant="gold" className="mb-2 text-xs">
             {category}
           </Badge>
           <h3 className="text-[#F5F5F0] font-semibold text-sm leading-snug line-clamp-2">
