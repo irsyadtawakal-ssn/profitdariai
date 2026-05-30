@@ -22,6 +22,7 @@ interface Materi {
   is_published: boolean
   is_featured: boolean | null
   videos: VideoItem[] | null
+  documents: { title: string; url: string }[] | null
 }
 
 export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {

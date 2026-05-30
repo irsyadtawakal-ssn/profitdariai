@@ -9,6 +9,7 @@ export async function createEbook(formData: FormData) {
   const supabase = createAdminClient()
   const pageCount = formData.get('page_count')
   const videosRaw = formData.get('videos') as string
+  const documentsRaw = formData.get('documents') as string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any).from('ebooks').insert({
     title: formData.get('title') as string,
@@ -21,6 +22,7 @@ export async function createEbook(formData: FormData) {
     is_published: formData.get('is_published') === 'true',
     is_featured: formData.get('is_featured') === 'true',
     videos: videosRaw ? JSON.parse(videosRaw) : null,
+    documents: documentsRaw ? JSON.parse(documentsRaw) : null,
   })
   if (error) {
     console.error('[createEbook]', error.message)
@@ -36,6 +38,7 @@ export async function updateEbook(id: string, formData: FormData) {
   const supabase = createAdminClient()
   const pageCount = formData.get('page_count')
   const videosRaw = formData.get('videos') as string
+  const documentsRaw = formData.get('documents') as string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
     .from('ebooks')
@@ -50,6 +53,7 @@ export async function updateEbook(id: string, formData: FormData) {
       is_published: formData.get('is_published') === 'true',
       is_featured: formData.get('is_featured') === 'true',
       videos: videosRaw ? JSON.parse(videosRaw) : null,
+      documents: documentsRaw ? JSON.parse(documentsRaw) : null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
