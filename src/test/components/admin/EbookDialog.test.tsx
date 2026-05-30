@@ -28,8 +28,9 @@ describe('MateriDialog', () => {
       id: 'e1', title: 'Panduan AI', slug: 'panduan-ai',
       description: null, category: 'AI', cover_url: null,
       file_path: 'ebooks/test.pdf', page_count: 50, is_published: true,
+      is_featured: false, videos: null, documents: null,
     }
-    render(<MateriDialog open={true} onClose={vi.fn()} ebook={ebook} />)
+    render(<MateriDialog open={true} onClose={vi.fn()} materi={ebook} />)
     expect(screen.getByText('Edit Materi')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Panduan AI')).toBeInTheDocument()
     expect(screen.getByText(/ebooks\/test\.pdf/)).toBeInTheDocument()
