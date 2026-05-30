@@ -24,7 +24,7 @@ export const getCachedEbooks = unstable_cache(
     const supabase = createAdminClient()
     let query = supabase
       .from('ebooks')
-      .select('id, slug, title, category, cover_url')
+      .select('id, slug, title, category, cover_url, description, is_featured')
       .eq('is_published', true)
       .order('sort_order')
 
