@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/button'
 import { MateriDialog } from './MateriDialog'
 import { deleteEbook } from './actions'
 
-interface Ebook {
+interface VideoItem {
+  title: string
+  url: string
+}
+
+interface Materi {
   id: string
   title: string
   slug: string
@@ -15,15 +20,17 @@ interface Ebook {
   file_path: string
   page_count: number | null
   is_published: boolean
+  is_featured: boolean | null
+  videos: VideoItem[] | null
 }
 
-export function MateriClient({ ebooks }: { ebooks: Ebook[] }) {
+export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<Ebook | undefined>()
+  const [editTarget, setEditTarget] = useState<Materi | undefined>()
   const [, startTransition] = useTransition()
 
   function openAdd() { setEditTarget(undefined); setDialogOpen(true) }
-  function openEdit(e: Ebook) { setEditTarget(e); setDialogOpen(true) }
+  function openEdit(m: Materi) { setEditTarget(m); setDialogOpen(true) }
   function handleDelete(id: string) {
     if (!confirm('Hapus materi ini?')) return
     startTransition(() => deleteEbook(id))
@@ -40,42 +47,53 @@ export function MateriClient({ ebooks }: { ebooks: Ebook[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#222222]">
-              {['Judul', 'Kategori', 'Hal.', 'Status', 'Aksi'].map((h) => (
+              {['Judul', 'Kategori', 'Hal.', 'Video', 'Status', 'Aksi'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {ebooks.map((e) => (
-              <tr key={e.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
-                <td className="px-4 py-3 text-[#F5F5F0] font-medium">{e.title}</td>
-                <td className="px-4 py-3 text-[#888888]">{e.category}</td>
-                <td className="px-4 py-3 text-[#888888]">{e.page_count ?? '—'}</td>
+            {materis.map((m) => (
+              <tr key={m.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
+                <td className="px-4 py-3 text-[#F5F5F0] font-medium">
+                  <div className="flex items-center gap-2">
+                    {m.is_featured && <span className="text-[#D4AF37] text-[10px] font-bold">★</span>}
+                    {m.title}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-[#888888]">{m.category}</td>
+                <td className="px-4 py-3 text-[#888888]">{m.page_count ?? '—'}</td>
+                <td className="px-4 py-3 text-[#888888]">
+                  {m.videos && m.videos.length > 0
+                    ? <span className="text-[#D4AF37] text-xs">{m.videos.length} video</span>
+                    : <span className="text-[#333]">—</span>
+                  }
+                </td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    e.is_published ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-[#1A1A1A] text-[#555555]'
+                    m.is_published ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-[#1A1A1A] text-[#555555]'
                   }`}>
-                    {e.is_published ? 'Aktif' : 'Draft'}
+                    {m.is_published ? 'Aktif' : 'Draft'}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
-                    <button onClick={() => openEdit(e)} className="text-xs text-[#888888] hover:text-[#D4AF37] transition-colors">Edit</button>
-                    <button onClick={() => handleDelete(e.id)} className="text-xs text-red-500 hover:text-red-400 transition-colors">Hapus</button>
+                    <button onClick={() => openEdit(m)} className="text-xs text-[#888888] hover:text-[#D4AF37] transition-colors">Edit</button>
+                    <button onClick={() => handleDelete(m.id)} className="text-xs text-red-500 hover:text-red-400 transition-colors">Hapus</button>
                   </div>
                 </td>
               </tr>
             ))}
-            {ebooks.length === 0 && (
+            {materis.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-[#555555]">Belum ada materi.</td>
+                <td colSpan={6} className="px-4 py-8 text-center text-[#555555]">Belum ada materi.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      <MateriDialog open={dialogOpen} onClose={() => setDialogOpen(false)} ebook={editTarget} />
+      <MateriDialog open={dialogOpen} onClose={() => setDialogOpen(false)} materi={editTarget} />
     </>
   )
 }

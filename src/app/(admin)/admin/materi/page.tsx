@@ -5,7 +5,7 @@ export default async function AdminMateriPage() {
   const supabase = createAdminClient()
   const { data: ebooks } = await supabase
     .from('ebooks')
-    .select('id, slug, title, description, category, cover_url, file_path, page_count, is_published')
+    .select('id, slug, title, description, category, cover_url, file_path, page_count, is_published, is_featured, videos')
     .order('sort_order')
 
   return (
