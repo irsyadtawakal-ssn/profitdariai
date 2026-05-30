@@ -32,7 +32,7 @@ pnpm typecheck    # tsc --noEmit
 - **`src/lib/email/`** — SMTP email (mailer, sender, templates)
 - **`src/lib/membership.ts`** — Membership status helpers
 - **`src/middleware.ts`** — Entry point Next.js middleware, re-export `proxy` dari `proxy.ts`
-- **`src/proxy.ts`** — Implementasi middleware: auth gate, membership check, admin gate. Proteksi routes: `/dashboard`, `/kursus`, `/ebook`, `/profile`, `/admin`
+- **`src/proxy.ts`** — Implementasi middleware: auth gate, membership check, admin gate. Proteksi routes: `/dashboard`, `/materi`, `/ebook`, `/profile`, `/admin`
 - **`supabase/migrations/`** — SQL migrations (run in Supabase SQL editor)
 - **`docs/vps-migration.md`** — Panduan lengkap migrasi dari Vercel ke Hostinger VPS (Phase 2+)
 
