@@ -100,7 +100,7 @@ export default function LandingPage() {
             </p>
             <div className="hero-ebook-single" style={{ marginTop: 50, display: 'flex', justifyContent: 'center', width: '100%' }}>
               <div style={{ width: '100%', maxWidth: 460, border: '3px solid var(--gold)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 15px 45px rgba(0,0,0,0.8), var(--shadow-glow)' }}>
-                <img src="https://belajarpakai.ai/wp-content/uploads/2026/05/ChatGPT-Image-May-21-2026-12_38_47-PM-1.png" alt="Ebook Cara Cuan Dari AI" style={{ width: '100%', display: 'block', height: 'auto' }} loading="lazy" />
+                <img src="/image/main.webp" alt="Ebook Cara Cuan Dari AI" style={{ width: '100%', display: 'block', height: 'auto' }} loading="lazy" />
               </div>
             </div>
           </div>
@@ -160,14 +160,14 @@ export default function LandingPage() {
                   <span className="dot dot-r" /><span className="dot dot-y" /><span className="dot dot-g" />
                   <span className="mockup-address">belajarpakai.ai/bukti-omzet</span>
                 </div>
-                <img className="mockup-img" src="https://belajarpakai.ai/wp-content/uploads/2026/05/ChatGPT-Image-May-21-2026-01_25_00-PM-1.png" alt="Sales Chart Proof" loading="lazy" />
+                <img className="mockup-img" src="/image/second.webp" alt="Sales Chart Proof" loading="lazy" />
               </div>
               <div className="mockup-window">
                 <div className="mockup-header">
                   <span className="dot dot-r" /><span className="dot dot-y" /><span className="dot dot-g" />
                   <span className="mockup-address">belajarpakai.ai/sales-ledger</span>
                 </div>
-                <img className="mockup-img" src="https://belajarpakai.ai/wp-content/uploads/2026/05/Screenshot-2026-05-21-110150.png" alt="Sales Ledger Proof" loading="lazy" />
+                <img className="mockup-img" src="/image/grafik.webp" alt="Sales Ledger Proof" loading="lazy" />
               </div>
             </div>
           </div>
