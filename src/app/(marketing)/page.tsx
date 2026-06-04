@@ -158,14 +158,14 @@ export default function LandingPage() {
               <div className="mockup-window">
                 <div className="mockup-header">
                   <span className="dot dot-r" /><span className="dot dot-y" /><span className="dot dot-g" />
-                  <span className="mockup-address">belajarpakai.ai/bukti-omzet</span>
+                  <span className="mockup-address">profitdariai.com/bukti-omzet</span>
                 </div>
                 <img className="mockup-img" src="/image/second.webp" alt="Sales Chart Proof" loading="lazy" />
               </div>
               <div className="mockup-window">
                 <div className="mockup-header">
                   <span className="dot dot-r" /><span className="dot dot-y" /><span className="dot dot-g" />
-                  <span className="mockup-address">belajarpakai.ai/sales-ledger</span>
+                  <span className="mockup-address">profitdariai.com/sales-ledger</span>
                 </div>
                 <img className="mockup-img" src="/image/grafik.webp" alt="Sales Ledger Proof" loading="lazy" />
               </div>
