@@ -8,6 +8,13 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+vi.mock('next/image', () => ({
+  default: ({ src, alt }: { src: string; alt: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} />
+  ),
+}))
+
 describe('CourseCard', () => {
   const props = {
     slug: 'ai-bisnis-101',
@@ -21,7 +28,7 @@ describe('CourseCard', () => {
     render(<CourseCard {...props} />)
     expect(screen.getByText('AI Bisnis 101: Cuan dari ChatGPT')).toBeInTheDocument()
     expect(screen.getByText('Bisnis')).toBeInTheDocument()
-    expect(screen.getByText('5 modul')).toBeInTheDocument()
+    expect(screen.getByText(/5\s*Modul/i)).toBeInTheDocument()
   })
 
   it('links to /kursus/[slug]', () => {

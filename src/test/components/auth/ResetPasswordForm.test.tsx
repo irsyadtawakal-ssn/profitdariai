@@ -14,6 +14,17 @@ vi.mock('@/lib/supabase/client', () => ({
   }),
 }))
 
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => ({ get: () => null }),
+  useRouter: () => ({ push: vi.fn() }),
+}))
+
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}))
+
 describe('ResetPasswordForm', () => {
   beforeEach(() => {
     mockResetPassword.mockResolvedValue({ error: null })

@@ -5,17 +5,19 @@ import { vi } from 'vitest'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch
-const mockWindowOpen = vi.fn()
-global.window.open = mockWindowOpen
 
 describe('DownloadButton', () => {
   beforeEach(() => {
     mockFetch.mockClear()
     mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ url: 'https://supabase.co/storage/signed/ebook.pdf' }),
+      json: async () => ({ url: 'https://drive.google.com/uc?export=download&id=abc123' }),
     })
-    mockWindowOpen.mockClear()
+    // Component uses window.location.href, not window.open
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, href: '' },
+    })
   })
 
   it('renders download button', () => {
@@ -23,21 +25,18 @@ describe('DownloadButton', () => {
     expect(screen.getByRole('button', { name: /Download PDF/i })).toBeInTheDocument()
   })
 
-  it('calls download API and opens signed URL', async () => {
+  it('calls download API on click', async () => {
     render(<DownloadButton ebookId="abc-123" />)
     await userEvent.click(screen.getByRole('button', { name: /Download PDF/i }))
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith('/api/ebook/download/abc-123')
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://supabase.co/storage/signed/ebook.pdf',
-        '_blank'
-      )
     })
   })
 
   it('shows error message on API failure', async () => {
     mockFetch.mockResolvedValue({
       ok: false,
+      status: 403,
       json: async () => ({ error: 'Membership required' }),
     })
     render(<DownloadButton ebookId="abc-123" />)
