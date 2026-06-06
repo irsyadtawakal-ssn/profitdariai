@@ -1,6 +1,6 @@
 # profitdariai — Build Plan
 
-## Status: MVP ✅ | VPS Live ✅ | Monitoring Period (target cleanup Vercel ~12 Jun 2026)
+## Status: VPS Live ✅ | Ownership System Active ✅ | Ready for Production Testing
 
 ---
 
@@ -36,79 +36,90 @@
 
 ## Week 5-6: Payment & Member Area ✅ SELESAI
 
-- [x] Checkout flow — `src/app/(member)/checkout/page.tsx` + `CheckoutForm.tsx`
+- [x] Checkout flow — `src/app/(checkout)/checkout/page.tsx` + `CheckoutForm.tsx`
 - [x] Payment create API — `src/app/api/payment/create/route.ts`
-- [x] Tripay webhook handler + membership activation — `src/app/api/payment/webhook/route.ts`
-- [x] Payment success page — `src/app/(member)/payment/success/page.tsx`
-- [x] Member dashboard (greeting, highlights, status badge) — `src/app/(member)/dashboard/page.tsx`
+  - Menyimpan `ebook_ids` di metadata transaksi (untuk webhook)
+- [x] Tripay webhook handler + **ownership activation** via `user_ebooks` — `src/app/api/payment/webhook/route.ts`
+- [x] Payment success page — menampilkan jumlah produk di library
+- [x] Marketplace checkout API per-produk — `src/app/api/payment/marketplace/route.ts`
+- [x] Member dashboard (greeting, highlights, latest materi grid) — `src/app/(member)/dashboard/page.tsx`
 - [x] Library kursus (grid, category filter) — `src/app/(member)/kursus/page.tsx`
-- [x] Kursus detail + video player (YouTube embed) — `src/app/(member)/kursus/[slug]/page.tsx`
-- [x] Library ebook (grid, download) — `src/app/(member)/ebook/page.tsx`
-- [x] Ebook detail — `src/app/(member)/ebook/[slug]/page.tsx`
-- [x] Ebook download via signed URL — `src/app/api/ebook/download/[id]/route.ts`
-- [x] Profile page (info, membership badge, logout) — `src/app/(member)/profile/page.tsx`
-- [x] Renewal reminder banner — `src/components/member/RenewalBanner.tsx`
-- [x] Member sidebar + bottom nav
-- [x] Category filter, CourseCard, EbookCard, ModuleList, VideoPlayer components
+- [x] Kursus detail + video player (YouTube embed)
+- [x] Library ebook / Materi (`/materi`) — owned = unlock, not owned = locked — `src/app/(member)/materi/page.tsx`
+- [x] Ebook detail — `src/app/(member)/materi/[slug]/page.tsx`
+- [x] Ebook download via signed URL (cek ownership via `user_ebooks`) — `src/app/api/ebook/download/[id]/route.ts`
+- [x] Profile page (info, status akses, logout)
+- [x] ~~RenewalBanner~~ — dihapus (tidak relevan, tidak ada renewal)
+- [x] Member sidebar (CTA "Beli Produk Baru →" /marketplace) + bottom nav
+- [x] Marketplace page — server component, fetch dari DB, OWNED badge
+- [x] MarketplaceClient — search/filter + CheckoutModal per produk
 
 ## Week 7: Admin Panel ✅ SELESAI
 
 - [x] Admin layout + role guard — `src/app/(admin)/layout.tsx`
-- [x] Admin dashboard dengan metrics (members, revenue, content count) — `src/app/(admin)/admin/dashboard/page.tsx`
-- [x] Member list (search, filter by status) — `src/app/(admin)/admin/members/page.tsx`
-- [x] CRUD kursus + modul — `src/app/(admin)/admin/kursus/`
-- [x] CRUD ebook — `src/app/(admin)/admin/ebook/`
+- [x] Admin dashboard — Total User, **Total Pembeli** (user_ebooks), Revenue bulan ini, Kursus & Ebook aktif
+- [x] User list — search, filter by "Ada Pembelian / Belum Beli" (dari user_ebooks count)
+- [x] CRUD kursus + modul
+- [x] CRUD ebook (Google Drive URL, bukan upload langsung)
   - ~~Upload PDF ke Supabase Storage~~ → diganti Google Drive URL (anti size-limit)
   - Auto-convert GDrive share link → direct download URL
 
-## Week 8: Polish & Launch
+## Week 8: Polish & Launch ✅ SELESAI
 
-### Bug Fixes (Done)
-- [x] **Login error toast** — fix TypeError destrukturisasi `{ data: { user } }` saat `getUser()` return null
-  - Improved error handling: bedakan auth error, email belum verify, vs network error
-  - File: `src/components/auth/LoginForm.tsx`
-- [x] **Vercel env vars** — tambah semua env vars production (Supabase, Tripay, SMTP, App URL)
-- [x] **Ebook upload size limit** — validasi ukuran file (PDF max 50MB, cover max 5MB) + toast error
-- [x] **Ebook GDrive URL** — ganti upload Supabase Storage dengan input Google Drive URL
-  - Auto-convert share link → `drive.google.com/uc?export=download&id=...`
-  - Download API support dual mode: GDrive URL redirect langsung, Supabase Storage signed URL
-  - File: `src/app/(admin)/admin/ebook/EbookDialog.tsx`, `src/app/api/ebook/download/[id]/route.ts`
+### Ownership System Migration (6 Jun 2026) ✅
+- [x] **Hapus sistem membership** — purge semua `membership_expires_at` logic
+- [x] **`user_ebooks` table** — tracking kepemilikan per-user per-ebook
+  - Migration: `supabase/migrations/20260606_user_ebooks.sql`
+  - RLS: users hanya bisa lihat ebook milik sendiri
+- [x] **`ebook_id` di marketplace_products** — FK ke ebooks
+- [x] **Materi Library** — semua ebook tampil, owned = unlock, locked = block download
+- [x] **Marketplace** — server component + OWNED badge per produk
+- [x] **Download API** — validasi kepemilikan via `user_ebooks` (403 jika belum beli)
+- [x] **Proxy/middleware** — hapus membership gate, cukup auth check
+- [x] **Marketplace checkout** — CheckoutModal + `/api/payment/marketplace` (per-produk)
 
-### Design System (Done)
-- [x] **Brand token reconciliation** — landing.css: gold `#FFBF00` → `#D4AF37`, Outfit → Geist + Inter + JetBrains Mono
-- [x] **FAQ accordion** — toggle behavior + chevron animation di landing page
-- [x] **Legal pages** — fix border/surface/muted tokens (`#1a1a24`, `#08080c`, `#94a3b8`) ke canonical values
-- [x] **AdminSidebar** — border fix + `border-l-2` gold active indicator (seragam dengan MemberSidebar)
-- [x] **Admin tables** — semua `border-[#1A1A1A]` divider → `border-[#222222]`
+### Design System: Aureum Cyber ✅
+- [x] Premium Neo-Cyberpunk aesthetic — `#0A0A0A`, `#D4AF37`, `#F5F5F0`
+- [x] `rounded-none` — semua elemen flat/angular (no border-radius kecuali UI primitif)
+- [x] Glassmorphism + cyber-corner decorative elements
+- [x] Font: Geist (display) + Inter (body) + JetBrains Mono (mono)
+- [x] Login/Signup page premium redesign (art panel + form panel)
 
-### Performance (Done)
-- [x] **Loading skeletons** — `loading.tsx` per member route (dashboard, kursus, ebook, profile) — instant visual feedback
-- [x] **Bottom nav active indicator** — gold bar di atas tab aktif
-- [x] **`unstable_cache`** — `getCachedCourses`, `getCachedEbooks`, `getCachedCourseCounts` (60s TTL) — eliminasi DB roundtrip pada tab switch ke-2+
-- [x] **React `cache()`** — `createServerClient` + `getServerUser` deduplicated per request
-- [x] **`next/image`** — `CourseCard` + `EbookCard`: lazy load, WebP, responsive sizes
-- [x] **Streaming Suspense** — dashboard: content grid (instant) + MemberHeader (stream after profile query)
+### Bug Fixes ✅
+- [x] Login error toast — improved error handling
+- [x] Vercel env vars — production env vars configured
+- [x] Ebook GDrive URL — auto-convert share link → direct download URL
+- [x] Payment 500 error — fix Tripay fee-calculator response parsing
 
-### Security Audit (Done)
-- [x] **`middleware.ts` dibuat** — `proxy.ts` tidak pernah dipanggil Next.js; semua route `/dashboard`, `/kursus`, `/ebook`, `/profile`, `/admin` sekarang diproteksi di edge
-- [x] **Open redirect** — `?next=//evil.com` di auth callback diblock; harus path relatif valid
-- [x] **Input validation payment create** — email regex + fullName length check sebelum buat transaksi Tripay
-- [x] **Webhook silent failure** — guest checkout dengan email yang sudah ada kini di-link ke akun existing, membership tetap diberikan
-- [x] **Ebook download draft** — tambah `.eq('is_published', true)` agar ebook draft tidak bisa didownload
-- [x] **`requireAdmin` error handling** — `.single()` → `.maybeSingle()` + explicit error check
+### Performance ✅
+- [x] Loading skeletons — `loading.tsx` per member route
+- [x] `unstable_cache` — `getCachedCourses`, `getCachedEbooks` (60s TTL)
+- [x] React `cache()` — server client deduplicated per request
+- [x] Streaming Suspense — dashboard content grid
+
+### Security ✅
+- [x] `middleware.ts` dibuat — semua protected routes diproteksi di edge
+- [x] Open redirect blocked — `?next=//evil.com` diblock
+- [x] Input validation payment — email regex + fullName length check
+- [x] Webhook amount validation — defense-in-depth amount mismatch check
+- [x] Ebook download draft — `.eq('is_published', true)` agar draft tidak bisa didownload
+- [x] Ownership validation — download API cek `user_ebooks` (403 jika belum beli)
+
+### Email ✅
+- [x] `purchaseConfirmationEmail` — "Produk kamu aktif, Buka Library →"
+- [x] Guest welcome email — link set-password
+- [x] Email sender: `admin@profitdariai.com` via Hostinger SMTP
 
 ### Remaining
-- [ ] QA & bug fixing end-to-end
-- [x] Seed 10 kursus + 15 ebook konten
-- [x] Email transactional final (payment success, renewal reminder)
-- [x] Renewal reminder cron (Vercel Cron) — `src/app/api/cron/renewal-reminder/route.ts` + `vercel.json`
+- [ ] QA & bug fixing end-to-end dengan real payment (butuh public URL)
 - [ ] Google Analytics 4 + Vercel Analytics setup
-- [x] Sentry error monitoring
-- [x] Security audit — lihat Security Audit section di atas
-- [ ] Soft launch (50 member)
+- [ ] Populate `marketplace_products` dengan produk upsell + set `ebook_id`
+- [ ] Soft launch (50 beta tester)
 - [ ] Public launch (IG/TikTok ads)
 
-## Phase 2+: Migrasi ke Hostinger VPS ✅ SELESAI (29 May 2026)
+---
+
+## Phase 2: VPS Hostinger ✅ SELESAI (29 May 2026)
 
 > VPS: Biznet GIO NEO Lite SS 2.2 — IP `103.93.163.183` — Live: **https://profitdariai.com**
 
@@ -121,11 +132,51 @@
 - [x] SSL via Certbot (Let's Encrypt) — expires 2026-08-27, auto-renew ✅
 - [x] GitHub Actions CI/CD (`deploy.yml`) — auto-deploy on push to main
 - [x] Ganti Vercel Cron → system crontab untuk renewal-reminder
-- [x] Update Tripay whitelist IP → `103.93.163.183` (solusi permanen)
+- [x] Update Tripay whitelist IP → `103.93.163.183`
 - [x] Migrasi DNS (A record → IP VPS via Niagahoster)
 - [x] Smoke test checklist — landing, auth, member, admin, payment ✅
-- [ ] Cleanup Vercel setelah stabil 1–2 minggu (target: ~12 June 2026)
+- [ ] Monitor & stabilisasi (ongoing)
 
-### Bug Fixes VPS (29 May 2026)
-- [x] **CSS/JS tidak load** — rebuild setelah `.env.production` lengkap agar `NEXT_PUBLIC_*` ter-bake ke bundle
-- [x] **Payment 500 error** — fix Tripay `fee-calculator` mengembalikan array, bukan single object (`client.ts`, `fee/route.ts`, `CheckoutForm.tsx`)
+---
+
+## Phase 3: Production Launch 🚀 NEXT
+
+### Checklist Pre-Launch
+- [ ] Push commit terbaru ke VPS (`git push` → GitHub Actions auto-deploy)
+- [ ] Jalankan SQL migration `20260606_user_ebooks.sql` di Supabase production (sudah dijalankan lokal)
+- [ ] Test end-to-end payment di production (Tripay webhook → user_ebooks → library unlock)
+- [ ] Populate `marketplace_products` dengan produk upsell (admin panel)
+- [ ] QA: login → checkout → bayar → cek email → cek /materi unlock
+- [ ] Setup GA4
+
+### Checklist Soft Launch
+- [ ] Invite 50 beta tester
+- [ ] Monitor konversi & support
+- [ ] Fix bug yang muncul
+
+### Public Launch
+- [ ] Announce di IG/TikTok
+- [ ] Run ads
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Styling | Tailwind CSS v4 + CSS custom properties |
+| Database | Supabase (PostgreSQL + RLS) |
+| Auth | Supabase Auth |
+| Payment | Tripay (QRIS, VA, e-wallet) |
+| Email | Hostinger SMTP (admin@profitdariai.com) |
+| Hosting | Biznet GIO VPS + Nginx + PM2 |
+| CI/CD | GitHub Actions |
+| Monitoring | PM2 + Sentry (optional) |
+
+## Business Model
+
+| Produk | Harga | Flow |
+|--------|-------|------|
+| Produk Utama (E-book) | Rp 199.000 | `/checkout` → webhook → `user_ebooks` |
+| Produk Marketplace | Sesuai produk | `/marketplace` → CheckoutModal → webhook → `user_ebooks` |
