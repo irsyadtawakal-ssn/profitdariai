@@ -88,80 +88,97 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      <div>
-        <Label htmlFor="email" error={!!errors.email}>Email</Label>
-        <Input
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
+      {/* Email Field */}
+      <div className="space-y-1">
+        <label htmlFor="email" className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#888888] block">
+          Email
+        </label>
+        <input
           id="email"
           type="email"
           placeholder="kamu@email.com"
           autoComplete="email"
-          error={!!errors.email}
+          className="w-full bg-transparent border-0 border-b border-gold/20 focus:border-gold py-3 px-0 font-mono text-sm text-gold placeholder:text-gold/25 focus:ring-0 transition-all rounded-none"
           {...register('email')}
         />
         {errors.email && (
-          <p role="alert" className="mt-1 text-xs text-[#EF4444]">{errors.email.message}</p>
+          <p role="alert" className="mt-1 text-xs text-[#EF4444] font-mono">{errors.email.message}</p>
         )}
       </div>
 
-      <div>
-        <Label htmlFor="password" error={!!errors.password}>Password</Label>
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Min. 8 karakter"
-            autoComplete="current-password"
-            error={!!errors.password}
-            {...register('password')}
-          />
+      {/* Password Field */}
+      <div className="space-y-1 relative">
+        <div className="flex justify-between items-center">
+          <label htmlFor="password" className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#888888] block">
+            Password
+          </label>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#888888] hover:text-[#F5F5F0] transition-colors"
+            className="text-gold/60 hover:text-gold transition-colors flex items-center gap-1 group cursor-pointer"
             aria-label={showPassword ? 'Sembunyikan' : 'Tampilkan'}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            <span className="font-mono text-[9px] opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
+              {showPassword ? 'SEMBUNYIKAN' : 'LIHAT'}
+            </span>
+            {showPassword ? <EyeOff className="h-4 w-4 shrink-0" /> : <Eye className="h-4 w-4 shrink-0" />}
           </button>
         </div>
+        <input
+          id="password"
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Min. 8 karakter"
+          autoComplete="current-password"
+          className="w-full bg-transparent border-0 border-b border-gold/20 focus:border-gold py-3 px-0 font-mono text-sm text-gold placeholder:text-gold/25 focus:ring-0 transition-all rounded-none"
+          {...register('password')}
+        />
         {errors.password && (
-          <p role="alert" className="mt-1 text-xs text-[#EF4444]">{errors.password.message}</p>
+          <p role="alert" className="mt-1 text-xs text-[#EF4444] font-mono">{errors.password.message}</p>
         )}
       </div>
 
+      {/* Forgot Password */}
       <div className="flex justify-end">
         <Link
           href="/reset-password"
-          className="text-sm text-[#888888] hover:text-[#D4AF37] transition-colors"
+          className="font-mono text-[10px] uppercase tracking-wider text-[#888888] hover:text-gold transition-colors"
         >
           Lupa password?
         </Link>
       </div>
 
+      {/* Cloudflare Turnstile */}
       {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-        <Turnstile
-          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-          onSuccess={setCaptchaToken}
-          onExpire={() => setCaptchaToken(null)}
-          options={{ theme: 'dark' }}
-        />
+        <div className="flex justify-center py-2">
+          <Turnstile
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+            onSuccess={setCaptchaToken}
+            onExpire={() => setCaptchaToken(null)}
+            options={{ theme: 'dark' }}
+          />
+        </div>
       )}
 
-      <Button type="submit" size="lg" loading={loading} className="w-full">
-        Masuk
-      </Button>
+      {/* Primary Action */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-gold text-obsidian font-mono text-xs uppercase tracking-widest font-bold py-4 cyber-corner hover:brightness-110 active:scale-95 transition-all duration-300 shadow-lg shadow-gold/10 cursor-pointer disabled:opacity-50"
+      >
+        {loading ? 'MEMPROSES...' : 'MASUK'}
+      </button>
 
-      {/* SLOT: Google OAuth — Phase 2 */}
-      {/* <Button type="button" variant="secondary" className="w-full">
-        <GoogleIcon /> Masuk dengan Google
-      </Button> */}
-
-      <p className="text-center text-sm text-[#888888]">
-        Belum punya akun?{' '}
-        <Link href="/signup" className="text-[#D4AF37] hover:underline font-medium">
-          Daftar sekarang
-        </Link>
-      </p>
+      {/* Footer Links */}
+      <footer className="text-center pt-2">
+        <p className="font-sans text-xs text-[#888888]">
+          Belum punya akun?{' '}
+          <Link href="/signup" className="text-gold font-bold hover:underline transition-all">
+            Daftar sekarang
+          </Link>
+        </p>
+      </footer>
     </form>
   )
 }
+
