@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { MateriDialog } from './MateriDialog'
-import { deleteEbook } from './actions'
+import { deleteEbook, toggleEbookPublished } from './actions'
 
 interface VideoItem {
   title: string
@@ -36,6 +36,9 @@ export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
     if (!confirm('Hapus materi ini?')) return
     startTransition(() => deleteEbook(id))
   }
+  function handleToggle(id: string, current: boolean) {
+    startTransition(() => toggleEbookPublished(id, current))
+  }
 
   return (
     <>
@@ -44,40 +47,46 @@ export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
         <Button variant="primary" size="sm" onClick={openAdd}>+ Tambah</Button>
       </div>
 
-      <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-[#222222]">
               {['Judul', 'Kategori', 'Hal.', 'Video', 'Status', 'Aksi'].map((h) => (
-                <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
+                <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {materis.map((m) => (
               <tr key={m.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
-                <td className="px-4 py-3 text-[#F5F5F0] font-medium">
+                <td className="px-4 py-3 text-[#F5F5F0] font-medium max-w-[200px]">
                   <div className="flex items-center gap-2">
-                    {m.is_featured && <span className="text-[#D4AF37] text-[10px] font-bold">★</span>}
-                    {m.title}
+                    {m.is_featured && <span className="text-[#D4AF37] text-[10px] font-bold shrink-0">★</span>}
+                    <span className="truncate">{m.title}</span>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-[#888888]">{m.category}</td>
-                <td className="px-4 py-3 text-[#888888]">{m.page_count ?? '—'}</td>
-                <td className="px-4 py-3 text-[#888888]">
+                <td className="px-4 py-3 text-[#888888] whitespace-nowrap">{m.category}</td>
+                <td className="px-4 py-3 text-[#888888] whitespace-nowrap">{m.page_count ?? '—'}</td>
+                <td className="px-4 py-3 whitespace-nowrap">
                   {m.videos && m.videos.length > 0
                     ? <span className="text-[#D4AF37] text-xs">{m.videos.length} video</span>
                     : <span className="text-[#333]">—</span>
                   }
                 </td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    m.is_published ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-[#1A1A1A] text-[#555555]'
-                  }`}>
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <button
+                    onClick={() => handleToggle(m.id, m.is_published)}
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+                      m.is_published
+                        ? 'bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-red-900/20 hover:text-red-400'
+                        : 'bg-[#1A1A1A] text-[#555555] hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]'
+                    }`}
+                    title={m.is_published ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'}
+                  >
                     {m.is_published ? 'Aktif' : 'Draft'}
-                  </span>
+                  </button>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 whitespace-nowrap">
                   <div className="flex gap-2">
                     <button onClick={() => openEdit(m)} className="text-xs text-[#888888] hover:text-[#D4AF37] transition-colors">Edit</button>
                     <button onClick={() => handleDelete(m.id)} className="text-xs text-red-500 hover:text-red-400 transition-colors">Hapus</button>

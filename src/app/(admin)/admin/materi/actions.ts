@@ -66,6 +66,22 @@ export async function updateEbook(id: string, formData: FormData) {
   revalidatePath('/dashboard')
 }
 
+export async function toggleEbookPublished(id: string, current: boolean) {
+  await requireAdmin()
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('ebooks')
+    .update({ is_published: !current, updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) {
+    console.error('[toggleEbookPublished]', error.message)
+    throw new Error(error.message)
+  }
+  revalidatePath('/admin/materi')
+  revalidatePath('/materi')
+}
+
 export async function deleteEbook(id: string) {
   await requireAdmin()
   const supabase = createAdminClient()

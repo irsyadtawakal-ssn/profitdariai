@@ -217,7 +217,12 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
                 className="text-sm text-[#888888] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-[#222222] file:text-[#F5F5F0] file:text-xs file:cursor-pointer hover:file:bg-[#2A2A2A]"
               />
               {uploadingCover && <p className="text-xs text-[#D4AF37]">Mengupload...</p>}
-              {coverUrl && !uploadingCover && <p className="text-xs text-green-400">&#10003; Cover siap</p>}
+              {coverUrl && !uploadingCover && (
+                <div className="flex items-center gap-2 mt-1">
+                  <img src={coverUrl} alt="preview" className="w-12 h-16 object-cover rounded border border-[#333]" />
+                  <p className="text-xs text-green-400">&#10003; Cover siap</p>
+                </div>
+              )}
               <input type="hidden" name="cover_url" value={coverUrl} />
             </div>
             <div className="flex flex-col gap-1.5 w-28">
