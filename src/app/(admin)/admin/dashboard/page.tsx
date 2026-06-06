@@ -8,17 +8,16 @@ export default async function AdminDashboardPage() {
 
   const [
     { count: totalMembers },
-    { count: activeMembers },
+    { count: totalBuyers },
     { data: mrrData },
     { count: totalCourses },
     { count: totalEbooks },
   ] = await Promise.all([
+    // Total users with role='member'
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'member'),
-    supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('role', 'member')
-      .gt('membership_expires_at', now.toISOString()),
+    // Total unique users who have bought at least 1 ebook
+    supabase.from('user_ebooks').select('user_id', { count: 'exact', head: true }),
+    // Revenue this month
     supabase
       .from('transactions')
       .select('amount')
@@ -37,8 +36,8 @@ export default async function AdminDashboardPage() {
   }).format(mrr)
 
   const stats = [
-    { label: 'Total Member', value: totalMembers ?? 0 },
-    { label: 'Member Aktif', value: activeMembers ?? 0 },
+    { label: 'Total User', value: totalMembers ?? 0 },
+    { label: 'Total Pembeli', value: totalBuyers ?? 0 },
     { label: `Revenue ${format(now, 'MMM yyyy', { locale: id })}`, value: mrrFormatted },
     { label: 'Kursus Aktif', value: totalCourses ?? 0 },
     { label: 'Ebook Aktif', value: totalEbooks ?? 0 },
