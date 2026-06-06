@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhookSignature, type TripayWebhookPayload } from '@/lib/tripay/webhook'
 import { sendPaymentSuccessEmail } from '@/lib/email/sender'
 import { transporter, MAIL_FROM } from '@/lib/email/mailer'
-import { MEMBERSHIP_LIFETIME_EXPIRY } from '@/types'
 
 export async function POST(request: Request) {
   const signature = request.headers.get('X-Callback-Signature') ?? ''
@@ -31,7 +30,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Transaction not found' }, { status: 404 })
   }
 
-  // Validate amount before granting membership (defense-in-depth)
+  // Validate amount (defense-in-depth)
   if (status === 'PAID' && payload.total_amount !== existing.amount) {
     console.error(`[webhook] Amount mismatch ref=${reference} expected=${existing.amount} got=${payload.total_amount}`)
     return NextResponse.json({ error: 'Amount mismatch' }, { status: 400 })
@@ -63,10 +62,13 @@ export async function POST(request: Request) {
     const email = tx.customer_email || ''
     const fullName = tx.customer_name || 'Member'
 
+    // Extract ebook_ids from transaction metadata
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ebookIds: string[] = (tx.metadata as any)?.ebook_ids ?? []
+
     // If guest checkout (no user_id), create or find account
     if (!userId && email) {
       try {
-        // Generate temporary password (CSPRNG — user is directed to reset-password flow)
         const tempPassword = crypto.randomBytes(16).toString('hex')
 
         const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
@@ -84,7 +86,6 @@ export async function POST(request: Request) {
             userId = existingUser.id
             console.log(`[webhook] Linked existing user ${userId} to guest transaction ${tx.id}`)
           } else {
-            // Truly failed — log prominently so admin can manually fix
             console.error(`[webhook] CRITICAL: Cannot create or find account for ${email} ref=${reference}. Manual intervention required.`)
           }
         } else if (authUser?.user) {
@@ -94,11 +95,9 @@ export async function POST(request: Request) {
             id: userId,
             email,
             full_name: fullName,
-            membership_expires_at: MEMBERSHIP_LIFETIME_EXPIRY,
             role: 'member',
           })
 
-          // Update transaction with new user_id
           await supabase
             .from('transactions')
             .update({ user_id: userId })
@@ -107,13 +106,8 @@ export async function POST(request: Request) {
           await sendGuestWelcomeEmail(email, fullName)
         }
 
-        // Grant membership to linked existing user (account already existed)
+        // Grant ebooks to linked existing user
         if (userId && authError) {
-          await supabase
-            .from('profiles')
-            .update({ membership_expires_at: MEMBERSHIP_LIFETIME_EXPIRY })
-            .eq('id', userId)
-
           await supabase
             .from('transactions')
             .update({ user_id: userId })
@@ -125,12 +119,7 @@ export async function POST(request: Request) {
         console.error('[webhook] CRITICAL: Guest account creation threw:', error)
       }
     } else if (userId) {
-      // Existing user - update membership and send confirmation
-      await supabase
-        .from('profiles')
-        .update({ membership_expires_at: MEMBERSHIP_LIFETIME_EXPIRY })
-        .eq('id', userId)
-
+      // Existing user — send confirmation
       const { data: profile } = await supabase
         .from('profiles')
         .select('email, full_name')
@@ -141,8 +130,30 @@ export async function POST(request: Request) {
         await sendPaymentSuccessEmail(
           profile.email,
           profile.full_name ?? 'Member',
-          MEMBERSHIP_LIFETIME_EXPIRY
+          new Date().toISOString()
         )
+      }
+    }
+
+    // Grant ebooks to user (insert into user_ebooks)
+    if (userId && ebookIds.length > 0) {
+      const rows = ebookIds.map((ebookId) => ({
+        user_id: userId as string,
+        ebook_id: ebookId,
+        source: tx.metadata && (tx.metadata as Record<string, unknown>).marketplace_product_id
+          ? 'marketplace'
+          : 'checkout',
+      }))
+
+      const { error: insertError } = await supabase
+        .from('user_ebooks')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .upsert(rows as any, { onConflict: 'user_id,ebook_id', ignoreDuplicates: true })
+
+      if (insertError) {
+        console.error('[webhook] Failed to insert user_ebooks:', insertError)
+      } else {
+        console.log(`[webhook] Granted ${ebookIds.length} ebook(s) to user ${userId}`)
       }
     }
   }
@@ -165,7 +176,7 @@ async function sendGuestWelcomeEmail(email: string, name: string) {
     <div style="padding:32px">
       <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px">Hei ${name}! 🎉</h2>
       <p style="color:#AAAAAA;line-height:1.6;margin:0 0 24px">
-        Akses kamu sudah aktif. Klik tombol di bawah untuk set password dan langsung masuk ke semua kursus & ebook.
+        Produk kamu sudah aktif. Klik tombol di bawah untuk set password dan langsung akses konten kamu.
       </p>
       <a href="${resetLink}"
         style="display:block;background:#D4AF37;color:#0A0A0A;text-align:center;padding:14px 24px;border-radius:8px;font-weight:700;text-decoration:none;font-size:16px;margin-bottom:16px">
@@ -188,7 +199,7 @@ async function sendGuestWelcomeEmail(email: string, name: string) {
     await transporter.sendMail({
       from: MAIL_FROM,
       to: email,
-      subject: '🎉 Selamat datang di Profit dari AI',
+      subject: '🎉 Produk kamu sudah aktif — Profit dari AI',
       html,
     })
   } catch (error) {

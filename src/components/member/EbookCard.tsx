@@ -12,7 +12,7 @@ interface EbookCardProps {
 export function EbookCard({ slug, title, category, cover_url }: EbookCardProps) {
   return (
     <Link href={`/ebook/${slug}`} className="block group">
-      <div className="rounded-xl overflow-hidden bg-[#111111] border border-[#222222] hover:border-[#D4AF37]/40 transition-colors">
+      <div className="rounded-none overflow-hidden glass-panel hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col h-full">
         <div className="aspect-[3/4] bg-[#1A1A1A] relative overflow-hidden">
           {cover_url ? (
             <Image

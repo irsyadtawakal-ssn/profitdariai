@@ -18,9 +18,9 @@ const buttonVariants = cva(
           'bg-[#EF4444] text-white hover:bg-[#DC2626]',
       },
       size: {
-        sm: 'h-8 px-4 text-sm rounded-md',
-        md: 'h-11 px-6 text-base rounded-lg',
-        lg: 'h-13 px-7 text-base rounded-lg',
+        sm: 'h-8 px-4 text-sm rounded-none',
+        md: 'h-11 px-6 text-base rounded-none',
+        lg: 'h-13 px-7 text-base rounded-none',
       },
     },
     defaultVariants: {

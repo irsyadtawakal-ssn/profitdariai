@@ -27,16 +27,16 @@ export function CategoryFilter({ activeCategory }: CategoryFilterProps) {
   const active = activeCategory ?? 'Semua'
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 p-1 bg-[#110E07] border border-[#D4AF37]/20 w-fit">
       {CATEGORIES.map((cat) => (
         <button
           key={cat}
           onClick={() => handleFilter(cat)}
           aria-pressed={active === cat}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+          className={`px-5 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-200 rounded-none ${
             active === cat
-              ? 'bg-[#D4AF37] text-[#0A0A0A]'
-              : 'bg-[#1A1A1A] text-[#888888] hover:text-[#F5F5F0] hover:bg-[#222222]'
+              ? 'bg-[#D4AF37] text-[#0A0A0A] font-bold shadow-[0_0_15px_rgba(212,175,55,0.25)]'
+              : 'bg-transparent text-[#888888] hover:text-[#F5F5F0] hover:bg-[#1A1A1A]'
           }`}
         >
           {cat}

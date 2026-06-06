@@ -30,27 +30,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && (pathname.startsWith('/materi/') || pathname.startsWith('/ebook/'))) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('membership_expires_at')
-      .eq('id', user.id)
-      .single()
-
-    const isActive =
-      profile?.membership_expires_at &&
-      new Date(profile.membership_expires_at) > new Date()
-
-    if (!isActive) {
-      return NextResponse.redirect(new URL('/pricing?expired=true', request.url))
-    }
-  }
-
   if (pathname.startsWith('/admin')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', user!.id)
+      .eq('id', user.id)
       .single()
 
     if (profile?.role !== 'admin') {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createSignature, createTransaction, getFeeCalculator, calculateTotal } from '@/lib/tripay/client'
 import { generateMerchantRef } from '@/lib/utils'
 import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
@@ -29,6 +30,17 @@ export async function POST(request: Request) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Fetch main product ebook (the one being sold at checkout)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const adminClient = createAdminClient() as any
+  const { data: mainEbook } = await adminClient
+    .from('ebooks')
+    .select('id, title')
+    .eq('is_published', true)
+    .order('sort_order', { ascending: true })
+    .limit(1)
+    .single()
+
   // Generate merchant ref - use UUID part of user ID if logged in, otherwise use email hash
   const merchantRef = user
     ? generateMerchantRef(user.id)
@@ -43,6 +55,9 @@ export async function POST(request: Request) {
     ? calculateTotal(baseAmount, feeData)
     : baseAmount
 
+  const productName = mainEbook?.title ?? 'Profit Dari AI (E-book)'
+  const productSku = `PDA-EBOOK-${mainEbook?.id?.slice(0, 8).toUpperCase() ?? 'MAIN'}`
+
   const signature = createSignature(merchantRef, totalAmount)
 
   const result = await createTransaction({
@@ -53,8 +68,8 @@ export async function POST(request: Request) {
     customer_email: email,
     order_items: [
       {
-        sku: 'PDA-MEMBERSHIP-LIFETIME',
-        name: 'profitdariai Membership',
+        sku: productSku,
+        name: productName,
         price: baseAmount,
         quantity: 1,
       },
@@ -68,7 +83,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 400 })
   }
 
-  // Save transaction in DB
+  // Save transaction in DB — store ebook_id in metadata for webhook to use
   await supabase.from('transactions').insert({
     user_id: user?.id ?? null,
     customer_email: email,
@@ -79,7 +94,10 @@ export async function POST(request: Request) {
     payment_method: paymentMethod,
     status: 'UNPAID',
     expires_at: new Date(result.data.expired_time * 1000).toISOString(),
-    metadata: result.data,
+    metadata: {
+      ...result.data,
+      ebook_ids: mainEbook ? [mainEbook.id] : [],
+    },
   })
 
   return NextResponse.json({

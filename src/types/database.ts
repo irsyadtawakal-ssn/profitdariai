@@ -155,6 +155,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_ebooks: {
+        Row: {
+          id: string
+          user_id: string
+          ebook_id: string
+          source: string
+          purchased_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          ebook_id: string
+          source?: string
+          purchased_at?: string
+        }
+        Update: {
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_ebooks_user_id_fkey'
+            columns: ['user_id']
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_ebooks_ebook_id_fkey'
+            columns: ['ebook_id']
+            referencedRelation: 'ebooks'
+            referencedColumns: ['id']
+          }
+        ]
+      }
       transactions: {
         Row: {
           id: string
@@ -215,6 +248,7 @@ export type Database = {
           original_price: number | null
           cover_url: string | null
           product_url: string
+          ebook_id: string | null
           is_published: boolean
           sort_order: number
           created_at: string
@@ -230,6 +264,7 @@ export type Database = {
           original_price?: number | null
           cover_url?: string | null
           product_url: string
+          ebook_id?: string | null
           is_published?: boolean
           sort_order?: number
           created_at?: string
@@ -244,6 +279,7 @@ export type Database = {
           original_price?: number | null
           cover_url?: string | null
           product_url?: string
+          ebook_id?: string | null
           is_published?: boolean
           sort_order?: number
           updated_at?: string

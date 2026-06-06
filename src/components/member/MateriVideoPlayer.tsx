@@ -36,7 +36,7 @@ export function MateriVideoPlayer({ videos }: MateriVideoPlayerProps) {
         <iframe
           src={embedUrl}
           title={activeVideo.title}
-          className="w-full aspect-video rounded-lg border border-[#1E1E1E]"
+          className="w-full aspect-video rounded-none border border-[#D4AF37]/20"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
@@ -51,7 +51,7 @@ export function MateriVideoPlayer({ videos }: MateriVideoPlayerProps) {
       <iframe
         src={embedUrl}
         title={activeVideo.title}
-        className="w-full aspect-video rounded-lg border border-[#1E1E1E] mb-4"
+        className="w-full aspect-video rounded-none border border-[#D4AF37]/20 mb-4"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
@@ -63,13 +63,13 @@ export function MateriVideoPlayer({ videos }: MateriVideoPlayerProps) {
             onClick={() => setActiveIndex(index)}
             aria-label={`Putar video: ${video.title}`}
             aria-current={index === activeIndex ? 'true' : undefined}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-left w-full transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-none text-left w-full transition-all duration-200 ${
               index === activeIndex
                 ? 'bg-[#D4AF37]/10 border border-[#D4AF37]/30'
-                : 'bg-[#111] border border-[#1E1E1E] hover:border-[#2A2A2A]'
+                : 'bg-[#110E07] border border-primary/10 hover:border-[#D4AF37]/45'
             }`}
           >
-            <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+            <span className={`w-7 h-7 rounded-none flex items-center justify-center text-xs font-bold flex-shrink-0 ${
               index === activeIndex
                 ? 'bg-[#D4AF37] text-[#0A0A0A]'
                 : 'bg-[#1A1A1A] text-[#555]'

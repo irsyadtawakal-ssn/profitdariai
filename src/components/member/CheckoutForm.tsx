@@ -80,7 +80,7 @@ function MethodLogo({ method, iconUrl }: { method: PaymentMethod; iconUrl?: stri
   }
   return (
     <span
-      className="inline-flex items-center justify-center rounded-lg px-2 py-1 text-xs font-bold tracking-wide leading-none"
+      className="inline-flex items-center justify-center rounded-none px-2 py-1 text-xs font-bold tracking-wide leading-none"
       style={{ background: method.bg, color: method.textColor, border: `1px solid ${method.color}22` }}
     >
       {method.shortLabel}
@@ -103,7 +103,7 @@ function PaymentCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`relative flex flex-col gap-2 p-3 rounded-xl border cursor-pointer transition-all text-left w-full ${
+      className={`relative flex flex-col gap-2 p-3 rounded-none border cursor-pointer transition-all text-left w-full ${
         selected
           ? 'border-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.25)]'
           : 'border-[#252525] hover:border-[#383838]'
@@ -138,7 +138,7 @@ function CollapsibleGroup({
   const selectedMethod = group.methods.find(m => m.code === selected)
 
   return (
-    <div className="border border-[#222222] rounded-xl overflow-hidden">
+    <div className="border border-[#D4AF37]/20 rounded-none overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
@@ -244,11 +244,11 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">
       {/* Order summary */}
-      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-4">
+      <div className="bg-[#111111] border border-[#D4AF37]/20 rounded-none p-5 mb-4">
         <h2 className="text-[#F5F5F0] font-semibold mb-3">Ringkasan Pesanan</h2>
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
-            <span className="text-[#888888] text-sm">profitdariai Membership</span>
+            <span className="text-[#888888] text-sm">Profit Dari AI (E-book)</span>
             <span className="text-[#F5F5F0] text-sm font-medium">{fmt(base)}</span>
           </div>
           <div className="flex justify-between items-center">
@@ -269,7 +269,7 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
       </div>
 
       {/* Buyer info */}
-      <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 mb-4">
+      <div className="bg-[#111111] border border-[#D4AF37]/20 rounded-none p-5 mb-4">
         <h2 className="text-[#F5F5F0] font-semibold mb-4">Data Pembeli</h2>
         <div className="flex flex-col gap-4">
           <div>
@@ -319,7 +319,7 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
 
       {/* Selected method summary */}
       {selectedMethod && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 mb-4">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-none border border-[#D4AF37]/20 bg-[#D4AF37]/5 mb-4">
           <div className="w-10 h-6 relative shrink-0">
             {selectedMethod.localIcon || channelIcons[selectedMethod.code] ? (
               <Image

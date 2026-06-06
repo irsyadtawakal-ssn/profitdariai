@@ -1,160 +1,166 @@
 # Customer Journey — profitdariai
 
+## Model Bisnis
+Platform **product-purchase** (bukan membership). Customer beli produk satuan. Setiap produk yang dibeli masuk ke **personal library** di `/materi`.
+
+- **Produk Utama:** Profit Dari AI (E-book) — Rp 199.000 (sekali bayar)
+- **Produk Tambahan:** Dijual satuan di `/marketplace` (upsell ke customer yang sudah beli)
+
+---
+
 ## 1. Landing Page Discovery
 - **Route:** `/` (marketing)
 - **Content:**
   - Hero: "Cara Hasilkan Rp 74 Juta dari Produk Digital Buatan AI"
-  - Topbar: "EARLY BIRD — Akses Lifetime Rp 199K"
-  - CTAs: "Ya, Saya Mau Mulai Sekarang!" → `/signup`
+  - Topbar: "EARLY BIRD — Rp 199K"
+  - CTAs: "Ya, Saya Mau Mulai Sekarang!" → `/checkout`
   - Proof: Ticker (Rp 74.7M omzet, 1.494 orders, 20.53% conversion)
   - Course outline, testimonials, FAQ
-  - Final CTA: "🚀 Mulai Sekarang — Rp 199.000 Lifetime"
-
-**Key Decision:** User decides to buy membership
+  - Final CTA: "🚀 Mulai Sekarang — Rp 199.000"
 
 ---
 
-## 2. Signup / Login
-- **Route:** `/signup` (auth) or `/login` (if returning user)
-- **Actions:**
-  - New user: Create account (email + password)
-  - Existing user: Sign in
-  - System creates profile with role='member', membership_expires_at=NULL
-- **After Auth:** Redirect to `/member/checkout`
-
----
-
-## 3. Checkout Page
-- **Route:** `/member/checkout` (protected, member-only)
-- **Guards:**
-  - If not logged in → redirect to `/login`
-  - If membership already active → redirect to `/dashboard`
+## 2. Checkout Page
+- **Route:** `/checkout` (publik, tidak perlu login)
 - **Content:**
-  - Order summary: "profitdariai Membership Lifetime — Rp 199.000"
-  - Payment method selection:
-    - QRIS (all e-wallets & m-banking)
-    - OVO, Dana, ShopeePay
-    - BCA, Mandiri, BNI, BRI Virtual Accounts
-  - "Bayar Sekarang" button
-  - Trust signals: "SSL Aman · 7 Hari Uang Kembali · Diproses via Tripay"
+  - Order summary: "Profit Dari AI (E-book) — Rp 199.000"
+  - Input: Nama + Email
+  - Payment method selection: QRIS, OVO, Dana, ShopeePay, BCA VA, Mandiri VA, BNI VA, BRI VA
+  - Trust signals: "SSL Aman · Diproses via Tripay"
 
-**Key Decision:** User selects payment method and clicks "Bayar Sekarang"
+**Key Decision:** User mengisi data dan klik "Bayar Sekarang"
 
 ---
 
-## 4. Payment Initiation
+## 3. Payment Initiation
 - **API Endpoint:** `POST /api/payment/create`
 - **Request:**
   ```json
   {
-    "paymentMethod": "QRIS" // or OVO, BCAVA, etc.
+    "paymentMethod": "QRIS",
+    "email": "user@email.com",
+    "fullName": "Nama User"
   }
   ```
 - **Backend Actions:**
-  1. Verify user is authenticated
-  2. Generate merchant reference: `{user_id}-{timestamp}`
-  3. Calculate signature: HMAC-SHA256(merchant_code + merchant_ref + amount, private_key)
-  4. Call Tripay API: `POST /transaction/create`
-  5. Insert transaction record in DB (status=UNPAID)
-  6. Return checkout_url, qr_url, pay_code to frontend
-
-**Response:**
-```json
-{
-  "checkout_url": "https://tripay.co.id/checkout/...",
-  "qr_url": "https://...",
-  "pay_code": "..."
-}
-```
+  1. Fetch ebook utama dari DB (sort_order pertama yang published)
+  2. Simpan `ebook_ids: [ebook.id]` di metadata transaksi
+  3. Buat transaksi di Tripay
+  4. Insert record ke tabel `transactions` (status=UNPAID, metadata berisi ebook_ids)
+  5. Return `checkout_url`, `qr_url`, `pay_code`
 
 ---
 
-## 5. Tripay Checkout
-- **Redirect:** User goes to `checkout_url` (Tripay hosted page)
+## 4. Tripay Checkout
+- **Redirect:** User ke `checkout_url` (halaman Tripay)
 - **User Actions:**
-  - Confirm payment details (Rp 199.000)
-  - Select exact payment method (e.g., "QRIS (GCash)")
-  - Complete payment (scan QR, tap button, etc.)
-- **Tripay Processing:**
-  - Verifies payment with bank/e-wallet
-  - Sends webhook callback to `/api/payment/webhook`
+  - Konfirmasi detail (Rp 199.000)
+  - Pilih metode pembayaran
+  - Selesaikan pembayaran
+- **Tripay Processing:** Kirim webhook ke `/api/payment/webhook`
 
 ---
 
-## 6. Payment Confirmation (Webhook)
+## 5. Payment Confirmation (Webhook)
 - **Endpoint:** `POST /api/payment/webhook`
-- **Tripay Callback:**
-  ```json
-  {
-    "reference": "TRIPAY_REF_...",
-    "merchant_ref": "USER_ID-...",
-    "status": "PAID",
-    "paid_at": 1685000000,
-    "amount": 199000
-  }
-  ```
+- **Tripay Callback:** `{ status: "PAID", reference: "...", paid_at: ... }`
 - **Backend Actions:**
-  1. Verify webhook signature: HMAC-SHA256(rawBody, private_key) == header signature
-  2. Find transaction by tripay_reference + merchant_ref
-  3. Update transaction status → "PAID", paid_at
-  4. **Query user profile**
-  5. Update profile: membership_expires_at = "2099-12-31T23:59:59.000Z" (lifetime)
-  6. Send payment success email to user
-  7. Return `{success: true}` to Tripay
+  1. Verifikasi signature webhook
+  2. Cari transaksi by reference
+  3. Update status → "PAID"
+  4. Baca `ebook_ids` dari `metadata` transaksi
+  5. **INSERT ke `user_ebooks`** (user_id + ebook_id, source='checkout')
+  6. Kirim email konfirmasi ke user
+  7. Return `{ success: true }`
 
 **Email Template:**
-- Subject: "Pembayaran Berhasil — Selamat Datang di profitdariai!"
-- Body: Confirms membership, shows expiry date, links to dashboard
+- Subject: "Produk kamu sudah aktif — Profit dari AI"
+- Body: Link ke library + set password (jika guest checkout)
 
 ---
 
-## 7. Return to App
-- **After Tripay Payment:**
-  - Tripay redirects user to `TRIPAY_RETURN_URL`
-  - Default: `https://profitdariai.com/dashboard?payment=success`
-  - Local dev: `http://localhost:3000/payment/success`
-
-- **Route:** `/member/payment/success`
+## 6. Return to App
+- **Route:** `/payment/success`
 - **Content:**
-  - Success icon (animated checkmark)
+  - Success icon (checkmark)
   - "Pembayaran Berhasil!"
-  - "Selamat datang di profitdariai. Akses kamu sudah aktif."
-  - Shows: "Membership aktif sampai 31 Desember 2099"
-  - Button: "Mulai Belajar →" → `/dashboard`
+  - "Produk kamu sudah aktif dan siap diakses."
+  - Tampilkan jumlah produk di library
+  - Button: "Buka Library →" → `/materi`
 
 ---
 
-## 8. Member Dashboard
-- **Route:** `/dashboard` (protected, membership required)
-- **Guards:**
-  - If not logged in → redirect to `/login`
-  - If membership expired → redirect to `/checkout`
+## 7. Signup / Login (Guest Checkout Flow)
+- **Guest:** Beli dulu tanpa login → setelah PAID, akun otomatis dibuat
+- **Email Setup:** User terima email berisi link set-password
+- **Setelah Set Password:** Login → langsung ke `/materi`
+
+- **Returning User:** Login → sudah ada ebook di library
+
+---
+
+## 8. Member Library (`/materi`)
+- **Route:** `/materi` (protected, login required)
+- **Guards:** Tidak login → redirect ke `/login`
 - **Content:**
-  - Welcome message with user's name
-  - Available courses (from DB)
-  - Available ebooks (from DB)
-  - Progress tracking
-  - Profile settings
+  - Semua ebook dari `ebooks` table ditampilkan
+  - **Owned** (ada di `user_ebooks`) → normal, bisa dibaca & didownload
+  - **Not owned** → lock overlay, klik → redirect ke marketplace
+  - Header: "X ITEM TERSEDIA · Y DIMILIKI"
 
 ---
 
-## 9. Ongoing — Renewal Reminder (Optional Future)
-- **Cron Job:** Daily at 2am UTC
-- **Trigger:** Profiles expiring in 7 days (±12 hour window)
-- **Action:** Send renewal reminder email
-- **Note:** Current model is lifetime, so this won't trigger. Will be useful if future model changes.
+## 9. Marketplace (`/marketplace`)
+- **Route:** `/marketplace` (protected, login required)
+- **Content:**
+  - Produk tambahan dari tabel `marketplace_products`
+  - Yang sudah dibeli → badge **"SUDAH DIMILIKI"** + tombol "Buka di Library"
+  - Yang belum → tombol "Beli Sekarang" (link ke halaman checkout produk tersebut)
+  - Search + filter kategori
 
 ---
 
-## 10. Admin Dashboard
+## 10. Dashboard (`/dashboard`)
+- **Route:** `/dashboard` (protected, login required)
+- **Content:**
+  - Welcome message + quote harian
+  - Quick stats: Total materi, kursus, dll
+  - **4 materi terbaru** (dari DB)
+  - Tombol "Lihat Semua" → `/materi`
+
+---
+
+## 11. Admin Dashboard
 - **Route:** `/admin/dashboard` (protected, role='admin' only)
-- **Access:** After login, if role='admin', redirect here instead of `/dashboard`
 - **Content:**
-  - Dashboard overview
-  - Course management (CRUD)
-  - Ebook management (CRUD)
-  - Member list + subscription status
-  - Payment history
+  - Dashboard stats
+  - Manajemen ebook (CRUD)
+  - Manajemen marketplace products (CRUD)
+  - Daftar user + riwayat pembelian
+  - Manajemen transaksi
+
+---
+
+## Database Schema (Ownership)
+
+```
+transactions
+  - id, user_id, customer_email, customer_name
+  - tripay_reference, merchant_ref
+  - amount, payment_method, status (UNPAID|PAID|FAILED)
+  - metadata: { ebook_ids: [...], ...tripay_data }
+
+user_ebooks  ← tabel baru (June 2026)
+  - id, user_id, ebook_id
+  - source ('checkout' | 'marketplace' | 'admin')
+  - purchased_at
+
+marketplace_products
+  - id, slug, title, description, category
+  - price, original_price, cover_url, product_url
+  - ebook_id (FK ke ebooks) ← kolom baru (June 2026)
+  - is_published, sort_order
+```
 
 ---
 
@@ -171,7 +177,7 @@ TRIPAY_API_KEY=...
 TRIPAY_PRIVATE_KEY=...
 TRIPAY_MERCHANT_CODE=...
 TRIPAY_CALLBACK_URL=https://profitdariai.com/api/payment/webhook
-TRIPAY_RETURN_URL=https://profitdariai.com/dashboard?payment=success
+TRIPAY_RETURN_URL=https://profitdariai.com/payment/success
 
 SMTP_HOST=smtp.hostinger.com
 SMTP_PORT=465
@@ -179,7 +185,6 @@ SMTP_USER=admin@profitdariai.com
 SMTP_PASS=...
 
 CRON_SECRET=...
-SENTRY_DSN=...
 ```
 
 ### Local Development
@@ -193,44 +198,42 @@ TRIPAY_RETURN_URL=http://localhost:3000/payment/success
 
 ## Testing Checklist
 
-### Sandbox Test (TRIPAY_MODE=sandbox)
-- [ ] User signs up
-- [ ] Checkout page loads
-- [ ] Select payment method (QRIS recommended for testing)
-- [ ] Click "Bayar Sekarang"
-- [ ] Redirected to Tripay sandbox checkout
-- [ ] Complete payment (use test credentials)
-- [ ] Webhook processed (check logs)
-- [ ] Email sent (check Hostinger logs)
-- [ ] Profile updated with membership_expires_at
-- [ ] Redirected to `/payment/success`
-- [ ] Button takes user to `/dashboard`
-- [ ] Dashboard shows membership active
+### Sandbox Test
+- [ ] User buka `/checkout`
+- [ ] Isi nama, email, pilih payment method
+- [ ] Klik "Bayar Sekarang"
+- [ ] Redirect ke Tripay sandbox checkout
+- [ ] Selesaikan pembayaran (test credentials)
+- [ ] Webhook diproses — cek log server
+- [ ] Email terkirim
+- [ ] `user_ebooks` berisi record baru di Supabase
+- [ ] Redirect ke `/payment/success`
+- [ ] Button "Buka Library" → `/materi` (ebook unlocked)
+- [ ] Download ebook berhasil
 
-### Production Deployment
-1. Set TRIPAY_MODE=production
-2. Add production Tripay credentials to Vercel env vars
-3. Deploy to production
-4. Test with real payment
-5. Verify email delivery
+### Manual Test (Insert Langsung)
+```sql
+-- Grant ebook ke user untuk testing tanpa payment
+INSERT INTO user_ebooks (user_id, ebook_id, source)
+VALUES ('uuid-user', 'uuid-ebook', 'admin');
+```
 
 ---
 
 ## Success Metrics
 
 **Customer sees:**
-1. ✅ Landing page with clear Rp 199K offer
-2. ✅ Smooth signup/login flow
-3. ✅ Checkout page with multiple payment options
-4. ✅ Successful payment → confirmation email
-5. ✅ Immediate access to all courses & ebooks
-6. ✅ Dashboard with content visible
+1. ✅ Landing page dengan penawaran Rp 199K
+2. ✅ Checkout tanpa harus signup dulu
+3. ✅ Pembayaran via berbagai metode (QRIS, VA, e-wallet)
+4. ✅ Email konfirmasi setelah bayar
+5. ✅ Akses langsung ke library `/materi`
+6. ✅ Bisa beli produk tambahan di marketplace
 
 **Backend ensures:**
-1. ✅ Payment verified via Tripay webhook signature
-2. ✅ Transaction recorded in DB
-3. ✅ Membership activated (lifetime)
-4. ✅ Email sent successfully
-5. ✅ User can access protected routes
-6. ✅ Errors tracked in Sentry
-7. ✅ Logs available for debugging
+1. ✅ Payment diverifikasi via Tripay webhook signature
+2. ✅ Transaksi tercatat di DB
+3. ✅ Ebook diberikan via `user_ebooks` (bukan membership)
+4. ✅ Email terkirim
+5. ✅ Download API cek kepemilikan via `user_ebooks`
+6. ✅ Marketplace tampilkan OWNED status per-user

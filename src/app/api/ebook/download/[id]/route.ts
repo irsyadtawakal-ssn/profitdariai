@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { isMembershipActive } from '@/lib/membership'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -10,14 +9,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('membership_expires_at')
-    .eq('id', user.id)
+  // Check ownership via user_ebooks table
+  const { data: ownership } = await supabase
+    .from('user_ebooks')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('ebook_id', id)
     .single()
 
-  if (!profile || !isMembershipActive(profile)) {
-    return NextResponse.json({ error: 'Membership required' }, { status: 403 })
+  if (!ownership) {
+    return NextResponse.json({ error: 'Ebook ini belum kamu miliki. Beli terlebih dahulu.' }, { status: 403 })
   }
 
   const { data: ebook } = await supabase

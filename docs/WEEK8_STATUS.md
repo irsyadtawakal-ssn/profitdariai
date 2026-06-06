@@ -1,212 +1,148 @@
-# Week 8 - Status & Progress
+# Development Status — profitdariai
 
-**Date:** 28 May 2026  
-**Status:** Guest Checkout Flow Complete — Ready for Production Deployment
+**Last Updated:** 6 Juni 2026  
+**Status:** Ownership System Complete — Ready for Production Testing
 
 ---
 
 ## ✅ COMPLETED
 
-### Core Payment Flow
-- ✅ Guest checkout (no signup required)
-- ✅ Checkout form: Name + Email + Payment method selection
-- ✅ Public route: `/checkout` (no authentication gate)
-- ✅ 8 payment methods: QRIS, OVO, Dana, ShopeePay, BCA VA, Mandiri VA, BNI VA, BRI VA
-- ✅ Price: Rp 199.000 (early bird lifetime membership)
-- ✅ Payment API (`/api/payment/create`) integrates with Tripay
-- ✅ Payment webhook (`/api/payment/webhook`) confirms payment
-- ✅ Auto-account creation after payment confirmation
-- ✅ Password setup email with reset link
-- ✅ Lifetime membership activation (expires 2099-12-31)
+### Core Architecture
+- ✅ Next.js 16 + Supabase + Tailwind v4
+- ✅ Aureum Cyber design system (Premium Neo-Cyberpunk aesthetic)
+- ✅ Auth flow: Login + Signup + Guest Checkout
 
-### Infrastructure & Features
-- ✅ Landing page: Updated with Rp 199K pricing
-- ✅ Sentry error monitoring (config ready)
-- ✅ Hostinger SMTP email (transactional emails working)
-- ✅ Renewal reminder cron job (daily 2am)
-- ✅ Admin role-based routing (admins → /admin, members → /dashboard)
-- ✅ Database migration: Guest checkout support (user_id nullable, customer_email/name columns)
+### Payment Flow
+- ✅ Guest checkout (tidak perlu signup dulu)
+- ✅ Checkout form: Nama + Email + Payment method
+- ✅ 8 metode pembayaran: QRIS, OVO, Dana, ShopeePay, BCA VA, Mandiri VA, BNI VA, BRI VA
+- ✅ Harga: Rp 199.000 (produk e-book utama)
+- ✅ Payment API (`/api/payment/create`) — menyimpan `ebook_ids` di metadata
+- ✅ Payment webhook (`/api/payment/webhook`) — grant ebook ke user via `user_ebooks`
+- ✅ Auto-account creation setelah payment (guest checkout)
+- ✅ Email konfirmasi + link set-password
 
-### Testing
-- ✅ Sandbox Tripay merchant credentials configured
-- ✅ Test payment created: Reference DEV-T504033731384DJBG3
-- ✅ Transaction marked PAID in Tripay dashboard
-- ✅ Payment API working (200 status)
+### Ownership System (User Ebooks)
+- ✅ Tabel `user_ebooks` — tracking kepemilikan per-user per-ebook
+- ✅ `/materi` — library personal (owned = unlock, not owned = lock overlay)
+- ✅ `/marketplace` — tampil OWNED badge untuk produk yang sudah dibeli
+- ✅ Download API — cek kepemilikan via `user_ebooks`
+- ✅ Webhook — INSERT ke `user_ebooks` setelah PAID
+- ✅ RLS policies pada `user_ebooks`
+
+### UI / Design
+- ✅ Dashboard — widget "Materi Terbaru" (4 materi terbaru dari DB)
+- ✅ MateriCard — `isLocked` prop dengan lock overlay
+- ✅ MarketplaceClient — search/filter + OWNED badge
+- ✅ MemberSidebar — tanpa membership status, ada CTA "Beli Produk Baru"
+- ✅ Profile page — hapus semua referensi membership
+- ✅ Payment success page — tampilkan jumlah produk dimiliki
+- ✅ Checkout form — label "Profit Dari AI (E-book)"
+
+### Infrastruktur
+- ✅ Hostinger SMTP email (transactional emails)
+- ✅ Admin role-based routing
+- ✅ Database migration: `user_ebooks`, `ebook_id` di marketplace_products
 
 ---
 
-## ⏳ PENDING
+## 🚧 PENDING / NEXT STEPS
 
-### 1. **Webhook Delivery (BLOCKING EMAIL)**
-**Issue:** Callback URL is `http://localhost:3000` - Tripay can't reach it
+### 1. Populate Marketplace Products
+- Admin perlu isi tabel `marketplace_products` dengan produk upsell
+- Set `ebook_id` untuk setiap produk marketplace (FK ke ebooks)
+- Test flow: beli dari marketplace → ebook muncul di /materi
 
-**Solution A: ngrok (Quick test)**
-```bash
-ngrok http 3000
-# Get URL: https://abc123.ngrok.io
-# Update .env.local:
-TRIPAY_CALLBACK_URL=https://abc123.ngrok.io/api/payment/webhook
-TRIPAY_RETURN_URL=https://abc123.ngrok.io/payment/success
-# Restart dev server
-# Test payment again
+### 2. Marketplace Checkout Flow (Produk Satuan)
+- Saat ini tombol "Beli Sekarang" di marketplace masih link ke `/checkout`
+- Perlu dedicated checkout per-produk dengan `ebook_ids: [product.ebook_id]`
+- API endpoint: `/api/payment/marketplace/create`
+
+### 3. Deploy ke Vercel
+- Webhook butuh public URL untuk bisa diterima Tripay
+- Production URL: `https://profitdariai.com/api/payment/webhook`
+
+### 4. Test End-to-End Payment
+```
+Checkout → Tripay → Webhook → user_ebooks INSERT → Library unlock
+```
+- Butuh public URL (ngrok atau Vercel) untuk webhook
+- Test dengan Tripay sandbox mode
+
+### 5. Admin Dashboard Update
+- `/admin/members` masih pakai `membership_expires_at` untuk filter
+- Perlu diupdate untuk pakai `user_ebooks` count sebagai indikator pembelian
+
+### 6. Email Templates Update
+- Email masih menyebut "membership" di beberapa template
+- Update `/src/lib/email/templates.ts`
+
+---
+
+## 🗄️ Database Schema
+
+```sql
+-- Tabel utama untuk ownership (baru: Juni 2026)
+CREATE TABLE user_ebooks (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  ebook_id uuid NOT NULL REFERENCES ebooks(id) ON DELETE CASCADE,
+  source text NOT NULL DEFAULT 'checkout',
+  purchased_at timestamptz DEFAULT now() NOT NULL,
+  UNIQUE(user_id, ebook_id)
+);
+
+-- Kolom baru di marketplace_products
+ALTER TABLE marketplace_products ADD COLUMN ebook_id uuid REFERENCES ebooks(id);
 ```
 
-**Solution B: Deploy to Vercel (Recommended)**
-- Skip local testing
-- Use production URL: https://profitdariai.com
-- Webhook works automatically
-- Test end-to-end in production
-
-### 2. **Deploy to Vercel**
-
-**Steps:**
-1. Connect repo to Vercel
-2. Set environment variables:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=...
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-   SUPABASE_SERVICE_ROLE_KEY=...
-   
-   TRIPAY_API_KEY=DEV-zcGSAddkQriEQjqPGRzEkClKopSkcOfg3OBB3aCX
-   TRIPAY_PRIVATE_KEY=TBPpW-nU5aK-Tqoof-166u0-HviyD
-   TRIPAY_MERCHANT_CODE=T50403
-   TRIPAY_MODE=sandbox (or production)
-   TRIPAY_CALLBACK_URL=https://profitdariai.com/api/payment/webhook
-   TRIPAY_RETURN_URL=https://profitdariai.com/dashboard?payment=success
-   
-   SMTP_HOST=smtp.hostinger.com
-   SMTP_PORT=465
-   SMTP_USER=admin@profitdariai.com
-   SMTP_PASS=@Rahasiadong22
-   
-   CRON_SECRET=dc861d6484acdf3171aae9dae0567d41b0772ad932c5ad4c12c14fd6e679a9b7
-   ```
-3. Deploy
-4. Test checkout at production URL
-
-### 3. **Connect Domain**
-- Point profitdariai.com DNS to Vercel
-- Verify SSL certificate
-
-### 4. **Switch to Production Tripay** (Before Public Launch)
-- Change TRIPAY_MODE from sandbox → production
-- Update merchant credentials to production account
-- Verify payment flow works with real payments
-
-### 5. **Sentry Setup** (Optional)
-- Create Sentry account & project
-- Add SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT to Vercel
-- Monitor errors in production
-
-### 6. **Soft Launch**
-- Enable checkout on production
-- Invite 50 beta testers
-- Gather feedback
-- Monitor conversion rate
-
-### 7. **Public Launch**
-- Announce publicly
-- Monitor sales & support
-- Track metrics
-
 ---
 
-## 📊 Current State
+## 📋 Customer Journey (Terkini)
 
-### Tripay Sandbox Test
-- ✅ Merchant Code: T50403
-- ✅ Payment Created: DEV-T504033731384DJBG3
-- ✅ Amount: Rp 199.000
-- ✅ Status: DIBAYAR (PAID)
-- ⏳ Webhook: Needs public URL to deliver
-- ⏳ Email: Waiting for webhook callback
-
-### Database
-- ✅ Schema updated: user_id nullable
-- ✅ Columns added: customer_email, customer_name
-- ✅ Ready for guest checkout
-
-### Code
-- ✅ All components built and tested locally
-- ✅ Payment flow working (API returns checkout_url)
-- ✅ Ready for production deployment
+```
+Landing Page (/)
+  ↓ "Beli Sekarang" button
+Checkout (/checkout)
+  ↓ Isi: Nama + Email + Payment method
+Tripay Checkout (external)
+  ↓ Selesaikan pembayaran
+Webhook Confirmation (/api/payment/webhook)
+  ↓ Baca ebook_ids dari metadata transaksi
+  ↓ INSERT ke user_ebooks
+  ↓ Kirim email konfirmasi
+  ↓ Auto-buat akun jika guest
+Password Setup Email (untuk guest)
+  ↓ Klik link → Set password → Login
+Library (/materi)
+  ↓ Tampil ebook yang dimiliki (unlocked)
+  ↓ Ebook belum dibeli = locked (beli di marketplace)
+Marketplace (/marketplace)
+  ↓ Beli produk tambahan
+  ↓ Produk dimiliki = badge OWNED + "Buka di Library"
+```
 
 ---
 
 ## 🚀 Critical Path to Launch
 
 ```
-1. Deploy to Vercel (15 min)
+1. Deploy ke Vercel (15 min)
    ↓
-2. Test payment flow on production (10 min)
+2. Set TRIPAY_CALLBACK_URL ke production URL
    ↓
-3. Soft launch: Invite 50 testers (2 days)
+3. Test end-to-end: checkout → webhook → library unlock
    ↓
-4. Gather feedback & fix issues (3-5 days)
+4. Isi marketplace_products dengan produk upsell
    ↓
-5. Switch to production Tripay (1 day)
+5. Switch TRIPAY_MODE=production
    ↓
-6. Public launch
+6. Soft launch
 ```
 
 ---
 
-## 📝 Configuration Files
+## ⚠️ Catatan Penting
 
-### .env.local (Local Testing)
-```
-TRIPAY_API_KEY=DEV-zcGSAddkQriEQjqPGRzEkClKopSkcOfg3OBB3aCX
-TRIPAY_PRIVATE_KEY=TBPpW-nU5aK-Tqoof-166u0-HviyD
-TRIPAY_MERCHANT_CODE=T50403
-TRIPAY_MODE=sandbox
-TRIPAY_CALLBACK_URL=http://localhost:3000/api/payment/webhook
-TRIPAY_RETURN_URL=http://localhost:3000/payment/success
-
-SMTP_HOST=smtp.hostinger.com
-SMTP_PORT=465
-SMTP_USER=admin@profitdariai.com
-SMTP_PASS=@Rahasiadong22
-
-CRON_SECRET=dc861d6484acdf3171aae9dae0567d41b0772ad932c5ad4c12c14fd6e679a9b7
-```
-
-### Vercel Environment Variables (Production)
-Same as above, but with production URLs:
-```
-TRIPAY_CALLBACK_URL=https://profitdariai.com/api/payment/webhook
-TRIPAY_RETURN_URL=https://profitdariai.com/dashboard?payment=success
-```
-
----
-
-## 📋 Customer Journey (Implemented)
-
-```
-Landing Page (/)
-  ↓ "Dapatkan Akses" button
-Checkout (/checkout)
-  ↓ Fill: Name + Email + Payment method
-Tripay Checkout (external)
-  ↓ Complete payment
-Webhook Confirmation
-  ↓ Auto-create account
-  ↓ Send password setup email
-Password Setup Email
-  ↓ Click link → Set password
-Login (/login)
-  ↓ Email + New password
-Dashboard (/dashboard)
-  ↓ Access all courses & ebooks (lifetime membership)
-```
-
----
-
-## 🎯 Next Action
-
-**Recommend:** Deploy to Vercel now
-- Production URL eliminates webhook issue
-- Can test payment flow end-to-end immediately
-- Faster path to soft launch
-- More reliable than ngrok
-
-Ready to deploy? 🚀
+> **SECURITY:** Jangan pernah commit file `.env.local` ke repository!
+> Semua credentials (Tripay, SMTP, Supabase) harus di environment variables, bukan di kode.

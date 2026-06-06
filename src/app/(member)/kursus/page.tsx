@@ -12,10 +12,11 @@ export default async function KursusPage({ searchParams }: KursusPageProps) {
   const courses = await getCachedCourses(category)
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#F5F5F0] mb-1">Library Kursus</h1>
-        <p className="text-[#888888] text-sm">{courses.length} kursus tersedia</p>
+    <div className="p-6 max-w-5xl mx-auto space-y-8 pt-8">
+      <div>
+        <span className="font-mono text-[9px] text-[#D4AF37] tracking-[0.2em] block mb-2 uppercase">Katalog Premium</span>
+        <h2 className="text-2xl md:text-3xl font-black text-white leading-none tracking-tight font-display">Daftar Kursus</h2>
+        <p className="text-[#888888] text-xs mt-2 font-mono">{courses.length} KURSUS TERSEDIA</p>
       </div>
 
       <div className="mb-6">

@@ -13,12 +13,12 @@ interface FeaturedMateriProps {
 export function FeaturedMateri({ slug, title, category, cover_url, description }: FeaturedMateriProps) {
   return (
     <Link href={`/materi/${slug}`} className="block group">
-      <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-[#131108] to-[#0F0D06] border border-[#2A2200] hover:border-[#D4AF37] transition-colors p-5 flex gap-5 items-start">
+      <div className="relative overflow-hidden glass-panel p-5 flex gap-5 items-start cyber-corner">
         {/* Left gold accent bar */}
-        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#D4AF37] to-[#D4AF37]/20 rounded-l-xl" />
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#D4AF37] to-[#D4AF37]/20" />
 
         {/* Cover */}
-        <div className="w-20 h-[100px] rounded-lg overflow-hidden bg-[#1A1808] border border-[#2A2200] flex-shrink-0 relative">
+        <div className="w-20 h-[100px] rounded-none overflow-hidden bg-[#1A1808] border border-primary/20 flex-shrink-0 relative">
           {cover_url ? (
             <Image
               src={cover_url}
@@ -42,22 +42,22 @@ export function FeaturedMateri({ slug, title, category, cover_url, description }
         {/* Body */}
         <div className="flex-1 min-w-0">
           {/* "Pilihan Editor" badge top-right */}
-          <span className="absolute top-4 right-5 text-[#D4AF37] text-[10px] font-bold uppercase tracking-wider">
+          <span className="absolute top-4 right-5 text-[#D4AF37] text-[10px] font-bold uppercase tracking-wider font-mono">
             ★ Pilihan Editor
           </span>
 
           <Badge variant="gold" className="mb-2 text-[10px]">
             ⭐ {category}
           </Badge>
-          <h3 className="text-[#F5F5F0] font-bold text-[15px] leading-snug mb-2 pr-24">
+          <h3 className="text-[#F5F5F0] font-bold text-[15px] leading-snug mb-2 pr-24 font-display">
             {title}
           </h3>
           {description && (
-            <p className="text-[#666] text-xs leading-relaxed mb-4 line-clamp-3">
+            <p className="text-muted text-xs leading-relaxed mb-4 line-clamp-3">
               {description}
             </p>
           )}
-          <span className="inline-block bg-[#D4AF37] text-[#0A0A0A] text-xs font-bold px-4 py-1.5 rounded-md group-hover:bg-[#E5C84A] transition-colors">
+          <span className="inline-block bg-[#D4AF37] text-[#0A0A0A] text-xs font-bold px-4 py-1.5 cyber-corner group-hover:bg-[#E5C84A] transition-all font-mono">
             Buka Materi →
           </span>
         </div>

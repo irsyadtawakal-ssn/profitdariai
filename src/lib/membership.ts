@@ -1,19 +1,11 @@
-import type { Database } from '@/types/database'
+// Ownership checking utilities
+// Previously: membership-based (membership_expires_at)
+// Now: any authenticated user has access (ownership tracked via user_ebooks — coming soon)
 
-type Profile = Database['public']['Tables']['profiles']['Row']
-
-export function isMembershipActive(profile: Pick<Profile, 'membership_expires_at'>): boolean {
-  if (!profile.membership_expires_at) return false
-  return new Date(profile.membership_expires_at) > new Date()
-}
-
-export function getDaysUntilExpiry(profile: Pick<Profile, 'membership_expires_at'>): number | null {
-  if (!profile.membership_expires_at) return null
-  const diff = new Date(profile.membership_expires_at).getTime() - Date.now()
-  return Math.ceil(diff / (1000 * 60 * 60 * 24))
-}
-
-export function isRenewalWarning(profile: Pick<Profile, 'membership_expires_at'>): boolean {
-  const days = getDaysUntilExpiry(profile)
-  return days !== null && days <= 14 && days > 0
+/**
+ * For now, any logged-in user can access their purchased content.
+ * TODO: Replace with user_ebooks table check when implemented.
+ */
+export function isUserAuthenticated(userId: string | null | undefined): boolean {
+  return !!userId
 }

@@ -47,7 +47,7 @@ export function ModuleList({ modules }: ModuleListProps) {
               key={mod.id}
               onClick={() => setActiveIndex(i)}
               aria-pressed={i === activeIndex}
-              className={`flex items-start gap-3 p-3 rounded-lg text-left transition-colors w-full ${
+              className={`flex items-start gap-3 p-3 rounded-none text-left transition-all duration-200 w-full ${
                 i === activeIndex
                   ? 'bg-[#D4AF37]/10 border border-[#D4AF37]/30'
                   : 'hover:bg-[#1A1A1A] border border-transparent'

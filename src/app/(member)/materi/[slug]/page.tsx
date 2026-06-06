@@ -39,24 +39,24 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
   const documents = Array.isArray(materi.documents) ? (materi.documents as DocumentItem[]) : null
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto space-y-8 pt-8">
 
       {/* ① Hero Card */}
       <div
-        className="relative rounded-2xl overflow-hidden border border-[#2A2200] p-6 flex flex-col md:flex-row gap-6 mb-6"
-        style={{ background: 'linear-gradient(135deg, #161208 0%, #0F0D04 100%)' }}
+        className="relative rounded-none overflow-hidden border border-[#D4AF37]/20 p-8 flex flex-col md:flex-row gap-8 mb-6 bg-[#0E0E0E]"
       >
-        {/* Gold radial glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at top right, rgba(212,175,55,0.06) 0%, transparent 60%)' }}
-        />
+        {/* Underlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent pointer-events-none" />
+
+        {/* Crop Brackets */}
+        <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-[#F5F5F0] pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-[#F5F5F0] pointer-events-none" />
 
         {/* Cover */}
         <div className="relative flex-shrink-0 self-center md:self-start">
           <div
-            className="w-28 md:w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br from-[#1E1808] to-[#2A2208] border border-[#2E2400]"
-            style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,175,55,0.1)' }}
+            className="w-28 md:w-[120px] aspect-[3/4] rounded-none overflow-hidden bg-gradient-to-br from-[#1E1808] to-[#2A2208] border border-[#D4AF37]/20"
+            style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
           >
             {materi.cover_url ? (
               <img
@@ -66,20 +66,26 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-[#D4AF37] text-4xl font-black opacity-40">M</span>
+                <span className="text-[#D4AF37] text-4xl font-black opacity-40 font-display">M</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Info */}
-        <div className="relative flex-1">
-          <Badge variant="gold" className="mb-3">{materi.category}</Badge>
-          <h1 className="text-[22px] font-black tracking-tight leading-tight text-[#F5F5F0] mb-3">
+        <div className="relative flex-1 flex flex-col justify-center">
+          <div className="mb-3">
+            <Badge variant="gold" className="text-[9px]">
+              {materi.category}
+            </Badge>
+          </div>
+          <h1 className="text-xl md:text-2xl font-black tracking-tight leading-tight text-[#F5F5F0] mb-3 font-display">
             {materi.title}
           </h1>
           {materi.page_count && (
-            <p className="text-[#555] text-sm mb-5">{materi.page_count} halaman · PDF</p>
+            <p className="text-[#888888] font-mono text-xs mb-5 uppercase tracking-wide">
+              {materi.page_count} HALAMAN • PDF FORMAT
+            </p>
           )}
           <div className="md:max-w-xs">
             <DownloadButton ebookId={materi.id} />
@@ -90,11 +96,11 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
       {/* ② Deskripsi */}
       {materi.description && (
         <section className="mb-6">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
-            Tentang Materi
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37] font-mono mb-3">
+            // TENTANG MATERI
           </p>
-          <div className="bg-[#0E0E0E] border border-[#1A1A1A] rounded-xl p-5 md:p-6">
-            <p className="text-[#999] text-sm leading-relaxed">{materi.description}</p>
+          <div className="glass-panel rounded-none p-6 md:p-8">
+            <p className="text-[#c4c7c7] text-sm leading-relaxed font-sans">{materi.description}</p>
           </div>
         </section>
       )}
@@ -102,10 +108,10 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
       {/* ③ Video */}
       {videos && videos.length > 0 && (
         <section className="mb-6">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
-            Video Penjelasan
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37] font-mono mb-3">
+            // VIDEO PENJELASAN
           </p>
-          <div className="bg-[#0E0E0E] border border-[#1A1A1A] rounded-xl p-5 md:p-6">
+          <div className="glass-panel rounded-none p-6 md:p-8">
             <MateriVideoPlayer videos={videos} />
           </div>
         </section>
@@ -114,10 +120,10 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
       {/* ④ Dokumen Tambahan */}
       {documents && documents.length > 0 && (
         <section className="mt-6">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#555] mb-3">
-            Dokumen Tambahan
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37] font-mono mb-3">
+            // DOKUMEN TAMBAHAN
           </p>
-          <div className="bg-[#0E0E0E] border border-[#1A1A1A] rounded-xl p-5 md:p-6">
+          <div className="glass-panel rounded-none p-6 md:p-8">
             <div className="flex flex-col gap-3">
               {documents.map((doc, index) => (
                 <a
@@ -125,7 +131,7 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
                   href={doc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#111] border border-[#1E1E1E] hover:border-[#D4AF37]/30 transition-colors group"
+                  className="flex items-center gap-3 px-4 py-3 rounded-none bg-[#110E07] border border-[#D4AF37]/20 hover:border-[#D4AF37]/60 hover:bg-[#1A1A1A] transition-all group"
                 >
                   <svg className="w-5 h-5 text-[#D4AF37] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>

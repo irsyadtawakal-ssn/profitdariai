@@ -70,7 +70,7 @@ export default function LandingPage() {
             <span style={{ whiteSpace: 'nowrap' }}>Profit dari <span>AI</span></span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <a href="/login" style={{ fontSize: 13, fontWeight: 600, color: 'var(--gold)', textDecoration: 'none', padding: '8px 18px', border: '1.5px solid var(--gold)', borderRadius: 8, transition: 'all 0.2s', letterSpacing: '0.03em' }}>Masuk</a>
+            <a href="/login" className="login-btn">Masuk</a>
             <a href="#pricing" className="cta-nav">DAPATKAN AKSES</a>
           </div>
         </nav>
@@ -78,29 +78,32 @@ export default function LandingPage() {
         {/* HERO */}
         <section className="hero">
           <div className="hero-center container">
-            <div className="tag">
-              <i data-lucide="cpu" style={{ width: 14, height: 14 }} /> Panduan Praktis 100% AI
+            <div className="hero-glass-card">
+              <div className="tag">
+                <i data-lucide="cpu" style={{ width: 14, height: 14 }} /> Panduan Praktis 100% AI
+              </div>
+              <h1>
+                <span className="prefix">[ Ebook &amp; Template ]</span>
+                Cara Hasilkan <span className="accent">Rp 74 Juta</span> dari Produk Digital Buatan AI
+              </h1>
+              <p className="sub-center">Buat sekali, jual berkali-kali, cuan mengalir. Panduan langkah-demi-langkah dari nol hingga punya penghasilan pasif nyata dengan bantuan AI — tanpa skill teknis, tanpa modal besar.</p>
+              <div className="hero-btns-center">
+                <a href="/checkout" className="btn-primary">
+                  <i data-lucide="sparkles" style={{ width: 18, height: 18 }} /> Ya, Saya Mau Mulai Sekarang!
+                </a>
+              </div>
+              <p className="hero-bullets-center" style={{ marginBottom: 0 }}>
+                <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Akses penuh</span>
+                <span>·</span>
+                <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Semua kursus & ebook</span>
+                <span>·</span>
+                <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Update konten gratis</span>
+              </p>
             </div>
-            <h1>
-              <span className="prefix">[ Ebook &amp; Template ]</span>
-              Cara Hasilkan <span className="accent">Rp 74 Juta</span> dari Produk Digital Buatan AI
-            </h1>
-            <p className="sub-center">Buat sekali, jual berkali-kali, cuan mengalir. Panduan langkah-demi-langkah dari nol hingga punya penghasilan pasif nyata dengan bantuan AI — tanpa skill teknis, tanpa modal besar.</p>
-            <div className="hero-btns-center">
-              <a href="/checkout" className="btn-primary">
-                <i data-lucide="sparkles" style={{ width: 18, height: 18 }} /> Ya, Saya Mau Mulai Sekarang!
-              </a>
-            </div>
-            <p className="hero-bullets-center">
-              <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Akses penuh</span>
-              <span>·</span>
-              <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Semua kursus & ebook</span>
-              <span>·</span>
-              <span><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Update konten gratis</span>
-            </p>
+            
             <div className="hero-ebook-single" style={{ marginTop: 50, display: 'flex', justifyContent: 'center', width: '100%' }}>
-              <div style={{ width: '100%', maxWidth: 460, border: '3px solid var(--gold)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 15px 45px rgba(0,0,0,0.8), var(--shadow-glow)' }}>
-                <img src="https://belajarpakai.ai/wp-content/uploads/2026/05/ChatGPT-Image-May-21-2026-12_38_47-PM-1.png" alt="Ebook Cara Cuan Dari AI" style={{ width: '100%', display: 'block', height: 'auto' }} loading="lazy" />
+              <div style={{ width: '100%', maxWidth: 460, border: '2px solid rgba(212, 175, 55, 0.4)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.25)' }}>
+                <img src="/ebook-cover.png" alt="Ebook Cara Cuan Dari AI" style={{ width: '100%', display: 'block', height: 'auto' }} loading="lazy" />
               </div>
             </div>
           </div>

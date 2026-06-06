@@ -12,14 +12,14 @@ export function VideoPlayer({ videoUrl, title }: VideoPlayerProps) {
 
   if (!videoId) {
     return (
-      <div className="w-full aspect-video rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+      <div className="w-full aspect-video rounded-none bg-[#1A1A1A] flex items-center justify-center border border-[#222222]">
         <p className="text-[#888888] text-sm">Video tidak tersedia</p>
       </div>
     )
   }
 
   return (
-    <div className="w-full aspect-video rounded-lg overflow-hidden bg-black">
+    <div className="w-full aspect-video rounded-none overflow-hidden bg-black border border-primary/20">
       <iframe
         src={getYouTubeEmbedUrl(videoId)}
         title={title ?? 'Video kursus'}

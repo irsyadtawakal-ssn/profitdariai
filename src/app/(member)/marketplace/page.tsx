@@ -1,18 +1,48 @@
-import { ShoppingBag } from 'lucide-react'
+import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { MarketplaceClient } from '@/components/member/MarketplaceClient'
 
-export default function MarketplacePage() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-      <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center mb-6">
-        <ShoppingBag size={32} className="text-[#D4AF37]" />
-      </div>
-      <span className="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-semibold tracking-widest uppercase mb-4">
-        Coming Soon
-      </span>
-      <h1 className="text-3xl font-bold text-[#F5F5F0] mb-3">Marketplace</h1>
-      <p className="text-[#888888] max-w-sm leading-relaxed">
-        Segera hadir — produk digital pilihan untuk memaksimalkan profit kamu dari AI.
-      </p>
-    </div>
-  )
+export default async function MarketplacePage() {
+  const supabase = await createServerClient()
+  const adminClient = createAdminClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Fetch marketplace products + user's owned ebooks in parallel
+  const [productsRes, ownedRes] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adminClient as any)
+      .from('marketplace_products')
+      .select('id, slug, title, description, category, price, original_price, cover_url, product_url, ebook_id')
+      .eq('is_published', true)
+      .order('sort_order'),
+    user
+      ? supabase
+          .from('user_ebooks')
+          .select('ebook_id')
+          .eq('user_id', user.id)
+      : Promise.resolve({ data: [] }),
+  ])
+
+  const products = productsRes.data ?? []
+  const ownedEbookIds = new Set((ownedRes.data ?? []).map((r: { ebook_id: string }) => r.ebook_id))
+
+  // Annotate each product with isOwned flag
+  const annotatedProducts = products.map((p: {
+    id: string
+    slug: string
+    title: string
+    description: string | null
+    category: string
+    price: number
+    original_price: number | null
+    cover_url: string | null
+    product_url: string
+    ebook_id: string | null
+  }) => ({
+    ...p,
+    isOwned: p.ebook_id ? ownedEbookIds.has(p.ebook_id) : false,
+  }))
+
+  return <MarketplaceClient products={annotatedProducts} />
 }

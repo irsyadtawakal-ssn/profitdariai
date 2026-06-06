@@ -18,7 +18,7 @@ export default function SignupPage() {
         </p>
       </div>
 
-      <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-8">
+      <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-none p-8">
         <SignupForm />
       </div>
     </div>

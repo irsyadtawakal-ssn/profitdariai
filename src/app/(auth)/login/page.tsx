@@ -9,7 +9,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-[960px] mx-auto px-4 py-8">
       <div
-        className="flex rounded-3xl overflow-hidden border border-[#1C1C1C] shadow-[0_0_120px_rgba(212,175,55,0.07),0_32px_80px_rgba(0,0,0,0.6)]"
+        className="flex rounded-none overflow-hidden border border-[#1C1C1C] shadow-[0_0_120px_rgba(212,175,55,0.07),0_32px_80px_rgba(0,0,0,0.6)]"
         style={{ minHeight: '640px' }}
       >
         {/* ── LEFT: Abstract Art Panel ── */}

@@ -23,7 +23,7 @@ export function DownloadButton({ ebookId }: DownloadButtonProps) {
         if (res.status === 401) {
           setError('Kamu harus login untuk mengunduh.')
         } else if (res.status === 403) {
-          setError('Membership diperlukan untuk mengunduh ebook ini.')
+          setError('Kamu belum memiliki ebook ini. Beli di Marketplace terlebih dahulu.')
         } else {
           setError(data.error ?? 'Gagal mengunduh, coba lagi.')
         }
