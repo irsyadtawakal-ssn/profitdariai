@@ -8,8 +8,10 @@ vi.mock('@/app/(admin)/admin/marketplace/actions', () => ({
 }))
 
 describe('MarketplaceDialog', () => {
+  const mockEbooks = [{ id: 'e1', title: 'Ebook Prompt Mastery' }]
+
   it('renders add form', () => {
-    render(<MarketplaceDialog open={true} onClose={vi.fn()} />)
+    render(<MarketplaceDialog open={true} onClose={vi.fn()} ebooks={mockEbooks} />)
     expect(screen.getByText('Tambah Produk')).toBeInTheDocument()
   })
 
@@ -25,21 +27,22 @@ describe('MarketplaceDialog', () => {
       cover_url: null,
       product_url: 'https://drive.google.com/uc?export=download&id=abc123',
       is_published: true,
+      ebook_id: null,
     }
-    render(<MarketplaceDialog open={true} onClose={vi.fn()} product={product} />)
+    render(<MarketplaceDialog open={true} onClose={vi.fn()} product={product} ebooks={mockEbooks} />)
     expect(screen.getByText('Edit Produk')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Template Canva Pro')).toBeInTheDocument()
   })
 
   it('calls onClose on Batal', () => {
     const onClose = vi.fn()
-    render(<MarketplaceDialog open={true} onClose={onClose} />)
+    render(<MarketplaceDialog open={true} onClose={onClose} ebooks={mockEbooks} />)
     fireEvent.click(screen.getByRole('button', { name: /batal/i }))
     expect(onClose).toHaveBeenCalled()
   })
 
   it('auto-generates slug from title on add mode', () => {
-    render(<MarketplaceDialog open={true} onClose={vi.fn()} />)
+    render(<MarketplaceDialog open={true} onClose={vi.fn()} ebooks={mockEbooks} />)
     const titleInput = screen.getByLabelText('Nama Produk')
     fireEvent.change(titleInput, { target: { value: 'Template AI Keren' } })
     expect(screen.getByDisplayValue('template-ai-keren')).toBeInTheDocument()

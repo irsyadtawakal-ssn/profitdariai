@@ -16,13 +16,19 @@ interface Product {
   cover_url: string | null
   product_url: string
   is_published: boolean
+  ebook_id: string | null
+}
+
+interface EbookOption {
+  id: string
+  title: string
 }
 
 function formatPrice(n: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 }
 
-export function MarketplaceClient({ products }: { products: Product[] }) {
+export function MarketplaceClient({ products, ebooks }: { products: Product[]; ebooks: EbookOption[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Product | undefined>()
   const [, startTransition] = useTransition()
@@ -50,7 +56,7 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#222222]">
-              {['Produk', 'Kategori', 'Harga', 'Status', 'Aksi'].map((h) => (
+              {['Produk', 'Kategori', 'Harga', 'Materi', 'Status', 'Aksi'].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[#555555] font-medium">{h}</th>
               ))}
             </tr>
@@ -67,6 +73,12 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
                       <span className="text-[#555555] text-xs line-through">{formatPrice(p.original_price)}</span>
                     )}
                   </div>
+                </td>
+                <td className="px-4 py-3 text-[#888888] text-xs">
+                  {p.ebook_id
+                    ? <span className="text-[#D4AF37]">{ebooks.find(e => e.id === p.ebook_id)?.title ?? '—'}</span>
+                    : <span className="text-red-500/70">Belum diset</span>
+                  }
                 </td>
                 <td className="px-4 py-3">
                   <button
@@ -91,14 +103,14 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-[#555555]">Belum ada produk.</td>
+                <td colSpan={6} className="px-4 py-8 text-center text-[#555555]">Belum ada produk.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      <MarketplaceDialog open={dialogOpen} onClose={() => setDialogOpen(false)} product={editTarget} />
+      <MarketplaceDialog open={dialogOpen} onClose={() => setDialogOpen(false)} product={editTarget} ebooks={ebooks} />
     </>
   )
 }

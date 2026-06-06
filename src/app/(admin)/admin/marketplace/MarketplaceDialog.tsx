@@ -20,29 +20,38 @@ interface Product {
   cover_url: string | null
   product_url: string
   is_published: boolean
+  ebook_id: string | null
+}
+
+interface EbookOption {
+  id: string
+  title: string
 }
 
 interface MarketplaceDialogProps {
   open: boolean
   onClose: () => void
   product?: Product
+  ebooks: EbookOption[]
 }
 
 function slugify(str: string) {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 }
 
-export function MarketplaceDialog({ open, onClose, product }: MarketplaceDialogProps) {
+export function MarketplaceDialog({ open, onClose, product, ebooks }: MarketplaceDialogProps) {
   const [isPending, startTransition] = useTransition()
   const [title, setTitle] = useState(product?.title ?? '')
   const [slug, setSlug] = useState(product?.slug ?? '')
   const [isPublished, setIsPublished] = useState(product?.is_published ?? false)
+  const [ebookId, setEbookId] = useState(product?.ebook_id ?? '')
   const isEdit = !!product
 
   useEffect(() => {
     setTitle(product?.title ?? '')
     setSlug(product?.slug ?? '')
     setIsPublished(product?.is_published ?? false)
+    setEbookId(product?.ebook_id ?? '')
   }, [open, product])
 
   function handleTitleChange(val: string) {
@@ -54,6 +63,7 @@ export function MarketplaceDialog({ open, onClose, product }: MarketplaceDialogP
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     formData.set('is_published', isPublished ? 'true' : 'false')
+    formData.set('ebook_id', ebookId || '')
     startTransition(async () => {
       if (isEdit) {
         await updateProduct(product.id, formData)
@@ -143,6 +153,25 @@ export function MarketplaceDialog({ open, onClose, product }: MarketplaceDialogP
                 placeholder="Kosongkan jika tidak ada"
               />
             </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="mp_ebook_id">
+              Materi yang Di-unlock <span className="text-red-400 text-xs ml-1">* wajib agar akses terbuka</span>
+            </Label>
+            <select
+              id="mp_ebook_id"
+              value={ebookId}
+              onChange={(e) => setEbookId(e.target.value)}
+              className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] focus:outline-none focus:border-[#D4AF37]"
+            >
+              <option value="">— Pilih materi —</option>
+              {ebooks.map((e) => (
+                <option key={e.id} value={e.id}>{e.title}</option>
+              ))}
+            </select>
+            {!ebookId && (
+              <p className="text-xs text-red-400/80">Belum dipilih — user yang beli tidak akan dapat akses materi.</p>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="mp_cover_url">Cover URL (opsional)</Label>

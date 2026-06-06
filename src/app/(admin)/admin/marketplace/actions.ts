@@ -8,6 +8,7 @@ export async function createProduct(formData: FormData) {
   await requireAdmin()
   const supabase = createAdminClient()
   const originalPrice = formData.get('original_price')
+  const ebookId = formData.get('ebook_id') as string
   const { error } = await supabase.from('marketplace_products').insert({
     title: formData.get('title') as string,
     slug: formData.get('slug') as string,
@@ -18,6 +19,7 @@ export async function createProduct(formData: FormData) {
     cover_url: (formData.get('cover_url') as string) || null,
     product_url: formData.get('product_url') as string,
     is_published: formData.get('is_published') === 'true',
+    ebook_id: ebookId || null,
   })
   if (error) {
     console.error('[createProduct]', error.message)
@@ -30,6 +32,7 @@ export async function updateProduct(id: string, formData: FormData) {
   await requireAdmin()
   const supabase = createAdminClient()
   const originalPrice = formData.get('original_price')
+  const ebookId = formData.get('ebook_id') as string
   const { error } = await supabase
     .from('marketplace_products')
     .update({
@@ -42,6 +45,7 @@ export async function updateProduct(id: string, formData: FormData) {
       cover_url: (formData.get('cover_url') as string) || null,
       product_url: formData.get('product_url') as string,
       is_published: formData.get('is_published') === 'true',
+      ebook_id: ebookId || null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
