@@ -122,7 +122,7 @@ export default function SocialProofPopup() {
           marginTop: 2,
           fontFamily: 'Inter, sans-serif',
         }}>
-          baru bergabung · {buyer.minutes} menit lalu
+          baru membeli · {buyer.minutes} menit lalu
         </div>
       </div>
 
