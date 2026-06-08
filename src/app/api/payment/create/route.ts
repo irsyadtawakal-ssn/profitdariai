@@ -3,11 +3,13 @@ import { createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createSignature, createTransaction, getFeeCalculator, calculateTotal } from '@/lib/tripay/client'
 import { generateMerchantRef } from '@/lib/utils'
-import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
+import { MEMBERSHIP_EARLY_BIRD_PRICE, VIP_UPSELL_PRICE } from '@/types'
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { paymentMethod, email, fullName } = body
+  const { paymentMethod, email, fullName, vip, bonus } = body
+  const wantVip = vip === true
+  const wantBonus = bonus === true
 
   if (!paymentMethod || !email || !fullName) {
     return NextResponse.json(
@@ -45,12 +47,46 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Produk utama belum dikonfigurasi. Hubungi admin.' }, { status: 500 })
   }
 
+  // Fetch bump ebook (step 2) bila admin mengonfigurasi & user memilih bonus
+  let bumpEbook: { id: string; title: string; bump_price: number } | null = null
+  if (wantBonus) {
+    const { data: bump } = await adminClient
+      .from('ebooks')
+      .select('id, title, bump_price')
+      .eq('is_published', true)
+      .eq('is_bump_product', true)
+      .not('bump_price', 'is', null)
+      .limit(1)
+      .single()
+    if (bump && typeof bump.bump_price === 'number' && bump.bump_price > 0) {
+      bumpEbook = bump
+    }
+  }
+
   // Generate merchant ref - use UUID part of user ID if logged in, otherwise use email hash
   const merchantRef = user
     ? generateMerchantRef(user.id)
     : `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-  const baseAmount = MEMBERSHIP_EARLY_BIRD_PRICE
+  // Subtotal dihitung SERVER-SIDE (jangan percaya harga client)
+  const mainProductName = mainEbook?.title ?? 'Profit Dari AI (E-book)'
+  const mainSku = `PDA-EBOOK-${mainEbook?.id?.slice(0, 8).toUpperCase() ?? 'MAIN'}`
+
+  type OrderItem = { sku: string; name: string; price: number; quantity: number }
+  const items: OrderItem[] = [
+    { sku: mainSku, name: mainProductName, price: MEMBERSHIP_EARLY_BIRD_PRICE, quantity: 1 },
+  ]
+  const ebookIds: string[] = mainEbook ? [mainEbook.id] : []
+
+  if (wantVip) {
+    items.push({ sku: 'PDA-VIP-CONSULT', name: 'Konsultasi VIP via WhatsApp', price: VIP_UPSELL_PRICE, quantity: 1 })
+  }
+  if (bumpEbook) {
+    items.push({ sku: `PDA-BUMP-${bumpEbook.id.slice(0, 8).toUpperCase()}`, name: bumpEbook.title, price: bumpEbook.bump_price, quantity: 1 })
+    ebookIds.push(bumpEbook.id)
+  }
+
+  const baseAmount = items.reduce((sum, it) => sum + it.price * it.quantity, 0)
 
   // Hitung total dengan biaya admin dari Tripay
   const feeRes = await getFeeCalculator(paymentMethod, baseAmount)
@@ -58,9 +94,6 @@ export async function POST(request: Request) {
   const totalAmount = feeData
     ? calculateTotal(baseAmount, feeData)
     : baseAmount
-
-  const productName = mainEbook?.title ?? 'Profit Dari AI (E-book)'
-  const productSku = `PDA-EBOOK-${mainEbook?.id?.slice(0, 8).toUpperCase() ?? 'MAIN'}`
 
   const signature = createSignature(merchantRef, totalAmount)
 
@@ -70,14 +103,7 @@ export async function POST(request: Request) {
     amount: totalAmount,
     customer_name: fullName,
     customer_email: email,
-    order_items: [
-      {
-        sku: productSku,
-        name: productName,
-        price: totalAmount,
-        quantity: 1,
-      },
-    ],
+    order_items: items,
     return_url: process.env.TRIPAY_RETURN_URL!,
     expired_time: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
     signature,
@@ -100,7 +126,8 @@ export async function POST(request: Request) {
     expires_at: new Date(result.data.expired_time * 1000).toISOString(),
     metadata: {
       ...result.data,
-      ebook_ids: mainEbook ? [mainEbook.id] : [],
+      ebook_ids: ebookIds,
+      vip: wantVip,
     },
   })
 
