@@ -22,7 +22,7 @@ interface MarketplaceClientProps {
   products: MarketplaceProduct[]
 }
 
-const CATEGORIES = ['ALL', 'E-BOOKS', 'ONLINE CLASSES', 'BUNDLES']
+const CATEGORIES = ['ALL', 'MATERI', 'TOOLS', 'LAINNYA']
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat('id-ID', {

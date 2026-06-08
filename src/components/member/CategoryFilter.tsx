@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 
-const CATEGORIES = ['Semua', 'Bisnis', 'Freelancing', 'Konten', 'Otomasi', 'Lainnya']
+const CATEGORIES = ['Semua', 'Materi', 'Tools', 'Lainnya']
 
 interface CategoryFilterProps {
   activeCategory?: string

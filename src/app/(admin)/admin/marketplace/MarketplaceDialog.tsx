@@ -113,10 +113,8 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
               className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] focus:outline-none focus:border-[#D4AF37]"
             >
               <option value="" disabled>Pilih kategori</option>
-              <option value="Template">Template</option>
+              <option value="Materi">Materi</option>
               <option value="Tools">Tools</option>
-              <option value="Preset">Preset</option>
-              <option value="Prompt">Prompt</option>
               <option value="Lainnya">Lainnya</option>
             </select>
           </div>

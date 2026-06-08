@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { bulkImportMateri, ImportRow, ImportResult } from './actions'
 
-const VALID_CATEGORIES = ['Bisnis', 'Freelancing', 'Konten', 'Otomasi', 'Prompt', 'Ebook', 'Lainnya'] as const
+const VALID_CATEGORIES = ['Materi', 'Tools', 'Lainnya'] as const
 
 const CSV_TEMPLATE = `title,slug,category,description,file_path,cover_url,page_count,is_featured,is_published
 Panduan Prompt AI,panduan-prompt-ai,Prompt,Deskripsi singkat materi,https://drive.google.com/file/d/FILE_ID/view,,50,false,false
