@@ -1,6 +1,9 @@
 'use client'
 
-import { ImportRow } from './actions'
+import { useState, useTransition } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { bulkImportMateri, ImportRow, ImportResult } from './actions'
 
 const VALID_CATEGORIES = ['Bisnis', 'Freelancing', 'Konten', 'Otomasi', 'Prompt', 'Lainnya'] as const
 
@@ -109,7 +112,200 @@ export function parseCsv(text: string): {
   return { rows, globalError: null }
 }
 
-// Placeholder — full UI in Task 3
-export function BulkImportDialog(_props: { open: boolean; onClose: () => void }) {
-  return null
+type ParsedRow = { valid: true; data: ImportRow } | { valid: false; error: string }
+type Status = 'idle' | 'preview' | 'importing' | 'done'
+
+function downloadTemplate() {
+  const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'template-bulk-import-materi.csv'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function BulkImportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [status, setStatus] = useState<Status>('idle')
+  const [rows, setRows] = useState<ParsedRow[]>([])
+  const [globalError, setGlobalError] = useState<string | null>(null)
+  const [result, setResult] = useState<ImportResult | null>(null)
+  const [, startTransition] = useTransition()
+
+  function handleClose() {
+    setStatus('idle')
+    setRows([])
+    setGlobalError(null)
+    setResult(null)
+    onClose()
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string
+      const parsed = parseCsv(text)
+      setGlobalError(parsed.globalError)
+      setRows(parsed.rows)
+      setStatus('preview')
+    }
+    reader.readAsText(file)
+  }
+
+  function handleImport() {
+    const validRows = rows.filter(r => r.valid).map(r => (r as { valid: true; data: ImportRow }).data)
+    if (validRows.length === 0) return
+    setStatus('importing')
+    startTransition(async () => {
+      const res = await bulkImportMateri(validRows)
+      setResult(res)
+      setStatus('done')
+    })
+  }
+
+  const validCount = rows.filter(r => r.valid).length
+  const errorCount = rows.filter(r => !r.valid).length
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-[#F5F5F0]">Import CSV Materi</DialogTitle>
+        </DialogHeader>
+
+        {/* IDLE */}
+        {status === 'idle' && (
+          <div className="flex flex-col gap-4 mt-2">
+            <p className="text-sm text-[#888888]">
+              Upload file CSV untuk menambahkan banyak materi sekaligus. Maks. 100 baris per import.
+            </p>
+            <button
+              type="button"
+              onClick={downloadTemplate}
+              className="text-sm text-[#D4AF37] hover:underline text-left"
+            >
+              ↓ Download Template CSV
+            </button>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-[#F5F5F0]">Upload File CSV</label>
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                onChange={handleFileChange}
+                className="text-sm text-[#888888] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-[#222222] file:text-[#F5F5F0] file:text-xs file:cursor-pointer hover:file:bg-[#2A2A2A]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* PREVIEW */}
+        {status === 'preview' && (
+          <div className="flex flex-col gap-4 mt-2">
+            {globalError && (
+              <p className="text-sm text-red-400 bg-red-900/20 border border-red-800 rounded px-3 py-2">
+                {globalError}
+              </p>
+            )}
+            {!globalError && (
+              <>
+                <div className="flex gap-4 text-sm">
+                  <span className="text-green-400">✓ {validCount} baris valid</span>
+                  {errorCount > 0 && <span className="text-red-400">✗ {errorCount} baris error</span>}
+                </div>
+                <div className="overflow-x-auto border border-[#222] rounded-lg max-h-64 overflow-y-auto">
+                  <table className="w-full text-xs min-w-[500px]">
+                    <thead className="sticky top-0 bg-[#111]">
+                      <tr className="border-b border-[#222]">
+                        {['#', 'Status', 'Judul', 'Kategori', 'Slug'].map(h => (
+                          <th key={h} className="text-left px-3 py-2 text-[#555] font-medium whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row, i) => (
+                        <tr key={i} className={`border-b border-[#1a1a1a] last:border-0 ${row.valid ? '' : 'bg-red-950/20'}`}>
+                          <td className="px-3 py-2 text-[#555]">{i + 2}</td>
+                          <td className="px-3 py-2">
+                            {row.valid
+                              ? <span className="text-green-400 text-[10px] font-bold">✓ Valid</span>
+                              : <span className="text-red-400 text-[10px] font-bold">✗ Error</span>
+                            }
+                          </td>
+                          <td className="px-3 py-2 text-[#F5F5F0] max-w-[160px] truncate">
+                            {row.valid ? row.data.title : <span className="text-red-400 text-[10px]">{row.error}</span>}
+                          </td>
+                          <td className="px-3 py-2 text-[#888]">{row.valid ? row.data.category : '—'}</td>
+                          <td className="px-3 py-2 text-[#888] max-w-[120px] truncate">{row.valid ? row.data.slug : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex gap-2 justify-between items-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setStatus('idle'); setRows([]); setGlobalError(null) }}
+                    className="text-xs text-[#888] hover:text-[#F5F5F0]"
+                  >
+                    ← Ganti file
+                  </button>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="secondary" size="sm" onClick={handleClose}>Batal</Button>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={handleImport}
+                      disabled={validCount === 0}
+                    >
+                      Import {validCount} Materi
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+            {globalError && (
+              <div className="flex justify-end">
+                <Button type="button" variant="secondary" size="sm" onClick={() => { setStatus('idle'); setGlobalError(null) }}>
+                  Coba Lagi
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* IMPORTING */}
+        {status === 'importing' && (
+          <div className="flex flex-col items-center gap-4 py-8">
+            <div className="w-6 h-6 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-[#888]">Mengimport {validCount} materi...</p>
+          </div>
+        )}
+
+        {/* DONE */}
+        {status === 'done' && result && (
+          <div className="flex flex-col gap-4 mt-2">
+            <div className="flex flex-col gap-2">
+              {result.success > 0 && (
+                <p className="text-sm text-green-400">✓ {result.success} materi berhasil diimport</p>
+              )}
+              {result.errors.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-red-400">✗ {result.errors.length} gagal:</p>
+                  {result.errors.map((e, i) => (
+                    <p key={i} className="text-xs text-[#888] pl-3">Baris {e.row}: {e.message}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end">
+              <Button type="button" variant="primary" size="sm" onClick={handleClose}>Tutup</Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
 }
