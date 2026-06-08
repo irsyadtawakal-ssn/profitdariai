@@ -30,16 +30,20 @@ export async function POST(request: Request) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Fetch main product ebook (the one being sold at checkout)
+  // Fetch main product ebook — harus is_featured = true (diatur admin via checkbox "Jadikan Materi Pilihan")
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adminClient = createAdminClient() as any
   const { data: mainEbook } = await adminClient
     .from('ebooks')
     .select('id, title')
     .eq('is_published', true)
-    .order('sort_order', { ascending: true })
+    .eq('is_featured', true)
     .limit(1)
     .single()
+
+  if (!mainEbook) {
+    return NextResponse.json({ error: 'Produk utama belum dikonfigurasi. Hubungi admin.' }, { status: 500 })
+  }
 
   // Generate merchant ref - use UUID part of user ID if logged in, otherwise use email hash
   const merchantRef = user
