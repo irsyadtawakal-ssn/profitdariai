@@ -94,3 +94,56 @@ export async function deleteEbook(id: string) {
   revalidatePath('/materi')
   revalidatePath('/dashboard')
 }
+
+export interface ImportRow {
+  title: string
+  slug: string
+  category: string
+  description: string | null
+  file_path: string
+  cover_url: string | null
+  page_count: number | null
+  is_featured: boolean
+  is_published: boolean
+}
+
+export interface ImportResult {
+  success: number
+  errors: { row: number; message: string }[]
+}
+
+export async function bulkImportMateri(rows: ImportRow[]): Promise<ImportResult> {
+  await requireAdmin()
+  const supabase = createAdminClient()
+  let success = 0
+  const errors: { row: number; message: string }[] = []
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from('ebooks').insert({
+      title: row.title,
+      slug: row.slug,
+      category: row.category,
+      description: row.description,
+      file_path: row.file_path,
+      cover_url: row.cover_url,
+      page_count: row.page_count,
+      is_featured: row.is_featured,
+      is_published: row.is_published,
+      videos: null,
+      documents: null,
+    })
+    if (error) {
+      errors.push({ row: i + 2, message: error.message })
+    } else {
+      success++
+    }
+  }
+
+  revalidatePath('/admin/materi')
+  revalidatePath('/materi')
+  revalidatePath('/dashboard')
+
+  return { success, errors }
+}
