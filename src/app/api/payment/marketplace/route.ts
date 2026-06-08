@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   }
 
   // Save transaction with ebook_ids + marketplace_product_id in metadata
-  await supabase.from('transactions').insert({
+  await adminClient.from('transactions').insert({
     user_id: user?.id ?? null,
     customer_email: email,
     customer_name: fullName,

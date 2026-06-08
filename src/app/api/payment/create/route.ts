@@ -88,7 +88,7 @@ export async function POST(request: Request) {
   }
 
   // Save transaction in DB — store ebook_id in metadata for webhook to use
-  await supabase.from('transactions').insert({
+  await adminClient.from('transactions').insert({
     user_id: user?.id ?? null,
     customer_email: email,
     customer_name: fullName,
