@@ -71,6 +71,9 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
   const [isFeatured, setIsFeatured] = useState(materi?.is_featured ?? false)
   const [videos, setVideos] = useState<VideoItem[]>(materi?.videos ?? [])
   const [documents, setDocuments] = useState<DocumentItem[]>(materi?.documents ?? [])
+  const [sellInMarketplace, setSellInMarketplace] = useState(false)
+  const [marketplacePrice, setMarketplacePrice] = useState('')
+  const [marketplaceOriginalPrice, setMarketplaceOriginalPrice] = useState('')
   const isEdit = !!materi
 
   useEffect(() => {
@@ -85,6 +88,9 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     const existing = materi?.file_path ?? ''
     setGdriveInput(existing.startsWith('https://') ? existing : '')
     setGdriveValid(null)
+    setSellInMarketplace(false)
+    setMarketplacePrice('')
+    setMarketplaceOriginalPrice('')
   }, [open, materi])
 
   async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -152,6 +158,9 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     formData.set('videos', validVideos.length > 0 ? JSON.stringify(validVideos) : '')
     const validDocs = documents.filter(d => d.title.trim() && d.url.trim())
     formData.set('documents', validDocs.length > 0 ? JSON.stringify(validDocs) : '')
+    formData.set('sell_in_marketplace', sellInMarketplace ? 'true' : 'false')
+    formData.set('marketplace_price', marketplacePrice)
+    formData.set('marketplace_original_price', marketplaceOriginalPrice)
     startTransition(async () => {
       if (isEdit) {
         await updateEbook(materi.id, formData)
@@ -319,10 +328,62 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
             </div>
           </div>
 
+          {/* JUAL DI MARKETPLACE — hanya saat create */}
+          {!isEdit && (
+            <div className="border border-[#222] rounded-lg p-4 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#F5F5F0]">Jual di Marketplace?</p>
+                  <p className="text-xs text-[#555] mt-0.5">Otomatis buat produk marketplace yang terhubung ke materi ini</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSellInMarketplace(!sellInMarketplace)}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${sellInMarketplace ? 'bg-[#D4AF37]' : 'bg-[#333]'}`}
+                >
+                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${sellInMarketplace ? 'left-6' : 'left-1'}`} />
+                </button>
+              </div>
+              {sellInMarketplace && (
+                <div className="flex gap-3">
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <Label htmlFor="mp_price_inline">Harga (IDR)</Label>
+                    <Input
+                      id="mp_price_inline"
+                      type="number"
+                      min={0}
+                      placeholder="49000"
+                      value={marketplacePrice}
+                      onChange={(e) => setMarketplacePrice(e.target.value)}
+                      required={sellInMarketplace}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <Label htmlFor="mp_original_inline">Harga Coret (opsional)</Label>
+                    <Input
+                      id="mp_original_inline"
+                      type="number"
+                      min={0}
+                      placeholder="99000"
+                      value={marketplaceOriginalPrice}
+                      onChange={(e) => setMarketplaceOriginalPrice(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex gap-2 justify-end pt-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>Batal</Button>
-            <Button type="submit" variant="primary" size="sm" loading={isPending} disabled={!filePath && !isEdit}>
-              {isEdit ? 'Simpan' : 'Tambah'}
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={isPending}
+              disabled={(!filePath && !isEdit) || (sellInMarketplace && !marketplacePrice)}
+            >
+              {isEdit ? 'Simpan' : sellInMarketplace ? 'Tambah + Buat Produk' : 'Tambah'}
             </Button>
           </div>
         </form>

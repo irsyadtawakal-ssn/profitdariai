@@ -11,7 +11,7 @@ export async function createEbook(formData: FormData) {
   const videosRaw = formData.get('videos') as string
   const documentsRaw = formData.get('documents') as string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).from('ebooks').insert({
+  const { data: ebook, error } = await (supabase as any).from('ebooks').insert({
     title: formData.get('title') as string,
     slug: formData.get('slug') as string,
     description: (formData.get('description') as string) || null,
@@ -23,11 +23,34 @@ export async function createEbook(formData: FormData) {
     is_featured: formData.get('is_featured') === 'true',
     videos: videosRaw ? JSON.parse(videosRaw) : null,
     documents: documentsRaw ? JSON.parse(documentsRaw) : null,
-  })
+  }).select('id, title, slug, description, cover_url, file_path').single()
   if (error) {
     console.error('[createEbook]', error.message)
     throw new Error(error.message)
   }
+
+  // Jika admin memilih jual di marketplace — otomatis buat marketplace_products
+  const sellInMarketplace = formData.get('sell_in_marketplace') === 'true'
+  if (sellInMarketplace && ebook) {
+    const mpPrice = Number(formData.get('marketplace_price') || 0)
+    const mpOriginal = formData.get('marketplace_original_price') as string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: mpError } = await (supabase as any).from('marketplace_products').insert({
+      title: ebook.title,
+      slug: ebook.slug,
+      description: ebook.description,
+      category: 'Lainnya',
+      price: mpPrice,
+      original_price: mpOriginal ? Number(mpOriginal) : null,
+      cover_url: ebook.cover_url,
+      product_url: ebook.file_path,
+      is_published: false,
+      ebook_id: ebook.id,
+    })
+    if (mpError) console.error('[createEbook] marketplace insert error:', mpError.message)
+    revalidatePath('/admin/marketplace')
+  }
+
   revalidatePath('/admin/materi')
   revalidatePath('/materi')
   revalidatePath('/dashboard')
