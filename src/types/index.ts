@@ -31,5 +31,6 @@ export const PAYMENT_METHODS: PaymentMethodOption[] = [
 ]
 
 export const MEMBERSHIP_PRICE = 999_000
-export const MEMBERSHIP_EARLY_BIRD_PRICE = 199_000
+export const MEMBERSHIP_EARLY_BIRD_PRICE = 99_000
+export const VIP_UPSELL_PRICE = 50_000
 export const MEMBERSHIP_LIFETIME_EXPIRY = '2099-12-31T23:59:59.000Z'
