@@ -189,8 +189,9 @@ export function BulkImportDialog({ open, onClose }: { open: boolean; onClose: ()
               ↓ Download Template CSV
             </button>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[#F5F5F0]">Upload File CSV</label>
+              <label htmlFor="csv-upload" className="text-sm font-medium text-[#F5F5F0]">Upload File CSV</label>
               <input
+                id="csv-upload"
                 type="file"
                 accept=".csv,text/csv"
                 onChange={handleFileChange}
