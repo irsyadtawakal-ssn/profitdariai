@@ -13,6 +13,7 @@ export type Database = {
           avatar_url: string | null
           role: 'member' | 'admin'
           membership_expires_at: string | null
+          is_vip: boolean
           created_at: string
           updated_at: string
         }
@@ -23,6 +24,7 @@ export type Database = {
           avatar_url?: string | null
           role?: 'member' | 'admin'
           membership_expires_at?: string | null
+          is_vip?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -33,6 +35,7 @@ export type Database = {
           avatar_url?: string | null
           role?: 'member' | 'admin'
           membership_expires_at?: string | null
+          is_vip?: boolean
           updated_at?: string
         }
         Relationships: []

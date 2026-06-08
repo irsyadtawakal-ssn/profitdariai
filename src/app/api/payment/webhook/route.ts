@@ -162,6 +162,21 @@ export async function POST(request: Request) {
         console.log(`[webhook] Granted ${ebookIds.length} ebook(s) to user ${userId}`)
       }
     }
+
+    // Set VIP flag bila user ambil upsell konsultasi
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isVipPurchase = (tx.metadata as any)?.vip === true
+    if (userId && isVipPurchase) {
+      const { error: vipError } = await supabase
+        .from('profiles')
+        .update({ is_vip: true })
+        .eq('id', userId)
+      if (vipError) {
+        console.error('[webhook] Failed to set is_vip:', vipError)
+      } else {
+        console.log(`[webhook] Set is_vip=true for user ${userId}`)
+      }
+    }
   }
 
   return NextResponse.json({ success: true })
