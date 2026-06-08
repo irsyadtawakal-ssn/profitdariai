@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Script from 'next/script'
 import './landing.css'
+import SocialProofPopup from '@/components/marketing/SocialProofPopup'
 
 export default function LandingPage() {
   useEffect(() => {
@@ -405,6 +406,8 @@ export default function LandingPage() {
           </div>
         </footer>
       </div>
+
+      <SocialProofPopup />
     </>
   )
 }
