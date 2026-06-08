@@ -83,7 +83,7 @@ export default function LandingPage() {
             </div>
             <h1>
               <span className="prefix">[ Ebook &amp; Template ]</span>
-              Cara Hasilkan <span className="accent">Rp 74 Juta</span> dari Produk Digital Buatan AI
+              Cara Hasilkan <span className="accent">Ratusan Juta</span> dari Produk Digital Buatan AI
             </h1>
             <p className="sub-center">Buat sekali, jual berkali-kali, cuan mengalir. Panduan langkah-demi-langkah dari nol hingga punya penghasilan pasif nyata dengan bantuan AI — tanpa skill teknis, tanpa modal besar.</p>
             <div className="hero-btns-center">
@@ -110,21 +110,21 @@ export default function LandingPage() {
         <div className="ledger-ticker-wrap">
           <div className="ticker-track">
             {[
-              ['dollar-sign', 'TOTAL OMZET: RP 74.700.000'],
-              ['trending-up', 'TOTAL ORDERS: 1.494'],
-              ['zap', 'HIGHEST CONVERSION: 20.53%'],
-              ['book-open', '49 HALAMAN PANDUAN LENGKAP'],
-              ['layers', '13 BAB STRATEGI PRAKTIS'],
-              ['lightbulb', 'TEMPLATE PROMPT SIAP PAKAI'],
-              ['eye', 'TOTAL VIEWS: 9.749 VIEWS'],
+              ['dollar-sign', 'LIFETIME SALES: RP 109.067.000'],
+              ['trending-up', 'TOTAL ORDERS: 2.097'],
+              ['eye', 'TOTAL VIEWS: 10.263 VIEWS'],
+              ['mouse-pointer-click', 'TOTAL CLICKS: 8.270'],
+              ['book-open', '60+ HALAMAN PANDUAN LENGKAP'],
+              ['layers', 'TEMPLATE PROMPT SIAP PAKAI'],
+              ['lightbulb', 'DIBUAT DENGAN BANTUAN AI'],
               ['download', 'DOWNLOAD INSTAN & AKSES PENUH'],
-              ['dollar-sign', 'TOTAL OMZET: RP 74.700.000'],
-              ['trending-up', 'TOTAL ORDERS: 1.494'],
-              ['zap', 'HIGHEST CONVERSION: 20.53%'],
-              ['book-open', '49 HALAMAN PANDUAN LENGKAP'],
-              ['layers', '13 BAB STRATEGI PRAKTIS'],
-              ['lightbulb', 'TEMPLATE PROMPT SIAP PAKAI'],
-              ['eye', 'TOTAL VIEWS: 9.749 VIEWS'],
+              ['dollar-sign', 'LIFETIME SALES: RP 109.067.000'],
+              ['trending-up', 'TOTAL ORDERS: 2.097'],
+              ['eye', 'TOTAL VIEWS: 10.263 VIEWS'],
+              ['mouse-pointer-click', 'TOTAL CLICKS: 8.270'],
+              ['book-open', '60+ HALAMAN PANDUAN LENGKAP'],
+              ['layers', 'TEMPLATE PROMPT SIAP PAKAI'],
+              ['lightbulb', 'DIBUAT DENGAN BANTUAN AI'],
               ['download', 'DOWNLOAD INSTAN & AKSES PENUH'],
             ].map(([icon, text], i) => (
               <div key={i} className="ticker-item">
@@ -143,10 +143,10 @@ export default function LandingPage() {
             </div>
             <div className="proof-numbers">
               {[
-                ['74.7Jt', 'Total penjualan dalam IDR'],
-                ['1,494', 'Total order sukses'],
-                ['20.53%', 'Konversi tertinggi (Gemini Ebook)'],
-                ['9,749', 'Total views dalam 1 bulan'],
+                ['109Jt+', 'Lifetime sales dalam IDR'],
+                ['2,097', 'Total order sukses'],
+                ['10,263', 'Total views dalam 1 bulan'],
+                ['8,270', 'Total clicks dalam 1 bulan'],
               ].map(([big, desc]) => (
                 <div key={big} className="proof-num-card">
                   <div className="big">{big}</div>
