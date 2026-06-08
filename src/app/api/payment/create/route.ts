@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       {
         sku: productSku,
         name: productName,
-        price: baseAmount,
+        price: totalAmount,
         quantity: 1,
       },
     ],

@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       {
         sku: `MKT-${product.id.slice(0, 8).toUpperCase()}`,
         name: product.title,
-        price: baseAmount,
+        price: totalAmount,
         quantity: 1,
       },
     ],
