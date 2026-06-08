@@ -72,6 +72,7 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
   const [isFeatured, setIsFeatured] = useState(materi?.is_featured ?? false)
   const [videos, setVideos] = useState<VideoItem[]>(materi?.videos ?? [])
   const [documents, setDocuments] = useState<DocumentItem[]>(materi?.documents ?? [])
+  const [driveFolderUrl, setDriveFolderUrl] = useState(materi?.drive_folder_url ?? '')
   const [sellInMarketplace, setSellInMarketplace] = useState(false)
   const [marketplacePrice, setMarketplacePrice] = useState('')
   const [marketplaceOriginalPrice, setMarketplaceOriginalPrice] = useState('')
@@ -86,6 +87,7 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     setIsFeatured(materi?.is_featured ?? false)
     setVideos(materi?.videos ?? [])
     setDocuments(materi?.documents ?? [])
+    setDriveFolderUrl(materi?.drive_folder_url ?? '')
     const existing = materi?.file_path ?? ''
     setGdriveInput(existing.startsWith('https://') ? existing : '')
     setGdriveValid(null)
@@ -258,7 +260,8 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
               id="m_drive_folder_url"
               name="drive_folder_url"
               type="url"
-              defaultValue={materi?.drive_folder_url ?? ''}
+              value={driveFolderUrl}
+              onChange={(e) => setDriveFolderUrl(e.target.value)}
               placeholder="https://drive.google.com/drive/folders/..."
             />
             <p className="text-xs text-[#555555]">Link folder Drive — member bisa akses seluruh isi folder.</p>
@@ -390,7 +393,7 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
               variant="primary"
               size="sm"
               loading={isPending}
-              disabled={(!filePath && !isEdit) || (sellInMarketplace && !marketplacePrice)}
+              disabled={(!filePath && !driveFolderUrl && !isEdit) || (sellInMarketplace && !marketplacePrice)}
             >
               {isEdit ? 'Simpan' : sellInMarketplace ? 'Tambah + Buat Produk' : 'Tambah'}
             </Button>
