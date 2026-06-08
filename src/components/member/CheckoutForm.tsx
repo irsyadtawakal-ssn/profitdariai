@@ -6,7 +6,8 @@ import Image from 'next/image'
 import { ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { MEMBERSHIP_EARLY_BIRD_PRICE } from '@/types'
+import { MEMBERSHIP_EARLY_BIRD_PRICE, VIP_UPSELL_PRICE } from '@/types'
+import type { BumpProduct } from '@/app/(checkout)/checkout/page'
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
@@ -180,8 +181,17 @@ function CollapsibleGroup({
   )
 }
 
-export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<string, string> }) {
+export function CheckoutForm({
+  channelIcons = {},
+  bumpProduct = null,
+}: {
+  channelIcons?: Record<string, string>
+  bumpProduct?: BumpProduct | null
+}) {
   const [selected, setSelected] = useState('QRIS')
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [vipSelected, setVipSelected] = useState(false)
+  const [bonusSelected, setBonusSelected] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [feeLoading, setFeeLoading] = useState(false)
@@ -190,11 +200,11 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
     defaultValues: { email: '', fullName: '' }
   })
 
-  const fetchFee = useCallback(async (code: string) => {
+  const fetchFee = useCallback(async (code: string, amount: number) => {
     setFeeLoading(true)
     setAdminFee(null)
     try {
-      const res = await fetch(`/api/payment/fee?code=${code}`)
+      const res = await fetch(`/api/payment/fee?code=${code}&amount=${amount}`)
       const json = await res.json()
       if (res.ok && json.data) {
         // Ambil customer fee langsung dari Tripay response
@@ -207,9 +217,14 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
     }
   }, [])
 
+  const subtotal =
+    MEMBERSHIP_EARLY_BIRD_PRICE +
+    (vipSelected ? VIP_UPSELL_PRICE : 0) +
+    (bonusSelected && bumpProduct ? bumpProduct.bumpPrice : 0)
+
   useEffect(() => {
-    fetchFee(selected)
-  }, [selected, fetchFee])
+    fetchFee(selected, subtotal)
+  }, [selected, subtotal, fetchFee])
 
   async function onSubmit(formData: { email: string; fullName: string }) {
     setLoading(true)
@@ -222,6 +237,8 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
           paymentMethod: selected,
           email: formData.email,
           fullName: formData.fullName,
+          vip: vipSelected,
+          bonus: bonusSelected,
         }),
       })
       const data = await res.json()
@@ -238,19 +255,119 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
   }
 
   const selectedMethod = PAYMENT_GROUPS.flatMap(g => g.methods).find(m => m.code === selected)
-  const base = MEMBERSHIP_EARLY_BIRD_PRICE
-  const total = adminFee !== null ? base + adminFee : base
+  const total = adminFee !== null ? subtotal + adminFee : subtotal
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">
+      {/* Progress */}
+      <div className="flex items-center gap-2 mb-6">
+        {[1, 2, 3].map((s) => (
+          <div
+            key={s}
+            className={`h-1 flex-1 rounded-full transition-colors ${
+              step >= s ? 'bg-[#D4AF37]' : 'bg-[#2a2a2a]'
+            }`}
+          />
+        ))}
+      </div>
+      <p className="text-[#888888] text-xs mb-4 text-center">Langkah {step} dari 3</p>
+
+      {step === 1 && (
+        <div>
+          <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-none p-5 mb-4">
+            <h2 className="text-[#F5F5F0] font-bold text-lg mb-1">Mau Dibimbing Langsung Sampai Bisa?</h2>
+            <p className="text-[#888888] text-sm mb-4">
+              Konsultasi privat via WhatsApp bareng tim kami. Tanya apa aja sampai kamu paham &amp; jalan.
+            </p>
+            <label className="flex items-start gap-3 p-3 rounded-none border border-[#D4AF37]/30 bg-[#D4AF37]/5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={vipSelected}
+                onChange={(e) => setVipSelected(e.target.checked)}
+                className="accent-[#D4AF37] w-5 h-5 mt-0.5"
+              />
+              <span className="text-[#F5F5F0] text-sm">
+                Ya! Tambahkan Konsultasi VIP via WhatsApp{' '}
+                <span className="text-[#D4AF37] font-bold">(+Rp {VIP_UPSELL_PRICE.toLocaleString('id-ID')})</span>
+              </span>
+            </label>
+          </div>
+          <Button type="button" onClick={() => setStep(bumpProduct ? 2 : 3)} className="w-full py-3">
+            Lanjutkan →
+          </Button>
+          <button
+            type="button"
+            onClick={() => { setVipSelected(false); setStep(bumpProduct ? 2 : 3) }}
+            className="w-full text-center text-[#666666] text-xs mt-3 hover:text-[#888888]"
+          >
+            Nggak dulu, lanjut tanpa VIP
+          </button>
+        </div>
+      )}
+
+      {step === 2 && bumpProduct && (
+        <div>
+          <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-none p-5 mb-4">
+            <h2 className="text-[#F5F5F0] font-bold text-lg mb-1">Tunggu! Ada 1 Penawaran Spesial Buat Kamu</h2>
+            <p className="text-[#888888] text-sm mb-4">Sekali ini aja, harga khusus buat kamu yang baru gabung.</p>
+            <label className="flex items-start gap-3 p-3 rounded-none border border-[#D4AF37]/30 bg-[#D4AF37]/5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={bonusSelected}
+                onChange={(e) => setBonusSelected(e.target.checked)}
+                className="accent-[#D4AF37] w-5 h-5 mt-0.5"
+              />
+              <span className="text-[#F5F5F0] text-sm">
+                Ya, Ambil <span className="font-semibold">{bumpProduct.title}</span> cuma{' '}
+                <span className="text-[#D4AF37] font-bold">Rp {bumpProduct.bumpPrice.toLocaleString('id-ID')}</span>
+                {bumpProduct.originalPrice && bumpProduct.originalPrice > bumpProduct.bumpPrice && (
+                  <span className="text-[#666666] line-through ml-1">Rp {bumpProduct.originalPrice.toLocaleString('id-ID')}</span>
+                )}
+              </span>
+            </label>
+          </div>
+          <Button type="button" onClick={() => setStep(3)} className="w-full py-3">
+            Lanjut ke Pembayaran →
+          </Button>
+          <button
+            type="button"
+            onClick={() => { setBonusSelected(false); setStep(3) }}
+            className="w-full text-center text-[#666666] text-xs mt-3 hover:text-[#888888]"
+          >
+            Lewati penawaran ini
+          </button>
+        </div>
+      )}
+
+      {step === 3 && (
+        <>
+          <button
+            type="button"
+            onClick={() => setStep(bumpProduct ? 2 : 1)}
+            className="text-[#666666] text-xs mb-3 hover:text-[#888888]"
+          >
+            ← Kembali
+          </button>
       {/* Order summary */}
       <div className="bg-[#111111] border border-[#D4AF37]/20 rounded-none p-5 mb-4">
         <h2 className="text-[#F5F5F0] font-semibold mb-3">Ringkasan Pesanan</h2>
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-[#888888] text-sm">Profit Dari AI (E-book)</span>
-            <span className="text-[#F5F5F0] text-sm font-medium">{fmt(base)}</span>
+            <span className="text-[#F5F5F0] text-sm font-medium">{fmt(MEMBERSHIP_EARLY_BIRD_PRICE)}</span>
           </div>
+          {vipSelected && (
+            <div className="flex justify-between items-center">
+              <span className="text-[#888888] text-sm">Konsultasi VIP (WhatsApp)</span>
+              <span className="text-[#F5F5F0] text-sm font-medium">{fmt(VIP_UPSELL_PRICE)}</span>
+            </div>
+          )}
+          {bonusSelected && bumpProduct && (
+            <div className="flex justify-between items-center">
+              <span className="text-[#888888] text-sm">{bumpProduct.title}</span>
+              <span className="text-[#F5F5F0] text-sm font-medium">{fmt(bumpProduct.bumpPrice)}</span>
+            </div>
+          )}
           <div className="flex justify-between items-center">
             <span className="text-[#888888] text-sm">Biaya Admin</span>
             {feeLoading ? (
@@ -361,6 +478,8 @@ export function CheckoutForm({ channelIcons = {} }: { channelIcons?: Record<stri
         <ShieldCheck className="w-3.5 h-3.5 text-[#555555]" />
         <p className="text-[#888888] text-xs">SSL Aman · Diproses via Tripay</p>
       </div>
+        </>
+      )}
     </form>
   )
 }
