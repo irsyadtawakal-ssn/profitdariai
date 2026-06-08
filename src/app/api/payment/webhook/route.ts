@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhookSignature, type TripayWebhookPayload } from '@/lib/tripay/webhook'
-import { sendPaymentSuccessEmail } from '@/lib/email/sender'
+import { sendPaymentSuccessEmail, sendMarketplacePurchaseEmail } from '@/lib/email/sender'
 import { transporter, MAIL_FROM } from '@/lib/email/mailer'
 
 export async function POST(request: Request) {
@@ -127,11 +127,17 @@ export async function POST(request: Request) {
         .single()
 
       if (profile?.email) {
-        await sendPaymentSuccessEmail(
-          profile.email,
-          profile.full_name ?? 'Member',
-          new Date().toISOString()
-        )
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const meta = tx.metadata as any
+        const isMarketplace = !!meta?.marketplace_product_id
+        const orderItems: { name: string }[] = meta?.order_items ?? []
+        const productTitle = orderItems[0]?.name ?? 'Profit Dari AI (E-book)'
+
+        if (isMarketplace) {
+          await sendMarketplacePurchaseEmail(profile.email, profile.full_name ?? 'Member', productTitle)
+        } else {
+          await sendPaymentSuccessEmail(profile.email, profile.full_name ?? 'Member', new Date().toISOString())
+        }
       }
     }
 

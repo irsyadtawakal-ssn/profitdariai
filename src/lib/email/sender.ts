@@ -1,5 +1,5 @@
 import { transporter, MAIL_FROM } from './mailer'
-import { purchaseConfirmationEmail } from './templates'
+import { purchaseConfirmationEmail, marketplacePurchaseEmail } from './templates'
 
 export async function sendPaymentSuccessEmail(
   to: string,
@@ -8,6 +8,11 @@ export async function sendPaymentSuccessEmail(
   productTitle = 'Profit Dari AI (E-book)'
 ) {
   const { subject, html } = purchaseConfirmationEmail(name, productTitle)
+  await transporter.sendMail({ from: MAIL_FROM, to, subject, html })
+}
+
+export async function sendMarketplacePurchaseEmail(to: string, name: string, productTitle: string) {
+  const { subject, html } = marketplacePurchaseEmail(name, productTitle)
   await transporter.sendMail({ from: MAIL_FROM, to, subject, html })
 }
 
