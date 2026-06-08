@@ -13,7 +13,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
   // Fetch profiles with their purchase count from user_ebooks
   let query = supabase
     .from('profiles')
-    .select('id, full_name, email, created_at, user_ebooks(count)')
+    .select('id, full_name, email, created_at, is_vip, user_ebooks(count)')
     .eq('role', 'member')
     .order('created_at', { ascending: false })
 
@@ -77,7 +77,14 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
               const hasPurchased = ebookCount > 0
               return (
                 <tr key={m.id} className="border-b border-[#222222] last:border-0 hover:bg-[#1A1A1A]/50 transition-colors">
-                  <td className="px-4 py-3 text-[#F5F5F0]">{m.full_name ?? '—'}</td>
+                  <td className="px-4 py-3 text-[#F5F5F0]">
+                    {m.full_name ?? '—'}
+                    {m.is_vip && (
+                      <span className="ml-2 inline-flex items-center rounded-none border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2 py-0.5 text-[10px] font-bold text-[#D4AF37]">
+                        VIP
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-[#888888]">{m.email}</td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
