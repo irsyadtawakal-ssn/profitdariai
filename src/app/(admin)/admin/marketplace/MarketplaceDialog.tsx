@@ -156,21 +156,24 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="mp_ebook_id">
-              Materi yang Di-unlock <span className="text-red-400 text-xs ml-1">* wajib agar akses terbuka</span>
+              Materi yang Di-unlock <span className="text-red-400 text-xs ml-1">* wajib</span>
             </Label>
             <select
               id="mp_ebook_id"
               value={ebookId}
               onChange={(e) => setEbookId(e.target.value)}
-              className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] focus:outline-none focus:border-[#D4AF37]"
+              required
+              className={`w-full bg-[#0A0A0A] border rounded-lg px-3 py-2 text-sm text-[#F5F5F0] focus:outline-none focus:border-[#D4AF37] ${
+                !ebookId ? 'border-red-500' : 'border-[#333333]'
+              }`}
             >
-              <option value="">— Pilih materi —</option>
+              <option value="" disabled>— Pilih materi —</option>
               {ebooks.map((e) => (
                 <option key={e.id} value={e.id}>{e.title}</option>
               ))}
             </select>
             {!ebookId && (
-              <p className="text-xs text-red-400/80">Belum dipilih — user yang beli tidak akan dapat akses materi.</p>
+              <p className="text-xs text-red-400">Wajib dipilih sebelum produk bisa disimpan.</p>
             )}
           </div>
           <div className="flex flex-col gap-1.5">
@@ -206,7 +209,7 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
           </div>
           <div className="flex gap-2 justify-end pt-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>Batal</Button>
-            <Button type="submit" variant="primary" size="sm" loading={isPending}>
+            <Button type="submit" variant="primary" size="sm" loading={isPending} disabled={!ebookId}>
               {isEdit ? 'Simpan' : 'Tambah'}
             </Button>
           </div>

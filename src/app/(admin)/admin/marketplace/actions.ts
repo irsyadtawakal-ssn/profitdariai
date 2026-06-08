@@ -9,6 +9,7 @@ export async function createProduct(formData: FormData) {
   const supabase = createAdminClient()
   const originalPrice = formData.get('original_price')
   const ebookId = formData.get('ebook_id') as string
+  if (!ebookId) throw new Error('Materi wajib dipilih sebelum produk bisa disimpan.')
   const { error } = await supabase.from('marketplace_products').insert({
     title: formData.get('title') as string,
     slug: formData.get('slug') as string,
@@ -33,6 +34,7 @@ export async function updateProduct(id: string, formData: FormData) {
   const supabase = createAdminClient()
   const originalPrice = formData.get('original_price')
   const ebookId = formData.get('ebook_id') as string
+  if (!ebookId) throw new Error('Materi wajib dipilih sebelum produk bisa disimpan.')
   const { error } = await supabase
     .from('marketplace_products')
     .update({
