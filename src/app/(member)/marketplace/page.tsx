@@ -8,6 +8,12 @@ export default async function MarketplacePage() {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Cek apakah user adalah admin
+  const { data: profile } = user
+    ? await supabase.from('profiles').select('role').eq('id', user.id).single()
+    : { data: null }
+  const isAdmin = profile?.role === 'admin'
+
   // Fetch marketplace products + user's owned ebooks in parallel
   const [productsRes, ownedRes] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,18 +22,15 @@ export default async function MarketplacePage() {
       .select('id, slug, title, description, category, price, original_price, cover_url, product_url, ebook_id')
       .eq('is_published', true)
       .order('sort_order'),
-    user
-      ? supabase
-          .from('user_ebooks')
-          .select('ebook_id')
-          .eq('user_id', user.id)
+    user && !isAdmin
+      ? supabase.from('user_ebooks').select('ebook_id').eq('user_id', user.id)
       : Promise.resolve({ data: [] }),
   ])
 
   const products = productsRes.data ?? []
   const ownedEbookIds = new Set((ownedRes.data ?? []).map((r: { ebook_id: string }) => r.ebook_id))
 
-  // Annotate each product with isOwned flag
+  // Annotate each product with isOwned flag (admin selalu owned semua)
   const annotatedProducts = products.map((p: {
     id: string
     slug: string
@@ -41,7 +44,7 @@ export default async function MarketplacePage() {
     ebook_id: string | null
   }) => ({
     ...p,
-    isOwned: p.ebook_id ? ownedEbookIds.has(p.ebook_id) : false,
+    isOwned: isAdmin || (p.ebook_id ? ownedEbookIds.has(p.ebook_id) : false),
   }))
 
   return <MarketplaceClient products={annotatedProducts} />
