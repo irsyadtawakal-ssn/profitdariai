@@ -183,15 +183,19 @@ function CollapsibleGroup({
 
 export function CheckoutForm({
   channelIcons = {},
-  bumpProduct = null,
+  bumpProducts = [],
 }: {
   channelIcons?: Record<string, string>
-  bumpProduct?: BumpProduct | null
+  bumpProducts?: BumpProduct[]
 }) {
   const [selected, setSelected] = useState('QRIS')
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [vipSelected, setVipSelected] = useState(false)
-  const [bonusSelected, setBonusSelected] = useState(false)
+  const [bonusIds, setBonusIds] = useState<string[]>([])
+  const hasBumps = bumpProducts.length > 0
+  const selectedBumps = bumpProducts.filter((b) => bonusIds.includes(b.id))
+  const toggleBump = (id: string) =>
+    setBonusIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [feeLoading, setFeeLoading] = useState(false)
@@ -220,7 +224,7 @@ export function CheckoutForm({
   const subtotal =
     MEMBERSHIP_EARLY_BIRD_PRICE +
     (vipSelected ? VIP_UPSELL_PRICE : 0) +
-    (bonusSelected && bumpProduct ? bumpProduct.bumpPrice : 0)
+    selectedBumps.reduce((sum, b) => sum + b.bumpPrice, 0)
 
   useEffect(() => {
     fetchFee(selected, subtotal)
@@ -238,7 +242,7 @@ export function CheckoutForm({
           email: formData.email,
           fullName: formData.fullName,
           vip: vipSelected,
-          bonus: bonusSelected,
+          bonusIds,
         }),
       })
       const data = await res.json()
@@ -292,12 +296,12 @@ export function CheckoutForm({
               </span>
             </label>
           </div>
-          <Button type="button" onClick={() => setStep(bumpProduct ? 2 : 3)} className="w-full py-3">
+          <Button type="button" onClick={() => setStep(hasBumps ? 2 : 3)} className="w-full py-3">
             Lanjutkan →
           </Button>
           <button
             type="button"
-            onClick={() => { setVipSelected(false); setStep(bumpProduct ? 2 : 3) }}
+            onClick={() => { setVipSelected(false); setStep(hasBumps ? 2 : 3) }}
             className="w-full text-center text-[#666666] text-xs mt-3 hover:text-[#888888]"
           >
             Nggak dulu, lanjut tanpa VIP
@@ -305,33 +309,37 @@ export function CheckoutForm({
         </div>
       )}
 
-      {step === 2 && bumpProduct && (
+      {step === 2 && hasBumps && (
         <div>
           <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-none p-5 mb-4">
-            <h2 className="text-[#F5F5F0] font-bold text-lg mb-1">Tunggu! Ada 1 Penawaran Spesial Buat Kamu</h2>
+            <h2 className="text-[#F5F5F0] font-bold text-lg mb-1">Tunggu! Ada Penawaran Spesial Buat Kamu</h2>
             <p className="text-[#888888] text-sm mb-4">Sekali ini aja, harga khusus buat kamu yang baru gabung.</p>
-            <label className="flex items-start gap-3 p-3 rounded-none border border-[#D4AF37]/30 bg-[#D4AF37]/5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={bonusSelected}
-                onChange={(e) => setBonusSelected(e.target.checked)}
-                className="accent-[#D4AF37] w-5 h-5 mt-0.5"
-              />
-              <span className="text-[#F5F5F0] text-sm">
-                Ya, Ambil <span className="font-semibold">{bumpProduct.title}</span> cuma{' '}
-                <span className="text-[#D4AF37] font-bold">Rp {bumpProduct.bumpPrice.toLocaleString('id-ID')}</span>
-                {bumpProduct.originalPrice && bumpProduct.originalPrice > bumpProduct.bumpPrice && (
-                  <span className="text-[#666666] line-through ml-1">Rp {bumpProduct.originalPrice.toLocaleString('id-ID')}</span>
-                )}
-              </span>
-            </label>
+            <div className="flex flex-col gap-2">
+              {bumpProducts.map((b) => (
+                <label key={b.id} className="flex items-start gap-3 p-3 rounded-none border border-[#D4AF37]/30 bg-[#D4AF37]/5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={bonusIds.includes(b.id)}
+                    onChange={() => toggleBump(b.id)}
+                    className="accent-[#D4AF37] w-5 h-5 mt-0.5"
+                  />
+                  <span className="text-[#F5F5F0] text-sm">
+                    Ya, Ambil <span className="font-semibold">{b.title}</span> cuma{' '}
+                    <span className="text-[#D4AF37] font-bold">Rp {b.bumpPrice.toLocaleString('id-ID')}</span>
+                    {b.originalPrice && b.originalPrice > b.bumpPrice && (
+                      <span className="text-[#666666] line-through ml-1">Rp {b.originalPrice.toLocaleString('id-ID')}</span>
+                    )}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
           <Button type="button" onClick={() => setStep(3)} className="w-full py-3">
             Lanjut ke Pembayaran →
           </Button>
           <button
             type="button"
-            onClick={() => { setBonusSelected(false); setStep(3) }}
+            onClick={() => { setBonusIds([]); setStep(3) }}
             className="w-full text-center text-[#666666] text-xs mt-3 hover:text-[#888888]"
           >
             Lewati penawaran ini
@@ -343,7 +351,7 @@ export function CheckoutForm({
         <>
           <button
             type="button"
-            onClick={() => setStep(bumpProduct ? 2 : 1)}
+            onClick={() => setStep(hasBumps ? 2 : 1)}
             className="text-[#666666] text-xs mb-3 hover:text-[#888888]"
           >
             ← Kembali
@@ -362,12 +370,12 @@ export function CheckoutForm({
               <span className="text-[#F5F5F0] text-sm font-medium">{fmt(VIP_UPSELL_PRICE)}</span>
             </div>
           )}
-          {bonusSelected && bumpProduct && (
-            <div className="flex justify-between items-center">
-              <span className="text-[#888888] text-sm">{bumpProduct.title}</span>
-              <span className="text-[#F5F5F0] text-sm font-medium">{fmt(bumpProduct.bumpPrice)}</span>
+          {selectedBumps.map((b) => (
+            <div key={b.id} className="flex justify-between items-center">
+              <span className="text-[#888888] text-sm">{b.title}</span>
+              <span className="text-[#F5F5F0] text-sm font-medium">{fmt(b.bumpPrice)}</span>
             </div>
-          )}
+          ))}
           <div className="flex justify-between items-center">
             <span className="text-[#888888] text-sm">Biaya Admin</span>
             {feeLoading ? (

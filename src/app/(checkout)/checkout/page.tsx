@@ -26,35 +26,43 @@ export default async function CheckoutPage() {
     }
   }
 
-  // Fetch bump product (step 2) bila admin sudah mengonfigurasi
+  // Fetch SEMUA bump products (step 2) yang dikonfigurasi admin
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adminClient = createAdminClient() as any
-  const { data: bump } = await adminClient
+  const { data: bumps } = await adminClient
     .from('ebooks')
     .select('id, title, bump_price')
     .eq('is_published', true)
     .eq('is_bump_product', true)
     .not('bump_price', 'is', null)
-    .limit(1)
-    .single()
+    .order('sort_order', { ascending: true })
 
-  let bumpProduct: BumpProduct | null = null
-  if (bump && typeof bump.bump_price === 'number' && bump.bump_price > 0) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const validBumps: any[] = Array.isArray(bumps)
+    ? bumps.filter((b) => typeof b.bump_price === 'number' && b.bump_price > 0)
+    : []
+
+  let bumpProducts: BumpProduct[] = []
+  if (validBumps.length > 0) {
     // Normal price (untuk dicoret) diambil dari marketplace_products bila ada
-    const { data: mp } = await adminClient
+    const { data: mps } = await adminClient
       .from('marketplace_products')
-      .select('price, original_price')
-      .eq('ebook_id', bump.id)
-      .limit(1)
-      .maybeSingle()
-    const originalPrice: number | null =
-      (mp?.original_price as number | null) ?? (mp?.price as number | null) ?? null
-    bumpProduct = {
-      id: bump.id,
-      title: bump.title,
-      bumpPrice: bump.bump_price,
-      originalPrice,
+      .select('ebook_id, price, original_price')
+      .in('ebook_id', validBumps.map((b) => b.id))
+
+    const priceByEbook = new Map<string, number | null>()
+    if (Array.isArray(mps)) {
+      for (const mp of mps) {
+        priceByEbook.set(mp.ebook_id, (mp.original_price as number | null) ?? (mp.price as number | null) ?? null)
+      }
     }
+
+    bumpProducts = validBumps.map((b) => ({
+      id: b.id,
+      title: b.title,
+      bumpPrice: b.bump_price,
+      originalPrice: priceByEbook.get(b.id) ?? null,
+    }))
   }
 
   return (
@@ -66,7 +74,7 @@ export default async function CheckoutPage() {
             Akses Profit Dari AI — Rp {MEMBERSHIP_EARLY_BIRD_PRICE.toLocaleString('id-ID')} (Sekali Bayar)
           </p>
         </div>
-        <CheckoutForm channelIcons={channelIcons} bumpProduct={bumpProduct} />
+        <CheckoutForm channelIcons={channelIcons} bumpProducts={bumpProducts} />
       </div>
     </div>
   )

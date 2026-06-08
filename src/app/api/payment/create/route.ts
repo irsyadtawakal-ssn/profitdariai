@@ -7,9 +7,11 @@ import { MEMBERSHIP_EARLY_BIRD_PRICE, VIP_UPSELL_PRICE } from '@/types'
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { paymentMethod, email, fullName, vip, bonus } = body
+  const { paymentMethod, email, fullName, vip, bonusIds } = body
   const wantVip = vip === true
-  const wantBonus = bonus === true
+  const requestedBumpIds: string[] = Array.isArray(bonusIds)
+    ? bonusIds.filter((id): id is string => typeof id === 'string')
+    : []
 
   if (!paymentMethod || !email || !fullName) {
     return NextResponse.json(
@@ -47,19 +49,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Produk utama belum dikonfigurasi. Hubungi admin.' }, { status: 500 })
   }
 
-  // Fetch bump ebook (step 2) bila admin mengonfigurasi & user memilih bonus
-  let bumpEbook: { id: string; title: string; bump_price: number } | null = null
-  if (wantBonus) {
-    const { data: bump } = await adminClient
+  // Fetch bump ebooks (step 2) yang dipilih user — divalidasi terhadap DB
+  let bumpEbooks: { id: string; title: string; bump_price: number }[] = []
+  if (requestedBumpIds.length > 0) {
+    const { data: bumps } = await adminClient
       .from('ebooks')
       .select('id, title, bump_price')
       .eq('is_published', true)
       .eq('is_bump_product', true)
       .not('bump_price', 'is', null)
-      .limit(1)
-      .single()
-    if (bump && typeof bump.bump_price === 'number' && bump.bump_price > 0) {
-      bumpEbook = bump
+      .in('id', requestedBumpIds)
+    if (Array.isArray(bumps)) {
+      bumpEbooks = bumps.filter(
+        (b: { bump_price: unknown }) => typeof b.bump_price === 'number' && b.bump_price > 0
+      )
     }
   }
 
@@ -81,7 +84,7 @@ export async function POST(request: Request) {
   if (wantVip) {
     items.push({ sku: 'PDA-VIP-CONSULT', name: 'Konsultasi VIP via WhatsApp', price: VIP_UPSELL_PRICE, quantity: 1 })
   }
-  if (bumpEbook) {
+  for (const bumpEbook of bumpEbooks) {
     items.push({ sku: `PDA-BUMP-${bumpEbook.id.slice(0, 8).toUpperCase()}`, name: bumpEbook.title, price: bumpEbook.bump_price, quantity: 1 })
     ebookIds.push(bumpEbook.id)
   }
