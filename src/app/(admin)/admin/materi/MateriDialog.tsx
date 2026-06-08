@@ -44,6 +44,8 @@ interface Materi {
   page_count: number | null
   is_published: boolean
   is_featured: boolean | null
+  is_bump_product: boolean | null
+  bump_price: number | null
   videos: VideoItem[] | null
   documents: DocumentItem[] | null
   drive_folder_url: string | null
@@ -70,6 +72,8 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
   const [uploadingCover, setUploadingCover] = useState(false)
   const [isPublished, setIsPublished] = useState(materi?.is_published ?? false)
   const [isFeatured, setIsFeatured] = useState(materi?.is_featured ?? false)
+  const [isBumpProduct, setIsBumpProduct] = useState(materi?.is_bump_product ?? false)
+  const [bumpPrice, setBumpPrice] = useState(materi?.bump_price?.toString() ?? '')
   const [videos, setVideos] = useState<VideoItem[]>(materi?.videos ?? [])
   const [documents, setDocuments] = useState<DocumentItem[]>(materi?.documents ?? [])
   const [driveFolderUrl, setDriveFolderUrl] = useState(materi?.drive_folder_url ?? '')
@@ -85,6 +89,8 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     setCoverUrl(materi?.cover_url ?? '')
     setIsPublished(materi?.is_published ?? false)
     setIsFeatured(materi?.is_featured ?? false)
+    setIsBumpProduct(materi?.is_bump_product ?? false)
+    setBumpPrice(materi?.bump_price?.toString() ?? '')
     setVideos(materi?.videos ?? [])
     setDocuments(materi?.documents ?? [])
     setDriveFolderUrl(materi?.drive_folder_url ?? '')
@@ -157,6 +163,8 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
     const formData = new FormData(e.currentTarget)
     formData.set('file_path', filePath)
     formData.set('is_featured', isFeatured ? 'true' : 'false')
+    formData.set('is_bump_product', isBumpProduct ? 'true' : 'false')
+    formData.set('bump_price', bumpPrice)
     const validVideos = videos.filter(v => v.title.trim() && v.url.trim())
     formData.set('videos', validVideos.length > 0 ? JSON.stringify(validVideos) : '')
     const validDocs = documents.filter(d => d.title.trim() && d.url.trim())
@@ -334,6 +342,23 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
               <input type="checkbox" id="m_featured" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
               <Label htmlFor="m_featured">Jadikan Materi Pilihan (★ Featured di Dashboard)</Label>
             </div>
+            <div className="flex items-center gap-2 mt-3">
+              <input type="checkbox" id="m_bump" checked={isBumpProduct} onChange={(e) => setIsBumpProduct(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
+              <Label htmlFor="m_bump">Jadikan Produk Bump Checkout (Step 2)</Label>
+            </div>
+            {isBumpProduct && (
+              <div className="mt-2">
+                <Label htmlFor="m_bump_price">Harga Bump (IDR)</Label>
+                <Input
+                  id="m_bump_price"
+                  type="number"
+                  value={bumpPrice}
+                  onChange={(e) => setBumpPrice(e.target.value)}
+                  placeholder="Contoh: 47000"
+                  className="bg-[#1a1a1a] border-[#333333] text-[#F5F5F0]"
+                />
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <input type="checkbox" name="is_published" value="true" id="m_published" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="accent-[#D4AF37] w-4 h-4" />
               <Label htmlFor="m_published">Published</Label>

@@ -30,7 +30,7 @@ describe('MateriDialog', () => {
       description: null, category: 'Bisnis', cover_url: null,
       file_path: 'https://drive.google.com/uc?export=download&id=abc123',
       page_count: 50, is_published: true,
-      is_featured: false, videos: null, documents: null, drive_folder_url: null,
+      is_featured: false, is_bump_product: false, bump_price: null, videos: null, documents: null, drive_folder_url: null,
     }
     render(<MateriDialog open={true} onClose={vi.fn()} materi={ebook} />)
     expect(screen.getByText('Edit Materi')).toBeInTheDocument()

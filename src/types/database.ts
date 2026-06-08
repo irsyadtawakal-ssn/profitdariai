@@ -126,6 +126,8 @@ export type Database = {
           file_path: string
           page_count: number | null
           is_published: boolean
+          is_bump_product: boolean | null
+          bump_price: number | null
           sort_order: number
           created_at: string
           updated_at: string
@@ -140,6 +142,8 @@ export type Database = {
           file_path: string
           page_count?: number | null
           is_published?: boolean
+          is_bump_product?: boolean | null
+          bump_price?: number | null
           sort_order?: number
           created_at?: string
           updated_at?: string
@@ -153,6 +157,8 @@ export type Database = {
           file_path?: string
           page_count?: number | null
           is_published?: boolean
+          is_bump_product?: boolean | null
+          bump_price?: number | null
           sort_order?: number
           updated_at?: string
         }

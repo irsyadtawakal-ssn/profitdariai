@@ -22,6 +22,8 @@ interface Materi {
   page_count: number | null
   is_published: boolean
   is_featured: boolean | null
+  is_bump_product: boolean | null
+  bump_price: number | null
   videos: VideoItem[] | null
   documents: { title: string; url: string }[] | null
   drive_folder_url: string | null
