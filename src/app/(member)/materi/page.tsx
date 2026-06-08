@@ -16,16 +16,10 @@ export default async function MateriPage({ searchParams }: MateriPageProps) {
   const adminClient = createAdminClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Cek apakah user adalah admin
-  const { data: profile } = user
-    ? await supabase.from('profiles').select('role').eq('id', user.id).single()
-    : { data: null }
-  const isAdmin = profile?.role === 'admin'
-
   // Fetch all published ebooks + user's owned ebooks + marketplace product slugs in parallel
   const [allMateris, ownedRes, mpRes] = await Promise.all([
     getCachedEbooks(category),
-    user && !isAdmin
+    user
       ? supabase.from('user_ebooks').select('ebook_id').eq('user_id', user.id)
       : Promise.resolve({ data: [] }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,11 +30,8 @@ export default async function MateriPage({ searchParams }: MateriPageProps) {
       .not('ebook_id', 'is', null),
   ])
 
-  // Admin bisa akses semua konten tanpa perlu beli
-  const ownedIds = isAdmin
-    ? new Set<string>() // tidak dipakai, isLocked selalu false untuk admin
-    : new Set((ownedRes.data ?? []).map((r) => r.ebook_id))
-  const totalOwned = isAdmin ? allMateris.length : ownedIds.size
+  const ownedIds = new Set((ownedRes.data ?? []).map((r) => r.ebook_id))
+  const totalOwned = ownedIds.size
 
   // Map ebook_id → marketplace slug for locked item redirect
   const ebookToMarketplaceSlug = new Map<string, string>(
@@ -87,7 +78,7 @@ export default async function MateriPage({ searchParams }: MateriPageProps) {
               title={materi.title}
               category={materi.category}
               cover_url={materi.cover_url}
-              isLocked={!isAdmin && !ownedIds.has(materi.id)}
+              isLocked={!ownedIds.has(materi.id)}
               marketplaceSlug={ebookToMarketplaceSlug.get(materi.id)}
             />
           ))}
