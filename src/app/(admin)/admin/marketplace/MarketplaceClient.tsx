@@ -17,6 +17,7 @@ interface Product {
   product_url: string
   is_published: boolean
   ebook_id: string | null
+  features: string[]
 }
 
 interface EbookOption {

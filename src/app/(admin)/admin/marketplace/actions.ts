@@ -10,7 +10,8 @@ export async function createProduct(formData: FormData) {
   const originalPrice = formData.get('original_price')
   const ebookId = formData.get('ebook_id') as string
   if (!ebookId) throw new Error('Materi wajib dipilih sebelum produk bisa disimpan.')
-  const { error } = await supabase.from('marketplace_products').insert({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('marketplace_products').insert({
     title: formData.get('title') as string,
     slug: formData.get('slug') as string,
     description: (formData.get('description') as string) || null,
@@ -21,6 +22,7 @@ export async function createProduct(formData: FormData) {
     product_url: formData.get('product_url') as string,
     is_published: formData.get('is_published') === 'true',
     ebook_id: ebookId || null,
+    features: JSON.parse((formData.get('features') as string) || '[]'),
   })
   if (error) {
     console.error('[createProduct]', error.message)
@@ -35,7 +37,8 @@ export async function updateProduct(id: string, formData: FormData) {
   const originalPrice = formData.get('original_price')
   const ebookId = formData.get('ebook_id') as string
   if (!ebookId) throw new Error('Materi wajib dipilih sebelum produk bisa disimpan.')
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
     .from('marketplace_products')
     .update({
       title: formData.get('title') as string,
@@ -48,6 +51,7 @@ export async function updateProduct(id: string, formData: FormData) {
       product_url: formData.get('product_url') as string,
       is_published: formData.get('is_published') === 'true',
       ebook_id: ebookId || null,
+      features: JSON.parse((formData.get('features') as string) || '[]'),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

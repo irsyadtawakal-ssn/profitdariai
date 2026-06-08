@@ -28,6 +28,7 @@ describe('MarketplaceDialog', () => {
       product_url: 'https://drive.google.com/uc?export=download&id=abc123',
       is_published: true,
       ebook_id: null,
+      features: [],
     }
     render(<MarketplaceDialog open={true} onClose={vi.fn()} product={product} ebooks={mockEbooks} />)
     expect(screen.getByText('Edit Produk')).toBeInTheDocument()

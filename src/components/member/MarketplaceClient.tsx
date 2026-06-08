@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ShoppingBag, Search, CheckCircle, X, Loader2 } from 'lucide-react'
+import { ShoppingBag, Search, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
 interface MarketplaceProduct {
@@ -20,8 +20,6 @@ interface MarketplaceProduct {
 
 interface MarketplaceClientProps {
   products: MarketplaceProduct[]
-  userEmail: string
-  userFullName: string
 }
 
 const CATEGORIES = ['ALL', 'MATERI', 'TOOLS', 'LAINNYA']
@@ -34,123 +32,9 @@ function formatPrice(price: number) {
   }).format(price)
 }
 
-// ── Checkout Modal ──────────────────────────────────────────────────────────
-function CheckoutModal({
-  product,
-  userEmail,
-  userFullName,
-  onClose,
-}: {
-  product: MarketplaceProduct
-  userEmail: string
-  userFullName: string
-  onClose: () => void
-}) {
-  const [paymentMethod, setPaymentMethod] = useState('QRIS')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const PAYMENT_METHODS = [
-    { value: 'QRIS', label: 'QRIS (Semua E-wallet)' },
-    { value: 'BRIVA', label: 'BRI Virtual Account' },
-    { value: 'BCAVA', label: 'BCA Virtual Account' },
-    { value: 'MANDIRIVA', label: 'Mandiri Virtual Account' },
-    { value: 'BNIVA', label: 'BNI Virtual Account' },
-  ]
-
-  async function handleBuy() {
-    setError(null)
-    setLoading(true)
-    try {
-      const res = await fetch('/api/payment/marketplace', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product.id,
-          paymentMethod,
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Gagal membuat transaksi.')
-        return
-      }
-      window.location.href = data.checkout_url
-    } catch {
-      setError('Tidak dapat terhubung ke server.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#0E0E0E] border border-[#D4AF37]/30 w-full max-w-md rounded-none">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#222]">
-          <div>
-            <p className="font-mono text-[9px] text-[#D4AF37] uppercase tracking-widest mb-1">Checkout</p>
-            <h3 className="font-display text-white font-bold text-sm">{product.title}</h3>
-            <p className="text-[#D4AF37] font-mono text-xs font-bold">{formatPrice(product.price)}</p>
-          </div>
-          <button onClick={onClose} className="text-[#888888] hover:text-white transition-colors">
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-6 space-y-4">
-          {/* User info (read-only) */}
-          <div className="bg-[#111] border border-[#222] px-4 py-3 space-y-1">
-            <p className="font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider mb-2">Pembeli</p>
-            <p className="text-sm text-[#F5F5F0] font-medium">{userFullName}</p>
-            <p className="text-xs text-[#888]">{userEmail}</p>
-          </div>
-
-          <div>
-            <label className="block font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider mb-2">Metode Pembayaran</label>
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full bg-[#111] border border-[#333] focus:border-[#D4AF37] px-4 py-3 text-sm text-[#F5F5F0] outline-none transition-all rounded-none"
-            >
-              {PAYMENT_METHODS.map((m) => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {error && (
-            <p className="text-red-400 text-xs font-mono">{error}</p>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-6 border-t border-[#222] flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 border border-[#333] text-[#888] py-3 text-[10px] font-mono uppercase tracking-wider hover:text-white transition-colors rounded-none"
-          >
-            Batal
-          </button>
-          <button
-            onClick={handleBuy}
-            disabled={loading}
-            className="flex-1 bg-[#D4AF37] text-[#0A0A0A] py-3 text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#D4AF37]/90 transition-all disabled:opacity-50 rounded-none flex items-center justify-center gap-2"
-          >
-            {loading ? <Loader2 size={14} className="animate-spin" /> : null}
-            {loading ? 'Memproses...' : 'Bayar Sekarang'}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export function MarketplaceClient({ products, userEmail, userFullName }: MarketplaceClientProps) {
+export function MarketplaceClient({ products }: MarketplaceClientProps) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('ALL')
-  const [checkoutProduct, setCheckoutProduct] = useState<MarketplaceProduct | null>(null)
 
   const filtered = products.filter((p) => {
     const matchSearch =
@@ -162,14 +46,6 @@ export function MarketplaceClient({ products, userEmail, userFullName }: Marketp
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8 pt-8 pb-16">
-      {checkoutProduct && (
-        <CheckoutModal
-          product={checkoutProduct}
-          userEmail={userEmail}
-          userFullName={userFullName}
-          onClose={() => setCheckoutProduct(null)}
-        />
-      )}
       {/* Title */}
       <div>
         <span className="font-mono text-[9px] text-[#D4AF37] tracking-[0.2em] block mb-2 uppercase">Etalase Digital</span>
@@ -227,8 +103,9 @@ export function MarketplaceClient({ products, userEmail, userFullName }: Marketp
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((prod) => (
-            <div
+            <Link
               key={prod.id}
+              href={`/marketplace/${prod.slug}`}
               className="glass-panel group flex flex-col rounded-none overflow-hidden transition-all duration-300 border border-[#D4AF37]/15 bg-[#0E0E0E] hover:border-[#D4AF37]/40"
             >
               {/* Cover */}
@@ -287,29 +164,12 @@ export function MarketplaceClient({ products, userEmail, userFullName }: Marketp
                   </div>
                 </div>
 
-                {/* CTA Button */}
-                {prod.isOwned ? (
-                  <Link
-                    href="/materi"
-                    className="w-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] py-3 text-[10px] font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 rounded-none"
-                  >
-                    <CheckCircle size={14} />
-                    Buka di Library
-                  </Link>
-                ) : prod.ebook_id ? (
-                  <button
-                    onClick={() => setCheckoutProduct(prod)}
-                    className="w-full border border-[#D4AF37]/40 text-[#D4AF37] py-3 text-[10px] font-mono font-bold tracking-wider uppercase hover:bg-[#D4AF37] hover:text-[#0A0A0A] transition-all duration-300 flex items-center justify-center gap-2 active:scale-98 rounded-none hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]"
-                  >
-                    Beli Sekarang
-                  </button>
-                ) : (
-                  <span className="w-full text-center text-[#555] py-3 text-[10px] font-mono uppercase tracking-wider border border-[#333] rounded-none block">
-                    Segera Hadir
-                  </span>
-                )}
+                {/* CTA */}
+                <div className="w-full border border-[#D4AF37]/40 text-[#D4AF37] py-3 text-[10px] font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 group-hover:bg-[#D4AF37] group-hover:text-[#0A0A0A] transition-all duration-300 rounded-none">
+                  {prod.isOwned ? 'Lihat Detail' : prod.ebook_id ? 'Lihat & Beli' : 'Lihat Detail'}
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       ) : products.length === 0 ? (

@@ -21,6 +21,7 @@ interface Product {
   product_url: string
   is_published: boolean
   ebook_id: string | null
+  features: string[]
 }
 
 interface EbookOption {
@@ -45,6 +46,7 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
   const [slug, setSlug] = useState(product?.slug ?? '')
   const [isPublished, setIsPublished] = useState(product?.is_published ?? false)
   const [ebookId, setEbookId] = useState(product?.ebook_id ?? '')
+  const [features, setFeatures] = useState<string[]>(product?.features ?? [])
   const isEdit = !!product
 
   useEffect(() => {
@@ -52,6 +54,7 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
     setSlug(product?.slug ?? '')
     setIsPublished(product?.is_published ?? false)
     setEbookId(product?.ebook_id ?? '')
+    setFeatures(product?.features ?? [])
   }, [open, product])
 
   function handleTitleChange(val: string) {
@@ -64,6 +67,7 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
     const formData = new FormData(e.currentTarget)
     formData.set('is_published', isPublished ? 'true' : 'false')
     formData.set('ebook_id', ebookId || '')
+    formData.set('features', JSON.stringify(features))
     startTransition(async () => {
       if (isEdit) {
         await updateProduct(product.id, formData)
@@ -127,6 +131,40 @@ export function MarketplaceDialog({ open, onClose, product, ebooks }: Marketplac
               rows={2}
               className="w-full bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] placeholder:text-[#555555] focus:outline-none focus:border-[#D4AF37] resize-none"
             />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label>Poin-poin Produk</Label>
+            <div className="flex flex-col gap-2">
+              {features.map((feat, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={feat}
+                    onChange={(e) => {
+                      const next = [...features]
+                      next[i] = e.target.value
+                      setFeatures(next)
+                    }}
+                    placeholder="Contoh: 10 dokumen PDF"
+                    className="flex-1 bg-[#0A0A0A] border border-[#333333] rounded-lg px-3 py-2 text-sm text-[#F5F5F0] placeholder:text-[#555555] focus:outline-none focus:border-[#D4AF37]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFeatures(features.filter((_, j) => j !== i))}
+                    className="text-[#555] hover:text-red-400 transition-colors px-2 text-lg leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setFeatures([...features, ''])}
+                className="text-[10px] font-mono text-[#D4AF37] uppercase tracking-wider border border-[#D4AF37]/30 py-2 hover:bg-[#D4AF37]/10 transition-colors rounded-none"
+              >
+                + Tambah Poin
+              </button>
+            </div>
           </div>
           <div className="flex gap-3">
             <div className="flex flex-col gap-1.5 flex-1">

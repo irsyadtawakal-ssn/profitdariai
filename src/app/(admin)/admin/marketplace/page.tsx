@@ -2,11 +2,12 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { MarketplaceClient } from './MarketplaceClient'
 
 export default async function AdminMarketplacePage() {
-  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createAdminClient() as any
   const [{ data: products }, { data: ebooks }] = await Promise.all([
     supabase
       .from('marketplace_products')
-      .select('id, slug, title, description, category, price, original_price, cover_url, product_url, is_published, ebook_id')
+      .select('id, slug, title, description, category, price, original_price, cover_url, product_url, is_published, ebook_id, features')
       .order('sort_order'),
     supabase
       .from('ebooks')

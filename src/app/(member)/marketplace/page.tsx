@@ -1,5 +1,5 @@
-import { createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createServerClient } from '@/lib/supabase/server'
 import { MarketplaceClient } from '@/components/member/MarketplaceClient'
 
 export default async function MarketplacePage() {
@@ -9,7 +9,7 @@ export default async function MarketplacePage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Fetch marketplace products + user's owned ebooks + profile in parallel
-  const [productsRes, ownedRes, profileRes] = await Promise.all([
+  const [productsRes, ownedRes] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (adminClient as any)
       .from('marketplace_products')
@@ -19,16 +19,11 @@ export default async function MarketplacePage() {
     user
       ? supabase.from('user_ebooks').select('ebook_id').eq('user_id', user.id)
       : Promise.resolve({ data: [] }),
-    user
-      ? supabase.from('profiles').select('email, full_name').eq('id', user.id).single()
-      : Promise.resolve({ data: null }),
   ])
 
   const products = productsRes.data ?? []
   const ownedEbookIds = new Set((ownedRes.data ?? []).map((r: { ebook_id: string }) => r.ebook_id))
-  const profile = profileRes.data
 
-  // Annotate each product with isOwned flag
   const annotatedProducts = products.map((p: {
     id: string
     slug: string
@@ -45,11 +40,5 @@ export default async function MarketplacePage() {
     isOwned: p.ebook_id ? ownedEbookIds.has(p.ebook_id) : false,
   }))
 
-  return (
-    <MarketplaceClient
-      products={annotatedProducts}
-      userEmail={profile?.email ?? user?.email ?? ''}
-      userFullName={profile?.full_name ?? ''}
-    />
-  )
+  return <MarketplaceClient products={annotatedProducts} />
 }
