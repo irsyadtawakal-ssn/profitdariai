@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { MateriDialog } from './MateriDialog'
+import { BulkImportDialog } from './BulkImportDialog'
 import { deleteEbook, toggleEbookPublished } from './actions'
 
 interface VideoItem {
@@ -28,6 +29,7 @@ interface Materi {
 export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Materi | undefined>()
+  const [importOpen, setImportOpen] = useState(false)
   const [, startTransition] = useTransition()
 
   function openAdd() { setEditTarget(undefined); setDialogOpen(true) }
@@ -44,7 +46,10 @@ export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
     <>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[#F5F5F0]">Materi</h1>
-        <Button variant="primary" size="sm" onClick={openAdd}>+ Tambah</Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={() => setImportOpen(true)}>Import CSV</Button>
+          <Button variant="primary" size="sm" onClick={openAdd}>+ Tambah</Button>
+        </div>
       </div>
 
       <div className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden overflow-x-auto">
@@ -104,6 +109,7 @@ export function MateriClient({ ebooks: materis }: { ebooks: Materi[] }) {
       </div>
 
       <MateriDialog open={dialogOpen} onClose={() => setDialogOpen(false)} materi={editTarget} />
+      <BulkImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
     </>
   )
 }
