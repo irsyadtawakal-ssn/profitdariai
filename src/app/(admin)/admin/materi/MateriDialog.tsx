@@ -46,6 +46,7 @@ interface Materi {
   is_featured: boolean | null
   videos: VideoItem[] | null
   documents: DocumentItem[] | null
+  drive_folder_url: string | null
 }
 
 interface MateriDialogProps {
@@ -249,6 +250,18 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
             {gdriveValid === true && <p className="text-xs text-green-400">&#10003; Link valid — akan otomatis jadi direct download.</p>}
             {gdriveValid === false && <p className="text-xs text-red-400">Link bukan dari Google Drive atau format tidak dikenali.</p>}
             {!gdriveInput && isEdit && <p className="text-xs text-[#555555]">Kosongkan jika tidak ingin ganti link.</p>}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="m_drive_folder_url">Link Google Drive Folder (opsional)</Label>
+            <Input
+              id="m_drive_folder_url"
+              name="drive_folder_url"
+              type="url"
+              defaultValue={materi?.drive_folder_url ?? ''}
+              placeholder="https://drive.google.com/drive/folders/..."
+            />
+            <p className="text-xs text-[#555555]">Link folder Drive — member bisa akses seluruh isi folder.</p>
           </div>
 
           {/* VIDEO SECTION */}

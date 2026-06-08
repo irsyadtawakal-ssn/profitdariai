@@ -23,6 +23,7 @@ export async function createEbook(formData: FormData) {
     is_featured: formData.get('is_featured') === 'true',
     videos: videosRaw ? JSON.parse(videosRaw) : null,
     documents: documentsRaw ? JSON.parse(documentsRaw) : null,
+    drive_folder_url: (formData.get('drive_folder_url') as string) || null,
   }).select('id, title, slug, description, cover_url, file_path').single()
   if (error) {
     console.error('[createEbook]', error.message)
@@ -77,6 +78,7 @@ export async function updateEbook(id: string, formData: FormData) {
       is_featured: formData.get('is_featured') === 'true',
       videos: videosRaw ? JSON.parse(videosRaw) : null,
       documents: documentsRaw ? JSON.parse(documentsRaw) : null,
+      drive_folder_url: (formData.get('drive_folder_url') as string) || null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

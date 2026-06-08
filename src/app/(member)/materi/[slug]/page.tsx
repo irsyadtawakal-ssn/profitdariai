@@ -18,6 +18,7 @@ interface MateriData {
   page_count: number | null
   videos: unknown
   documents: unknown
+  drive_folder_url: string | null
 }
 
 export default async function MateriDetailPage({ params }: MateriDetailPageProps) {
@@ -26,7 +27,7 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
 
   const { data } = await supabase
     .from('ebooks')
-    .select('id, slug, title, description, category, cover_url, page_count, videos, documents')
+    .select('id, slug, title, description, category, cover_url, page_count, videos, documents, drive_folder_url')
     .eq('slug', slug)
     .eq('is_published', true)
     .single()
@@ -87,8 +88,21 @@ export default async function MateriDetailPage({ params }: MateriDetailPageProps
               {materi.page_count} HALAMAN • PDF FORMAT
             </p>
           )}
-          <div className="md:max-w-xs">
+          <div className="md:max-w-xs flex flex-col gap-3">
             <DownloadButton ebookId={materi.id} />
+            {materi.drive_folder_url && (
+              <a
+                href={materi.drive_folder_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full border border-[#D4AF37]/40 text-[#D4AF37] py-3 text-[10px] font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 hover:bg-[#D4AF37]/10 transition-all rounded-none"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                </svg>
+                Buka Folder Drive
+              </a>
+            )}
           </div>
         </div>
       </div>
