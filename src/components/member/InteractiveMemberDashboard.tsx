@@ -203,7 +203,7 @@ export function InteractiveMemberDashboard({
               Materi Pilihan Editor
             </h2>
             {featuredMateri ? (
-              <Link href={ownedEbookIds.includes(featuredMateri.id) ? `/materi/${featuredMateri.slug}` : '/checkout'} className="block group">
+              <Link href={ownedEbookIds.includes(featuredMateri.id) ? `/materi/${featuredMateri.slug}` : '/marketplace'} className="block group">
                 <div className="relative overflow-hidden glass-panel p-6 flex flex-col md:flex-row gap-6 items-start cyber-corner">
                   {/* Left accent border */}
                   <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-gradient-to-b from-gold to-gold/20" />
@@ -348,7 +348,7 @@ export function InteractiveMemberDashboard({
               ) : (
                 newestMateris.map((materi) => {
                   const isOwned = ownedEbookIds.includes(materi.id)
-                  const linkHref = isOwned ? `/materi/${materi.slug}` : '/checkout'
+                  const linkHref = isOwned ? `/materi/${materi.slug}` : '/marketplace'
 
                   return (
                     <Link

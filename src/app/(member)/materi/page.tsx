@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getCachedEbooks } from '@/lib/cache/content'
 import { MateriCard } from '@/components/member/MateriCard'
 import { CategoryFilter } from '@/components/member/CategoryFilter'
@@ -12,21 +13,30 @@ export default async function MateriPage({ searchParams }: MateriPageProps) {
   const { category } = await searchParams
 
   const supabase = await createServerClient()
+  const adminClient = createAdminClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Fetch all published ebooks + user's owned ebooks in parallel
-  const [allMateris, ownedRes] = await Promise.all([
+  // Fetch all published ebooks + user's owned ebooks + marketplace product slugs in parallel
+  const [allMateris, ownedRes, mpRes] = await Promise.all([
     getCachedEbooks(category),
     user
-      ? supabase
-          .from('user_ebooks')
-          .select('ebook_id')
-          .eq('user_id', user.id)
+      ? supabase.from('user_ebooks').select('ebook_id').eq('user_id', user.id)
       : Promise.resolve({ data: [] }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adminClient as any)
+      .from('marketplace_products')
+      .select('ebook_id, slug')
+      .eq('is_published', true)
+      .not('ebook_id', 'is', null),
   ])
 
   const ownedIds = new Set((ownedRes.data ?? []).map((r) => r.ebook_id))
   const totalOwned = ownedIds.size
+
+  // Map ebook_id → marketplace slug for locked item redirect
+  const ebookToMarketplaceSlug = new Map<string, string>(
+    (mpRes.data ?? []).map((p: { ebook_id: string; slug: string }) => [p.ebook_id, p.slug])
+  )
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8 pt-8">
@@ -69,6 +79,7 @@ export default async function MateriPage({ searchParams }: MateriPageProps) {
               category={materi.category}
               cover_url={materi.cover_url}
               isLocked={!ownedIds.has(materi.id)}
+              marketplaceSlug={ebookToMarketplaceSlug.get(materi.id)}
             />
           ))}
         </div>

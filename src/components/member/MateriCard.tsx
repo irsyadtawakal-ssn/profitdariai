@@ -9,10 +9,12 @@ interface MateriCardProps {
   category: string
   cover_url: string | null
   isLocked?: boolean
+  marketplaceSlug?: string
 }
 
-export function MateriCard({ slug, title, category, cover_url, isLocked = false }: MateriCardProps) {
-  const href = isLocked ? '/checkout' : `/materi/${slug}`
+export function MateriCard({ slug, title, category, cover_url, isLocked = false, marketplaceSlug }: MateriCardProps) {
+  const lockedHref = marketplaceSlug ? `/marketplace/${marketplaceSlug}` : '/marketplace'
+  const href = isLocked ? lockedHref : `/materi/${slug}`
 
   return (
     <Link href={href} className="block group">
@@ -41,14 +43,13 @@ export function MateriCard({ slug, title, category, cover_url, isLocked = false 
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
 
           {isLocked ? (
-            /* Lock overlay */
             <>
               <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 group-hover:bg-black/70 transition-colors">
                 <div className="w-10 h-10 rounded-none bg-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center">
                   <Lock className="w-5 h-5 text-[#D4AF37]" />
                 </div>
                 <span className="font-mono text-[8px] text-[#D4AF37] tracking-widest uppercase opacity-80">
-                  Upgrade Akses
+                  Beli di Marketplace
                 </span>
               </div>
               <span className="absolute top-3 right-3 bg-[#888888]/80 text-white font-mono text-[8px] font-bold px-2 py-0.5 tracking-wider uppercase">
@@ -78,14 +79,14 @@ export function MateriCard({ slug, title, category, cover_url, isLocked = false 
           <div className="mt-4 pt-3 border-t border-primary/5 flex items-center justify-between">
             {isLocked ? (
               <>
-                <span className="text-[#555555] font-mono text-[9px]">MEMBER ONLY</span>
+                <span className="text-[#555555] font-mono text-[9px]">BELUM DIMILIKI</span>
                 <span className="text-[#D4AF37] font-bold font-mono text-[9px] tracking-wider uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Beli Akses <span className="text-[11px] font-sans">→</span>
+                  Beli <span className="text-[11px] font-sans">→</span>
                 </span>
               </>
             ) : (
               <>
-                <span className="text-[#888888] font-mono text-[9px]">PREMIUM</span>
+                <span className="text-[#888888] font-mono text-[9px]">DIMILIKI</span>
                 <span className="text-[#D4AF37] font-bold font-mono text-[9px] tracking-wider uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                   Belajar <span className="text-[11px] font-sans">→</span>
                 </span>
