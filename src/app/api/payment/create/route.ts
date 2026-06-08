@@ -95,6 +95,13 @@ export async function POST(request: Request) {
     ? calculateTotal(baseAmount, feeData)
     : baseAmount
 
+  // Tripay mensyaratkan jumlah order_items == amount. Tambahkan biaya admin
+  // sebagai line item agar totalnya cocok dengan totalAmount.
+  const adminFeeAmount = totalAmount - baseAmount
+  if (adminFeeAmount > 0) {
+    items.push({ sku: 'PDA-ADMIN-FEE', name: 'Biaya Admin', price: adminFeeAmount, quantity: 1 })
+  }
+
   const signature = createSignature(merchantRef, totalAmount)
 
   const result = await createTransaction({
