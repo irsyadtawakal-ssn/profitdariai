@@ -60,7 +60,7 @@ export default function LandingPage() {
         <div className="topbar">
           <span>
             <i data-lucide="zap" style={{ width: 14, height: 14, color: 'var(--gold)', fill: 'var(--gold)', verticalAlign: 'middle', marginRight: 4 }} />
-            {' '}<span className="blink">EARLY BIRD</span> — Akses Penuh Rp 199K — Harga Naik Setelah 100 Member Pertama!
+            {' '}<span className="blink">EARLY BIRD</span> — Akses Penuh Rp 99K — Harga Naik Setelah 100 Member Pertama!
           </span>
         </div>
 
@@ -315,8 +315,8 @@ export default function LandingPage() {
               </div>
               <h3 style={{ fontSize: 22, marginTop: 24 }}>Profit Dari AI</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 8 }}>Akses penuh semua kursus & ebook</p>
-              <div className="price-old">Rp 999.000</div>
-              <div className="price-new"><small>Rp </small>199.000</div>
+              <div className="price-old">Rp 199.000</div>
+              <div className="price-new"><small>Rp </small>99.000</div>
               <div className="price-note">Early Bird — Hanya untuk 100 member pertama!</div>
               <ul className="price-features">
                 {[
@@ -333,7 +333,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <a href="/checkout" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 18, padding: '20px' }}>
-                🚀 Dapatkan Akses Sekarang — Rp 199.000
+                🚀 Dapatkan Akses Sekarang — Rp 99.000
               </a>
               <div className="guarantee">
                 <span className="shield"><i data-lucide="shield-check" style={{ width: 24, height: 24 }} /></span>
@@ -357,7 +357,7 @@ export default function LandingPage() {
                 ['Berapa lama sampai bisa menghasilkan uang?', 'Bergantung konsistensi kamu. Dengan mengikuti framework di platform ini, pemula bisa mulai membuat produk pertama dalam beberapa hari dan mendapatkan penjualan dalam minggu pertama.'],
                 ['Apa bedanya dengan YouTube atau konten gratis?', 'Platform ini menyajikan kurikulum terstruktur, studi kasus nyata, template siap pakai, dan framework terbukti — bukan sekadar teori. Hemat waktu berbulan-bulan trial and error sendiri.'],
                 ['Setelah bayar, langsung bisa akses?', 'Ya! Setelah pembayaran terkonfirmasi otomatis, akun kamu langsung aktif dan bisa mengakses semua kursus & ebook. Tidak perlu menunggu konfirmasi manual.'],
-                ['Apakah harga bisa naik?', 'Ya. Harga Rp 199.000 adalah harga early bird untuk 100 member pertama. Setelah kuota penuh, harga akan naik. Daftar sekarang untuk kunci harga terbaik.'],
+                ['Apakah harga bisa naik?', 'Ya. Harga Rp 99.000 adalah harga early bird untuk 100 member pertama. Setelah kuota penuh, harga akan naik. Daftar sekarang untuk kunci harga terbaik.'],
               ].map(([q, a]) => (
                 <div key={q} className="faq-item">
                   <div className="faq-q">
@@ -379,7 +379,7 @@ export default function LandingPage() {
           <h2>Siap Ubah Ilmu AI<br />Jadi <span style={{ color: 'var(--gold-light)' }}>Cuan Nyata?</span></h2>
           <p>Satu keputusan hari ini bisa mengubah segalanya. Bergabunglah dengan creator yang sudah membuktikan bahwa AI bisa menghasilkan pendapatan nyata — bukan sekadar wacana.</p>
           <a href="/checkout" className="btn-primary" style={{ fontSize: 18, padding: '20px 44px' }}>
-            🚀 Mulai Sekarang — Rp 199.000
+            🚀 Mulai Sekarang — Rp 99.000
           </a>
           <p style={{ fontSize: 13, color: 'var(--gold-light)', marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><i data-lucide="check-circle" style={{ width: 14, height: 14 }} /> Akses langsung setelah bayar</span>
