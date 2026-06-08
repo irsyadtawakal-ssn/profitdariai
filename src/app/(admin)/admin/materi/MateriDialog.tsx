@@ -194,6 +194,7 @@ export function MateriDialog({ open, onClose, materi }: MateriDialogProps) {
               <option value="Konten">Konten</option>
               <option value="Otomasi">Otomasi</option>
               <option value="Prompt">Prompt</option>
+              <option value="Ebook">Ebook</option>
               <option value="Lainnya">Lainnya</option>
             </select>
           </div>

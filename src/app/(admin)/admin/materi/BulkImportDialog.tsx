@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { bulkImportMateri, ImportRow, ImportResult } from './actions'
 
-const VALID_CATEGORIES = ['Bisnis', 'Freelancing', 'Konten', 'Otomasi', 'Prompt', 'Lainnya'] as const
+const VALID_CATEGORIES = ['Bisnis', 'Freelancing', 'Konten', 'Otomasi', 'Prompt', 'Ebook', 'Lainnya'] as const
 
 const CSV_TEMPLATE = `title,slug,category,description,file_path,cover_url,page_count,is_featured,is_published
 Panduan Prompt AI,panduan-prompt-ai,Prompt,Deskripsi singkat materi,https://drive.google.com/file/d/FILE_ID/view,,50,false,false
@@ -25,24 +25,38 @@ function parseGdriveUrl(input: string): string | null {
   return null
 }
 
-function parseCsvLine(line: string): string[] {
-  const result: string[] = []
-  let current = ''
+// Parse entire CSV text into rows of cells — handles multi-line quoted fields
+function parseCsvRows(text: string): string[][] {
+  const rows: string[][] = []
+  let currentRow: string[] = []
+  let currentCell = ''
   let inQuotes = false
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i]
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
     if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++ }
+      if (inQuotes && text[i + 1] === '"') { currentCell += '"'; i++ }
       else inQuotes = !inQuotes
     } else if (ch === ',' && !inQuotes) {
-      result.push(current.trim())
-      current = ''
+      currentRow.push(currentCell.trim())
+      currentCell = ''
+    } else if (ch === '\r' && text[i + 1] === '\n' && !inQuotes) {
+      i++ // skip \n
+      currentRow.push(currentCell.trim())
+      if (currentRow.some(c => c)) rows.push(currentRow)
+      currentRow = []; currentCell = ''
+    } else if (ch === '\n' && !inQuotes) {
+      currentRow.push(currentCell.trim())
+      if (currentRow.some(c => c)) rows.push(currentRow)
+      currentRow = []; currentCell = ''
     } else {
-      current += ch
+      currentCell += ch
     }
   }
-  result.push(current.trim())
-  return result
+  // last cell/row
+  currentRow.push(currentCell.trim())
+  if (currentRow.some(c => c)) rows.push(currentRow)
+  return rows
 }
 
 function validateRow(
@@ -93,18 +107,17 @@ export function parseCsv(text: string): {
   rows: ({ valid: true; data: ImportRow } | { valid: false; error: string })[]
   globalError: string | null
 } {
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0)
-  if (lines.length < 2) return { rows: [], globalError: 'File CSV kosong atau hanya berisi header' }
+  const allRows = parseCsvRows(text)
+  if (allRows.length < 2) return { rows: [], globalError: 'File CSV kosong atau hanya berisi header' }
 
-  const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase().trim())
-  const dataLines = lines.slice(1)
+  const headers = allRows[0].map(h => h.toLowerCase().trim())
+  const dataRows = allRows.slice(1)
 
-  if (dataLines.length > 100) {
+  if (dataRows.length > 100) {
     return { rows: [], globalError: 'Maksimal 100 baris per import' }
   }
 
-  const rows = dataLines.map((line, i) => {
-    const cells = parseCsvLine(line)
+  const rows = dataRows.map((cells, i) => {
     if (cells.every(c => !c)) return null
     return validateRow(cells, headers, i + 2)
   }).filter(Boolean) as ({ valid: true; data: ImportRow } | { valid: false; error: string })[]
