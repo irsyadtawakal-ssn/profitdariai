@@ -321,8 +321,13 @@ export function CheckoutForm({
                     type="checkbox"
                     checked={bonusIds.includes(b.id)}
                     onChange={() => toggleBump(b.id)}
-                    className="accent-[#D4AF37] w-5 h-5 mt-0.5"
+                    className="accent-[#D4AF37] w-5 h-5 mt-0.5 shrink-0"
                   />
+                  {b.coverUrl && (
+                    <div className="relative w-12 h-16 shrink-0 rounded-sm overflow-hidden border border-[#D4AF37]/20">
+                      <Image src={b.coverUrl} alt={b.title} fill className="object-cover" sizes="48px" />
+                    </div>
+                  )}
                   <span className="text-[#F5F5F0] text-sm">
                     Ya, Ambil <span className="font-semibold">{b.title}</span> cuma{' '}
                     <span className="text-[#D4AF37] font-bold">Rp {b.bumpPrice.toLocaleString('id-ID')}</span>

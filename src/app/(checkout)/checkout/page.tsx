@@ -9,6 +9,7 @@ export type BumpProduct = {
   title: string
   bumpPrice: number
   originalPrice: number | null
+  coverUrl: string | null
 }
 
 export default async function CheckoutPage() {
@@ -31,7 +32,7 @@ export default async function CheckoutPage() {
   const adminClient = createAdminClient() as any
   const { data: bumps } = await adminClient
     .from('ebooks')
-    .select('id, title, bump_price')
+    .select('id, title, bump_price, cover_url')
     .eq('is_published', true)
     .eq('is_bump_product', true)
     .not('bump_price', 'is', null)
@@ -62,6 +63,7 @@ export default async function CheckoutPage() {
       title: b.title,
       bumpPrice: b.bump_price,
       originalPrice: priceByEbook.get(b.id) ?? null,
+      coverUrl: (b.cover_url as string | null) ?? null,
     }))
   }
 
