@@ -6,22 +6,34 @@ import { generateMerchantRef } from '@/lib/utils'
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { paymentMethod, email, fullName, productId } = body
+  const { paymentMethod, productId } = body
 
-  if (!paymentMethod || !email || !fullName || !productId) {
+  if (!paymentMethod || !productId) {
     return NextResponse.json(
-      { error: 'paymentMethod, email, fullName, dan productId wajib diisi' },
+      { error: 'paymentMethod dan productId wajib diisi' },
       { status: 400 }
     )
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
-    return NextResponse.json({ error: 'Format email tidak valid' }, { status: 400 })
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Kamu harus login untuk membeli produk ini' }, { status: 401 })
   }
 
-  if (typeof fullName !== 'string' || fullName.trim().length < 2 || fullName.length > 100) {
-    return NextResponse.json({ error: 'Nama tidak valid' }, { status: 400 })
+  // Ambil email & nama dari profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('email, full_name')
+    .eq('id', user.id)
+    .single()
+
+  const email = profile?.email ?? user.email ?? ''
+  const fullName = profile?.full_name ?? ''
+
+  if (!email) {
+    return NextResponse.json({ error: 'Email tidak ditemukan di profil kamu' }, { status: 400 })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,26 +55,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Produk belum tersedia untuk pembelian' }, { status: 400 })
   }
 
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
   // Check if already owned
-  if (user) {
-    const { data: existing } = await supabase
-      .from('user_ebooks')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('ebook_id', product.ebook_id)
-      .single()
+  const { data: existing } = await supabase
+    .from('user_ebooks')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('ebook_id', product.ebook_id)
+    .single()
 
-    if (existing) {
-      return NextResponse.json({ error: 'Kamu sudah memiliki produk ini' }, { status: 409 })
-    }
+  if (existing) {
+    return NextResponse.json({ error: 'Kamu sudah memiliki produk ini' }, { status: 409 })
   }
 
-  const merchantRef = user
-    ? generateMerchantRef(user.id)
-    : `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const merchantRef = generateMerchantRef(user.id)
 
   const baseAmount = product.price
 

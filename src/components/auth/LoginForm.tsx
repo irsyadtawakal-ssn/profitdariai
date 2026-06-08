@@ -173,8 +173,8 @@ export function LoginForm() {
       <footer className="text-center pt-2">
         <p className="font-sans text-xs text-[#888888]">
           Belum punya akun?{' '}
-          <Link href="/signup" className="text-gold font-bold hover:underline transition-all">
-            Daftar sekarang
+          <Link href="/checkout" className="text-gold font-bold hover:underline transition-all">
+            Beli sekarang
           </Link>
         </p>
       </footer>

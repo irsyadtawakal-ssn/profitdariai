@@ -20,6 +20,8 @@ interface MarketplaceProduct {
 
 interface MarketplaceClientProps {
   products: MarketplaceProduct[]
+  userEmail: string
+  userFullName: string
 }
 
 const CATEGORIES = ['ALL', 'MATERI', 'TOOLS', 'LAINNYA']
@@ -35,13 +37,15 @@ function formatPrice(price: number) {
 // ── Checkout Modal ──────────────────────────────────────────────────────────
 function CheckoutModal({
   product,
+  userEmail,
+  userFullName,
   onClose,
 }: {
   product: MarketplaceProduct
+  userEmail: string
+  userFullName: string
   onClose: () => void
 }) {
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('QRIS')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,10 +60,6 @@ function CheckoutModal({
 
   async function handleBuy() {
     setError(null)
-    if (!fullName.trim() || !email.trim()) {
-      setError('Nama dan email wajib diisi.')
-      return
-    }
     setLoading(true)
     try {
       const res = await fetch('/api/payment/marketplace', {
@@ -68,8 +68,6 @@ function CheckoutModal({
         body: JSON.stringify({
           productId: product.id,
           paymentMethod,
-          email: email.trim(),
-          fullName: fullName.trim(),
         }),
       })
       const data = await res.json()
@@ -102,26 +100,13 @@ function CheckoutModal({
 
         {/* Body */}
         <div className="p-6 space-y-4">
-          <div>
-            <label className="block font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider mb-2">Nama Lengkap</label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Nama kamu"
-              className="w-full bg-[#111] border border-[#333] focus:border-[#D4AF37] px-4 py-3 text-sm text-[#F5F5F0] placeholder-[#555] outline-none transition-all rounded-none"
-            />
+          {/* User info (read-only) */}
+          <div className="bg-[#111] border border-[#222] px-4 py-3 space-y-1">
+            <p className="font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider mb-2">Pembeli</p>
+            <p className="text-sm text-[#F5F5F0] font-medium">{userFullName}</p>
+            <p className="text-xs text-[#888]">{userEmail}</p>
           </div>
-          <div>
-            <label className="block font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@kamu.com"
-              className="w-full bg-[#111] border border-[#333] focus:border-[#D4AF37] px-4 py-3 text-sm text-[#F5F5F0] placeholder-[#555] outline-none transition-all rounded-none"
-            />
-          </div>
+
           <div>
             <label className="block font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider mb-2">Metode Pembayaran</label>
             <select
@@ -162,7 +147,7 @@ function CheckoutModal({
   )
 }
 
-export function MarketplaceClient({ products }: MarketplaceClientProps) {
+export function MarketplaceClient({ products, userEmail, userFullName }: MarketplaceClientProps) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('ALL')
   const [checkoutProduct, setCheckoutProduct] = useState<MarketplaceProduct | null>(null)
@@ -178,7 +163,12 @@ export function MarketplaceClient({ products }: MarketplaceClientProps) {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8 pt-8 pb-16">
       {checkoutProduct && (
-        <CheckoutModal product={checkoutProduct} onClose={() => setCheckoutProduct(null)} />
+        <CheckoutModal
+          product={checkoutProduct}
+          userEmail={userEmail}
+          userFullName={userFullName}
+          onClose={() => setCheckoutProduct(null)}
+        />
       )}
       {/* Title */}
       <div>
