@@ -318,8 +318,8 @@ export function CheckoutForm({
       {step === 2 && hasBumps && (
         <div>
           <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-none p-5 mb-4">
-            <h2 className="text-[#F5F5F0] font-bold text-lg mb-1">Tunggu! Ada Penawaran Spesial Buat Kamu</h2>
-            <p className="text-[#888888] text-sm mb-4">Sekali ini aja, harga khusus buat kamu yang baru gabung.</p>
+            <h2 className="text-[#F5F5F0] font-bold text-lg mb-1">Beli Sekali, Untung Berkali-Kali Produk Digital Siap Dijual</h2>
+            <p className="text-[#888888] text-sm mb-4">Dapatkan template + panduan siap pakai dengan harga spesial.</p>
             <div className="flex flex-col gap-2">
               {bumpProducts.map((b) => (
                 <label key={b.id} className="flex items-start gap-3 p-3 rounded-none border border-[#D4AF37]/30 bg-[#D4AF37]/5 cursor-pointer">
