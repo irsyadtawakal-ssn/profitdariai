@@ -107,6 +107,11 @@ export async function POST(request: Request) {
 
   const signature = createSignature(merchantRef, totalAmount)
 
+  // Sisipkan merchant_ref ke return_url → halaman sukses fire pixel Purchase
+  // dengan eventID sama (dedup vs CAPI server-side).
+  const baseReturn = process.env.TRIPAY_RETURN_URL!
+  const returnUrl = `${baseReturn}${baseReturn.includes('?') ? '&' : '?'}ref=${encodeURIComponent(merchantRef)}`
+
   const result = await createTransaction({
     method: paymentMethod,
     merchant_ref: merchantRef,
@@ -114,7 +119,7 @@ export async function POST(request: Request) {
     customer_name: fullName,
     customer_email: email,
     order_items: items,
-    return_url: process.env.TRIPAY_RETURN_URL!,
+    return_url: returnUrl,
     expired_time: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
     signature,
   })

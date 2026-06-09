@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Sora, Hanken_Grotesk, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
+import MetaPixel from '@/components/MetaPixel'
+import { getSetting } from '@/lib/settings'
 import './globals.css'
 
 const sora = Sora({
@@ -52,10 +54,12 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const pixelId = await getSetting('meta_pixel_id', process.env.NEXT_PUBLIC_FB_PIXEL_ID)
   return (
     <html lang="id" className={`${sora.variable} ${hankenGrotesk.variable} ${jetbrainsMono.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
+        <MetaPixel pixelId={pixelId} />
         {children}
         <Toaster
           position="bottom-right"

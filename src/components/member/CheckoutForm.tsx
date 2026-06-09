@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MEMBERSHIP_EARLY_BIRD_PRICE, VIP_UPSELL_PRICE } from '@/types'
+import { fbpixelTrack } from '@/components/MetaPixel'
 import type { BumpProduct } from '@/app/(checkout)/checkout/page'
 
 const fmt = (n: number) =>
@@ -233,6 +234,11 @@ export function CheckoutForm({
   async function onSubmit(formData: { email: string; fullName: string }) {
     setLoading(true)
     setError(null)
+    fbpixelTrack('InitiateCheckout', {
+      value: subtotal,
+      currency: 'IDR',
+      num_items: 1 + (vipSelected ? 1 : 0) + selectedBumps.length,
+    })
     try {
       const res = await fetch('/api/payment/create', {
         method: 'POST',

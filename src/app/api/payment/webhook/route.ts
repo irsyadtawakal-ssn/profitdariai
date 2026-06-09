@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyWebhookSignature, type TripayWebhookPayload } from '@/lib/tripay/webhook'
 import { sendPaymentSuccessEmail, sendMarketplacePurchaseEmail } from '@/lib/email/sender'
 import { transporter, MAIL_FROM } from '@/lib/email/mailer'
+import { sendPurchaseEvent } from '@/lib/meta/capi'
 
 export async function POST(request: Request) {
   const signature = request.headers.get('X-Callback-Signature') ?? ''
@@ -177,6 +178,16 @@ export async function POST(request: Request) {
         console.log(`[webhook] Set is_vip=true for user ${userId}`)
       }
     }
+
+    // Meta CAPI Purchase (server-side, autoritatif). event_id = merchant_ref → dedup
+    // dengan event pixel browser di halaman sukses. No-op kalau pixel/token belum diisi.
+    await sendPurchaseEvent({
+      eventId: merchant_ref,
+      email,
+      value: existing.amount,
+      currency: 'IDR',
+      eventSourceUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://profitdariai.com'}/dashboard`,
+    })
   }
 
   return NextResponse.json({ success: true })

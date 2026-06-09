@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { X, Loader2 } from 'lucide-react'
+import { fbpixelTrack } from '@/components/MetaPixel'
 
 export interface CheckoutProduct {
   id: string
@@ -43,6 +44,12 @@ export function CheckoutModal({
   async function handleBuy() {
     setError(null)
     setLoading(true)
+    fbpixelTrack('InitiateCheckout', {
+      value: product.price,
+      currency: 'IDR',
+      content_name: product.title,
+      num_items: 1,
+    })
     try {
       const res = await fetch('/api/payment/marketplace', {
         method: 'POST',

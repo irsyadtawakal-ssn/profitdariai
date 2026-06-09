@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { getCachedEbooks, getCachedCourseCounts } from '@/lib/cache/content'
 import { InteractiveMemberDashboard } from '@/components/member/InteractiveMemberDashboard'
+import { PurchaseTracker } from '@/components/member/PurchaseTracker'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
@@ -32,6 +33,8 @@ export default async function DashboardPage() {
   }
 
   return (
+    <>
+    <PurchaseTracker />
     <InteractiveMemberDashboard
       user={{
         full_name: profile.full_name,
@@ -44,5 +47,6 @@ export default async function DashboardPage() {
       newestMateris={newestMateris}
       ownedEbookIds={ownedEbookIds}
     />
+    </>
   )
 }

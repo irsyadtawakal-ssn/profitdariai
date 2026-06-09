@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, BookOpen, ShoppingBag, Users, LogOut, HelpCircle } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ShoppingBag, Users, LogOut, HelpCircle, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { label: 'Materi', href: '/admin/materi', icon: BookOpen },
   { label: 'Marketplace', href: '/admin/marketplace', icon: ShoppingBag },
   { label: 'Members', href: '/admin/members', icon: Users },
+  { label: 'Pengaturan', href: '/admin/pengaturan', icon: Settings },
 ]
 
 export function AdminSidebar() {
