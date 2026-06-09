@@ -88,7 +88,7 @@ export default function LandingPage() {
             </h1>
             <p className="sub-center">Buat sekali, jual berkali-kali, cuan mengalir. Panduan langkah-demi-langkah dari nol hingga punya penghasilan pasif nyata dengan bantuan AI — tanpa skill teknis, tanpa modal besar.</p>
             <div className="hero-btns-center">
-              <a href="/checkout" className="btn-primary">
+              <a href="#pricing" className="btn-primary">
                 <i data-lucide="sparkles" style={{ width: 18, height: 18 }} /> Ya, Saya Mau Mulai Sekarang!
               </a>
             </div>
