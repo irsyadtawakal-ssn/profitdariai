@@ -6,13 +6,15 @@ CREATE TABLE pixel_events (
   event_type VARCHAR(50) NOT NULL,
   user_email VARCHAR(255),
   user_id UUID,
-  session_id VARCHAR(255),
+  session_id VARCHAR(100) NOT NULL,
   event_data JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  page_url VARCHAR(500)
+  page_url TEXT
 );
 
 COMMENT ON TABLE pixel_events IS 'Tracks customer journey events for Meta Pixel and conversion funnel analysis. Records form submissions, pending payments, and checkout completions.';
+
+ALTER TABLE pixel_events ENABLE ROW LEVEL SECURITY;
 
 -- Create indexes for efficient querying
 CREATE INDEX idx_pixel_events_type ON pixel_events(event_type);
