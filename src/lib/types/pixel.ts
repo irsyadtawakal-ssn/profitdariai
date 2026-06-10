@@ -1,9 +1,9 @@
 export type PixelEventType = 'form_submit' | 'pending_payment' | 'checkout_complete';
 
 export interface PixelEventData {
-  email?: string;
-  userId?: string;
-  sessionId?: string;
+  user_email?: string;
+  user_id?: string;
+  session_id?: string;
   amount?: number;
   product_count?: number;
   [key: string]: any;  // Allow additional fields
