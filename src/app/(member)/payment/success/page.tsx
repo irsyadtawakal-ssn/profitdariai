@@ -1,19 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { BookOpen } from 'lucide-react'
+import { trackCheckoutComplete } from '@/lib/pixel/pixel-events'
 
 export default function PaymentSuccessPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [ebookCount, setEbookCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchOwned() {
+    async function fetchOwnedAndTrack() {
       try {
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
@@ -25,14 +27,37 @@ export default function PaymentSuccessPage() {
           .eq('user_id', user.id)
 
         setEbookCount(count ?? 0)
+
+        // Track checkout_complete event
+        const merchantRef = searchParams.get('ref')
+        if (merchantRef) {
+          try {
+            // Fetch transaction from database to get transaction_id and amount
+            const { data: transaction } = await supabase
+              .from('transactions')
+              .select('tripay_reference, amount')
+              .eq('merchant_ref', merchantRef)
+              .single()
+
+            if (transaction) {
+              await trackCheckoutComplete({
+                transaction_id: transaction.tripay_reference,
+                amount: transaction.amount,
+              })
+            }
+          } catch (trackError) {
+            console.error('Failed to track checkout_complete event:', trackError)
+            // Don't fail the page if tracking fails
+          }
+        }
       } catch {
         setError('Gagal memuat data. Silakan refresh halaman.')
       } finally {
         setLoading(false)
       }
     }
-    fetchOwned()
-  }, [router])
+    fetchOwnedAndTrack()
+  }, [router, searchParams])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
