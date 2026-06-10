@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MEMBERSHIP_EARLY_BIRD_PRICE, VIP_UPSELL_PRICE } from '@/types'
 import { fbpixelTrack } from '@/components/MetaPixel'
+import { trackFormSubmit } from '@/lib/pixel/pixel-events'
 import type { BumpProduct } from '@/app/(checkout)/checkout/page'
 
 const fmt = (n: number) =>
@@ -239,6 +240,13 @@ export function CheckoutForm({
       currency: 'IDR',
       num_items: 1 + (vipSelected ? 1 : 0) + selectedBumps.length,
     })
+
+    // Track form submission event
+    await trackFormSubmit({
+      email: formData.email,
+      product_count: 1 + (vipSelected ? 1 : 0) + selectedBumps.length,
+    })
+
     try {
       const res = await fetch('/api/payment/create', {
         method: 'POST',
