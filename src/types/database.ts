@@ -295,6 +295,37 @@ export type Database = {
         }
         Relationships: []
       }
+      pixel_events: {
+        Row: {
+          id: string
+          event_type: string
+          user_email: string | null
+          user_id: string | null
+          session_id: string | null
+          event_data: Json | null
+          created_at: string
+          page_url: string | null
+        }
+        Insert: {
+          id?: string
+          event_type: string
+          user_email?: string | null
+          user_id?: string | null
+          session_id?: string | null
+          event_data?: Json | null
+          created_at?: string
+          page_url?: string | null
+        }
+        Update: {
+          event_type?: string
+          user_email?: string | null
+          user_id?: string | null
+          session_id?: string | null
+          event_data?: Json | null
+          page_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

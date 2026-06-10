@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PengaturanForm } from './PengaturanForm';
 import { MonitoringDashboard } from './monitoring-dashboard';
-import { getSettings } from '@/lib/settings';
+import { getSettings } from './actions';
 
 export default function PengaturanPage() {
   const [activeTab, setActiveTab] = useState<'general' | 'monitoring'>('general');

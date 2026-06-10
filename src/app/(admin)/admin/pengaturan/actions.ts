@@ -1,7 +1,12 @@
 'use server'
 
 import { requireAdmin } from '@/lib/auth/requireAdmin'
-import { setSettings } from '@/lib/settings'
+import { setSettings, getSettings as getSettingsDb } from '@/lib/settings'
+
+export async function getSettings() {
+  await requireAdmin()
+  return await getSettingsDb()
+}
 
 export async function savePixelSettings(formData: FormData) {
   await requireAdmin()
