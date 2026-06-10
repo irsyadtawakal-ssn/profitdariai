@@ -1,13 +1,17 @@
 import { TrackEventPayload, PixelEventType, PixelEventData } from '@/lib/types/pixel';
 
+// Constants
+const SESSION_ID_KEY = 'pixel_session_id';
+const TRACK_API_PATH = '/api/events/track';
+
 // Get atau create session ID
 const getSessionId = (): string => {
   if (typeof window === 'undefined') return '';
 
-  let sessionId = sessionStorage.getItem('pixel_session_id');
+  let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
   if (!sessionId) {
     sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    sessionStorage.setItem('pixel_session_id', sessionId);
+    sessionStorage.setItem(SESSION_ID_KEY, sessionId);
   }
   return sessionId;
 };
@@ -27,11 +31,15 @@ export const trackPixelEvent = async (
     };
 
     // Send ke API
-    await fetch('/api/events/track', {
+    const response = await fetch(TRACK_API_PATH, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+
+    if (!response.ok) {
+      throw new Error(`Track event failed: ${response.status}`);
+    }
   } catch (error) {
     console.error('Failed to track pixel event:', error);
   }
