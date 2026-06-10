@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { EventAnalytics } from '@/lib/types/pixel';
 import { ConversionFunnel } from './conversion-funnel';
+import { BarChart3, RefreshCw, AlertCircle } from 'lucide-react';
 
 export function MonitoringDashboard() {
   const [analytics, setAnalytics] = useState<EventAnalytics | null>(null);
@@ -32,90 +33,150 @@ export function MonitoringDashboard() {
   };
 
   return (
-    <div className="monitoring-dashboard p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Event Monitoring</h2>
+    <div className="monitoring-dashboard space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <BarChart3 className="w-6 h-6 text-gold" />
+          <div>
+            <h2 className="font-display font-extrabold text-gold text-2xl uppercase tracking-tight">
+              Event Monitoring
+            </h2>
+            <p className="font-mono text-[#888888] text-xs mt-1">Track your customer journey conversion</p>
+          </div>
+        </div>
 
+        {/* Time Period Buttons */}
         <div className="flex gap-2">
           {[7, 30, 90].map(d => (
             <button
               key={d}
               onClick={() => setDays(d)}
-              className={`px-4 py-2 rounded ${
+              className={`px-4 py-2 font-mono text-xs font-semibold transition-all cyber-corner ${
                 days === d
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  ? 'bg-gold text-obsidian border border-gold'
+                  : 'border border-[#2A2A2A] text-ivory hover:border-gold/50 active:scale-95'
               }`}
             >
-              Last {d} days
+              {d}D
             </button>
           ))}
           <button
             onClick={fetchAnalytics}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-4 py-2 border border-gold/40 text-gold hover:bg-gold/10 font-mono text-xs font-semibold transition-all cyber-corner flex items-center gap-2 active:scale-95"
           >
-            Refresh
+            <RefreshCw className="w-3 h-3" />
+            REFRESH
           </button>
         </div>
       </div>
 
+      {/* Error State */}
       {error && (
-        <div className="p-4 bg-red-100 text-red-700 rounded mb-4">
-          {error}
+        <div className="glass-panel p-4 cyber-corner border-red-500/30 bg-red-500/5 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-mono text-xs text-red-300 font-semibold">ERROR</p>
+            <p className="font-mono text-xs text-red-200 mt-1">{error}</p>
+          </div>
         </div>
       )}
 
+      {/* Loading State */}
       {loading ? (
-        <div className="text-center py-8">Loading analytics...</div>
+        <div className="glass-panel p-16 cyber-corner flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 rounded-full border-2 border-gold/30 border-t-gold animate-spin" />
+          <p className="font-mono text-sm text-[#888888]">Loading analytics...</p>
+        </div>
       ) : analytics ? (
         <div className="space-y-6">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 bg-white border rounded-lg shadow">
-              <p className="text-sm text-gray-600">Total Form Submits</p>
-              <p className="text-3xl font-bold text-blue-600">
-                {analytics.total_form_submit}
-              </p>
+          {/* Key Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Form Submits */}
+            <div className="glass-panel p-6 cyber-corner relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="font-mono text-[9px] text-[#888888] tracking-widest uppercase font-bold mb-2">
+                    Form Submits
+                  </p>
+                  <p className="font-display text-gold text-4xl font-extrabold leading-none">
+                    {analytics.total_form_submit}
+                  </p>
+                </div>
+                <span className="text-2xl">📝</span>
+              </div>
+              <div className="h-1 w-16 bg-gradient-to-r from-gold to-[#E8C84A]" />
+              <div className="absolute -bottom-3 -right-3 opacity-5 group-hover:opacity-10 transition-opacity">
+                <BarChart3 className="w-20 h-20 text-gold" />
+              </div>
             </div>
-            <div className="p-4 bg-white border rounded-lg shadow">
-              <p className="text-sm text-gray-600">Pending Payments</p>
-              <p className="text-3xl font-bold text-yellow-600">
-                {analytics.total_pending_payment}
-              </p>
+
+            {/* Pending Payments */}
+            <div className="glass-panel p-6 cyber-corner relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="font-mono text-[9px] text-[#888888] tracking-widest uppercase font-bold mb-2">
+                    Pending Payments
+                  </p>
+                  <p className="font-display text-gold text-4xl font-extrabold leading-none">
+                    {analytics.total_pending_payment}
+                  </p>
+                </div>
+                <span className="text-2xl">⏳</span>
+              </div>
+              <div className="h-1 w-16 bg-gradient-to-r from-gold to-[#E8C84A]" />
+              <div className="absolute -bottom-3 -right-3 opacity-5 group-hover:opacity-10 transition-opacity">
+                <BarChart3 className="w-20 h-20 text-gold" />
+              </div>
             </div>
-            <div className="p-4 bg-white border rounded-lg shadow">
-              <p className="text-sm text-gray-600">Completed Checkouts</p>
-              <p className="text-3xl font-bold text-green-600">
-                {analytics.total_checkout_complete}
-              </p>
+
+            {/* Completed Checkouts */}
+            <div className="glass-panel p-6 cyber-corner relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="font-mono text-[9px] text-[#888888] tracking-widest uppercase font-bold mb-2">
+                    Completed Checkouts
+                  </p>
+                  <p className="font-display text-gold text-4xl font-extrabold leading-none">
+                    {analytics.total_checkout_complete}
+                  </p>
+                </div>
+                <span className="text-2xl">✓</span>
+              </div>
+              <div className="h-1 w-16 bg-gradient-to-r from-gold to-[#E8C84A]" />
+              <div className="absolute -bottom-3 -right-3 opacity-5 group-hover:opacity-10 transition-opacity">
+                <BarChart3 className="w-20 h-20 text-gold" />
+              </div>
             </div>
           </div>
 
           {/* Funnel Visualization */}
-          <div className="p-6 bg-white border rounded-lg shadow">
+          <div className="glass-panel p-7 cyber-corner">
             <ConversionFunnel analytics={analytics} />
           </div>
 
-          {/* Events Timeline */}
-          <div className="p-6 bg-white border rounded-lg shadow">
-            <h3 className="text-lg font-bold mb-4">Daily Breakdown</h3>
+          {/* Daily Breakdown Table */}
+          <div className="glass-panel p-7 cyber-corner">
+            <h3 className="font-mono text-[10px] text-[#888888] tracking-widest uppercase font-bold mb-6">
+              Daily Breakdown
+            </h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b">
-                  <tr>
-                    <th className="text-left p-2">Date</th>
-                    <th className="text-right p-2">Form Submit</th>
-                    <th className="text-right p-2">Pending Payment</th>
-                    <th className="text-right p-2">Checkout Complete</th>
+              <table className="w-full text-xs font-mono">
+                <thead>
+                  <tr className="border-b border-[#2A2A2A]">
+                    <th className="text-left p-3 text-[#888888] font-bold uppercase tracking-wider">Date</th>
+                    <th className="text-right p-3 text-[#888888] font-bold uppercase tracking-wider">Form Submit</th>
+                    <th className="text-right p-3 text-[#888888] font-bold uppercase tracking-wider">Pending</th>
+                    <th className="text-right p-3 text-[#888888] font-bold uppercase tracking-wider">Completed</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analytics.events_by_date.map((day, idx) => (
-                    <tr key={idx} className="border-b hover:bg-gray-50">
-                      <td className="p-2">{day.date}</td>
-                      <td className="text-right p-2">{day.form_submit}</td>
-                      <td className="text-right p-2">{day.pending_payment}</td>
-                      <td className="text-right p-2">{day.checkout_complete}</td>
+                    <tr key={idx} className="border-b border-[#1A1A1A] hover:bg-[#111111]/50 transition-colors">
+                      <td className="p-3 text-ivory font-semibold">{day.date}</td>
+                      <td className="text-right p-3 text-gold font-bold">{day.form_submit}</td>
+                      <td className="text-right p-3 text-[#E8C84A] font-bold">{day.pending_payment}</td>
+                      <td className="text-right p-3 text-ivory font-bold">{day.checkout_complete}</td>
                     </tr>
                   ))}
                 </tbody>
