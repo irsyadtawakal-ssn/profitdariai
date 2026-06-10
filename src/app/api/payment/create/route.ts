@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createSignature, createTransaction, getFeeCalculator, calculateTotal } from '@/lib/tripay/client'
 import { generateMerchantRef } from '@/lib/utils'
 import { MEMBERSHIP_EARLY_BIRD_PRICE, VIP_UPSELL_PRICE } from '@/types'
+import { trackPendingPayment } from '@/lib/pixel/pixel-events'
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -145,6 +146,21 @@ export async function POST(request: Request) {
       vip: wantVip,
     },
   })
+
+  // Track pending_payment event when payment is initiated
+  try {
+    await trackPendingPayment({
+      transaction_id: result.data.reference,
+      merchant_ref: merchantRef,
+      amount: totalAmount,
+      method: paymentMethod,
+      user_email: email,
+      user_id: user?.id,
+    })
+  } catch (error) {
+    console.error('[payment/create] Failed to track pending_payment event:', error)
+    // Don't fail the payment creation if tracking fails
+  }
 
   return NextResponse.json({
     checkout_url: result.data.checkout_url,
