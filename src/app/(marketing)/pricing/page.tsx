@@ -38,12 +38,14 @@ export default function PricingPage() {
           ))}
         </ul>
 
-        <Link
-          href="/checkout"
+        <a
+          href="https://lynk.id/spbaicreator/mmy8445nreq8"
+          target="_blank"
+          rel="noopener noreferrer"
           className="block w-full text-center bg-[#D4AF37] text-[#0A0A0A] font-bold py-3 rounded-xl hover:bg-[#D4AF37]/90 transition-colors"
         >
           Mulai Sekarang →
-        </Link>
+        </a>
 
         <p className="text-center text-[#555555] text-xs mt-4">
           SSL Aman · Diproses via Tripay

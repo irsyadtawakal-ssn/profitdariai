@@ -332,7 +332,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <a href="/checkout" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 18, padding: '20px' }}>
+              <a href="https://lynk.id/spbaicreator/mmy8445nreq8" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 18, padding: '20px' }}>
                 🚀 Dapatkan Akses Sekarang — Rp 99.000
               </a>
               <div className="guarantee">
@@ -378,7 +378,7 @@ export default function LandingPage() {
           </div>
           <h2>Siap Ubah Ilmu AI<br />Jadi <span style={{ color: 'var(--gold-light)' }}>Cuan Nyata?</span></h2>
           <p>Satu keputusan hari ini bisa mengubah segalanya. Bergabunglah dengan creator yang sudah membuktikan bahwa AI bisa menghasilkan pendapatan nyata — bukan sekadar wacana.</p>
-          <a href="/checkout" className="btn-primary" style={{ fontSize: 18, padding: '20px 44px' }}>
+          <a href="https://lynk.id/spbaicreator/mmy8445nreq8" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: 18, padding: '20px 44px' }}>
             🚀 Mulai Sekarang — Rp 99.000
           </a>
           <p style={{ fontSize: 13, color: 'var(--gold-light)', marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -398,7 +398,7 @@ export default function LandingPage() {
           <div>© 2026 Profit dari AI — Hak cipta dilindungi undang-undang.</div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href="/login" style={{ color: 'inherit' }}>Masuk</a>
-            <a href="/checkout" style={{ color: 'inherit' }}>Daftar</a>
+            <a href="https://lynk.id/spbaicreator/mmy8445nreq8" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Daftar</a>
             <a href="/ketentuan-layanan" style={{ color: 'inherit' }}>Ketentuan Layanan</a>
             <a href="/kebijakan-privasi" style={{ color: 'inherit' }}>Kebijakan Privasi</a>
             <a href="/kebijakan-refund" style={{ color: 'inherit' }}>Kebijakan Refund</a>

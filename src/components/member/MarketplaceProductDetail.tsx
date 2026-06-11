@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { ShoppingBag, CheckCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { CheckoutModal } from './CheckoutModal'
 
 interface ProductDetail {
   id: string
@@ -37,18 +35,8 @@ export function MarketplaceProductDetail({
   userEmail: string
   userFullName: string
 }) {
-  const [showCheckout, setShowCheckout] = useState(false)
-
   return (
     <div className="p-6 max-w-2xl mx-auto pt-8 pb-16 space-y-8">
-      {showCheckout && (
-        <CheckoutModal
-          product={product}
-          userEmail={userEmail}
-          userFullName={userFullName}
-          onClose={() => setShowCheckout(false)}
-        />
-      )}
 
       {/* Back */}
       <Link
@@ -126,12 +114,14 @@ export function MarketplaceProductDetail({
             Buka di Library
           </Link>
         ) : product.ebook_id ? (
-          <button
-            onClick={() => setShowCheckout(true)}
+          <a
+            href="https://lynk.id/spbaicreator/mmy8445nreq8"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full bg-[#D4AF37] text-[#0A0A0A] py-4 text-[11px] font-mono font-bold tracking-wider uppercase hover:bg-[#D4AF37]/90 transition-all duration-300 flex items-center justify-center gap-2 rounded-none shadow-[0_0_20px_rgba(212,175,55,0.2)]"
           >
             Beli Sekarang — {formatPrice(product.price)}
-          </button>
+          </a>
         ) : (
           <span className="w-full text-center text-[#555] py-4 text-[11px] font-mono uppercase tracking-wider border border-[#333] rounded-none block">
             Segera Hadir

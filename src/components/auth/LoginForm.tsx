@@ -173,9 +173,9 @@ export function LoginForm() {
       <footer className="text-center pt-2">
         <p className="font-sans text-xs text-[#888888]">
           Belum punya akun?{' '}
-          <Link href="/checkout" className="text-gold font-bold hover:underline transition-all">
+          <a href="https://lynk.id/spbaicreator/mmy8445nreq8" target="_blank" rel="noopener noreferrer" className="text-gold font-bold hover:underline transition-all">
             Beli sekarang
-          </Link>
+          </a>
         </p>
       </footer>
     </form>
