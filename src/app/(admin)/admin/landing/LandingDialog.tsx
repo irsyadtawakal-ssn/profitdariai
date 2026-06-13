@@ -65,6 +65,13 @@ export function LandingDialog({ open, onClose, landing }: LandingDialogProps) {
     })
   }
 
+  function handlePreview() {
+    if (!html.trim()) return
+    const encoded = btoa(html)
+    const encodedSafe = encodeURIComponent(encoded)
+    window.open(`/admin/landing/preview?html=${encodedSafe}`, '_blank')
+  }
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent className="max-w-2xl">
@@ -100,6 +107,15 @@ export function LandingDialog({ open, onClose, landing }: LandingDialogProps) {
           {error && <p className="text-sm text-red-500">{error}</p>}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={onClose}>Batal</Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handlePreview}
+              disabled={!html.trim() || isPending}
+            >
+              Preview
+            </Button>
             <Button type="submit" variant="primary" disabled={isPending}>
               {isPending ? 'Menyimpan...' : 'Simpan'}
             </Button>
