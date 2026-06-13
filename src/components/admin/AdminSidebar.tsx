@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, BookOpen, ShoppingBag, Users, LogOut, HelpCircle, Settings } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ShoppingBag, Users, LogOut, HelpCircle, Settings, FileText } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { label: 'Materi', href: '/admin/materi', icon: BookOpen },
   { label: 'Marketplace', href: '/admin/marketplace', icon: ShoppingBag },
+  { label: 'Landing Pages', href: '/admin/landing', icon: FileText },
   { label: 'Members', href: '/admin/members', icon: Users },
   { label: 'Pengaturan', href: '/admin/pengaturan', icon: Settings },
 ]
