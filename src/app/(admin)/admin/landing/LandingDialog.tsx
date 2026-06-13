@@ -67,7 +67,7 @@ export function LandingDialog({ open, onClose, landing }: LandingDialogProps) {
 
   function handlePreview() {
     if (!html.trim()) return
-    const encoded = btoa(html)
+    const encoded = btoa(unescape(encodeURIComponent(html)))
     const encodedSafe = encodeURIComponent(encoded)
     window.open(`/admin/landing/preview?html=${encodedSafe}`, '_blank')
   }

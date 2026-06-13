@@ -23,7 +23,6 @@ export async function GET(req: Request) {
       'content-type': 'text/html; charset=utf-8',
       'x-content-type-options': 'nosniff',
       'x-frame-options': 'SAMEORIGIN',
-      'content-security-policy': "default-src 'self'; script-src 'none'",
     },
   })
 }
