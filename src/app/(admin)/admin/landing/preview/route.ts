@@ -12,13 +12,18 @@ export async function GET(req: Request) {
 
   let decodedHtml: string
   try {
-    decodedHtml = atob(html)
+    decodedHtml = Buffer.from(html, 'base64').toString('utf-8')
   } catch (err) {
     return new Response('Invalid base64 encoding', { status: 400 })
   }
 
   return new Response(decodedHtml, {
     status: 200,
-    headers: { 'content-type': 'text/html; charset=utf-8' },
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'x-content-type-options': 'nosniff',
+      'x-frame-options': 'SAMEORIGIN',
+      'content-security-policy': "default-src 'self'; script-src 'none'",
+    },
   })
 }
