@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { EventAnalytics } from '@/lib/types/pixel';
+import { EventAnalytics, PixelEvent } from '@/lib/types/pixel';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     }
 
     // Calculate analytics
-    const analytics = calculateAnalytics(events || []);
+    const analytics = calculateAnalytics((events as unknown as PixelEvent[]) || []);
 
     return Response.json({ success: true, data: analytics }, { status: 200 });
   } catch (error) {
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   }
 }
 
-function calculateAnalytics(events: any[]): EventAnalytics {
+function calculateAnalytics(events: PixelEvent[]): EventAnalytics {
   const formSubmits = events.filter(e => e.event_type === 'form_submit').length;
   const pendingPayments = events.filter(e => e.event_type === 'pending_payment').length;
   const checkoutCompletes = events.filter(e => e.event_type === 'checkout_complete').length;
@@ -47,13 +47,16 @@ function calculateAnalytics(events: any[]): EventAnalytics {
   const overallConversionRate = formSubmits > 0 ? (checkoutCompletes / formSubmits) * 100 : 0;
 
   // Group events by date
-  const eventsByDate: Record<string, any> = {};
+  const eventsByDate: Record<string, { date: string; form_submit: number; pending_payment: number; checkout_complete: number }> = {};
   events.forEach(event => {
     const date = new Date(event.created_at).toISOString().split('T')[0];
     if (!eventsByDate[date]) {
       eventsByDate[date] = { date, form_submit: 0, pending_payment: 0, checkout_complete: 0 };
     }
-    eventsByDate[date][event.event_type]++;
+    const type = event.event_type;
+    if (type === 'form_submit' || type === 'pending_payment' || type === 'checkout_complete') {
+      eventsByDate[date][type]++;
+    }
   });
 
   return {

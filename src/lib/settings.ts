@@ -1,4 +1,4 @@
-import { unstable_cache, revalidatePath } from 'next/cache'
+import { unstable_cache, revalidatePath, revalidateTag } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const SETTINGS_TAG = 'site-settings'
@@ -50,6 +50,7 @@ export async function setSettings(values: Record<string, string>): Promise<void>
     throw new Error(error.message)
   }
   // Bust cache root layout (pixel) + halaman admin pengaturan.
+  revalidateTag(SETTINGS_TAG, { expire: 0 })
   revalidatePath('/', 'layout')
   revalidatePath('/admin/pengaturan')
 }

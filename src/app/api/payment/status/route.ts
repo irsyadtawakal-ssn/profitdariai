@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const supabase = createAdminClient() as any
   const { data, error } = await supabase
     .from('transactions')
-    .select('status, amount')
+    .select('status, amount, tripay_reference')
     .eq('merchant_ref', ref)
     .single()
 
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json(
-    { status: data.status, amount: data.amount },
+    { status: data.status, amount: data.amount, tripay_reference: data.tripay_reference },
     { headers: { 'Cache-Control': 'no-store' } }
   )
 }

@@ -8,6 +8,7 @@ import { savePixelSettings } from './actions'
 interface Props {
   pixelId: string
   capiToken: string
+  onSaveSuccess?: () => void
 }
 
 /** Mask token panjang: tampilkan 6 char awal + akhir. */
@@ -17,7 +18,7 @@ function maskToken(token: string) {
   return `${token.slice(0, 6)}…${token.slice(-4)}`
 }
 
-export function PengaturanForm({ pixelId, capiToken }: Props) {
+export function PengaturanForm({ pixelId, capiToken, onSaveSuccess }: Props) {
   const [isPending, startTransition] = useTransition()
   const [showToken, setShowToken] = useState(false)
   const hasToken = capiToken.length > 0
@@ -33,6 +34,9 @@ export function PengaturanForm({ pixelId, capiToken }: Props) {
       try {
         await savePixelSettings(formData)
         toast.success('Pengaturan Pixel tersimpan')
+        if (onSaveSuccess) {
+          onSaveSuccess()
+        }
       } catch (e) {
         toast.error(e instanceof Error ? e.message : 'Gagal menyimpan')
       }

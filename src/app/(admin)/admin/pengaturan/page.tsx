@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PengaturanForm } from './PengaturanForm';
 import { MonitoringDashboard } from './monitoring-dashboard';
 import { getSettings } from './actions';
@@ -10,11 +10,7 @@ export default function PengaturanPage() {
   const [settings, setSettings] = useState({ meta_pixel_id: '', meta_capi_token: '' });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getSettings();
@@ -27,7 +23,12 @@ export default function PengaturanPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadSettings();
+  }, [loadSettings]);
 
   if (loading) {
     return (
@@ -78,6 +79,7 @@ export default function PengaturanPage() {
           <PengaturanForm
             pixelId={settings.meta_pixel_id}
             capiToken={settings.meta_capi_token}
+            onSaveSuccess={loadSettings}
           />
         </section>
       )}

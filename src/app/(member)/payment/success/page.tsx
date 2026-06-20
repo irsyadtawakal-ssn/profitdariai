@@ -6,11 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { BookOpen } from 'lucide-react'
 import { trackCheckoutComplete } from '@/lib/pixel/pixel-events'
+import { fbpixelTrack } from '@/components/MetaPixel'
 
 export default function PaymentSuccessPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [ebookCount, setEbookCount] = useState<number | null>(null)
+  const [isGuest, setIsGuest] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -19,34 +21,44 @@ export default function PaymentSuccessPage() {
       try {
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { router.push('/login'); return }
+        
+        if (user) {
+          const { count } = await supabase
+            .from('user_ebooks')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id)
 
-        const { count } = await supabase
-          .from('user_ebooks')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
+          setEbookCount(count ?? 0)
+        } else {
+          setIsGuest(true)
+        }
 
-        setEbookCount(count ?? 0)
-
-        // Track checkout_complete event
+        // Track checkout_complete & Meta Pixel Purchase event
         const merchantRef = searchParams.get('ref')
         if (merchantRef) {
           try {
-            // Fetch transaction from database to get transaction_id and amount
-            const { data: transaction } = await supabase
-              .from('transactions')
-              .select('tripay_reference, amount')
-              .eq('merchant_ref', merchantRef)
-              .single()
+            // Fetch transaction from safe status API (works for both guests & members without RLS issues)
+            const res = await fetch(`/api/payment/status?ref=${encodeURIComponent(merchantRef)}`)
+            if (res.ok) {
+              const transaction = await res.json()
+              
+              if (transaction && transaction.status === 'PAID') {
+                // 1. Send checkout_complete event to DB
+                await trackCheckoutComplete({
+                  transaction_id: transaction.tripay_reference,
+                  amount: transaction.amount,
+                })
 
-            if (transaction) {
-              await trackCheckoutComplete({
-                transaction_id: transaction.tripay_reference,
-                amount: transaction.amount,
-              })
+                // 2. Fire Meta Pixel Purchase event (browser-side) with deduplication check
+                const flagKey = `pda_purchase_${merchantRef}`
+                if (!sessionStorage.getItem(flagKey)) {
+                  fbpixelTrack('Purchase', { value: transaction.amount, currency: 'IDR' }, merchantRef)
+                  sessionStorage.setItem(flagKey, '1')
+                }
+              }
             }
           } catch (trackError) {
-            console.error('Failed to track checkout_complete event:', trackError)
+            console.error('Failed to track checkout success events:', trackError)
             // Don't fail the page if tracking fails
           }
         }
@@ -69,15 +81,22 @@ export default function PaymentSuccessPage() {
         </div>
 
         <h1 className="text-2xl font-bold text-[#F5F5F0] mb-2">Pembayaran Berhasil!</h1>
-        <p className="text-[#888888] mb-2">
-          Produk kamu sudah aktif dan siap diakses.
-        </p>
+        
+        {isGuest ? (
+          <p className="text-[#888888] text-sm mb-6 leading-relaxed">
+            Akun kamu telah dibuat secara otomatis. Silakan cek inbox/spam email kamu untuk melakukan set password dan mengakses produk.
+          </p>
+        ) : (
+          <p className="text-[#888888] text-sm mb-6 leading-relaxed">
+            Produk kamu sudah aktif dan siap diakses.
+          </p>
+        )}
 
         {error && (
           <p role="alert" className="text-red-400 text-sm mb-4">{error}</p>
         )}
 
-        {!loading && !error && ebookCount !== null && ebookCount > 0 && (
+        {!loading && !error && !isGuest && ebookCount !== null && ebookCount > 0 && (
           <div className="flex items-center justify-center gap-2 mb-8 text-[#D4AF37] text-sm font-medium font-mono">
             <BookOpen size={14} />
             <span>{ebookCount} produk tersedia di Library kamu</span>
@@ -87,10 +106,10 @@ export default function PaymentSuccessPage() {
         <Button
           variant="primary"
           loading={loading}
-          onClick={() => router.push('/materi')}
+          onClick={() => router.push(isGuest ? '/login' : '/materi')}
           className="px-8"
         >
-          Buka Library →
+          {isGuest ? 'Masuk ke Akun Saya →' : 'Buka Library →'}
         </Button>
       </div>
     </div>

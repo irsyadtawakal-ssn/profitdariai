@@ -2,7 +2,7 @@
 
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 
 declare global {
   interface Window {
@@ -30,8 +30,13 @@ export function fbpixelTrack(
 function PageViewTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
     if (typeof window.fbq === 'function') {
       window.fbq('track', 'PageView')
     }

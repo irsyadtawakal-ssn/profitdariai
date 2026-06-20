@@ -15,13 +15,14 @@ interface MateriVideoPlayerProps {
 export function MateriVideoPlayer({ videos }: MateriVideoPlayerProps) {
   const [activeIndex, setActiveIndex] = useState(0)
 
-  if (!videos.length) return null
-
   useEffect(() => {
-    if (activeIndex >= videos.length) {
+    if (videos.length && activeIndex >= videos.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveIndex(Math.max(0, videos.length - 1))
     }
   }, [videos.length, activeIndex])
+
+  if (!videos.length) return null
 
   const activeVideo = videos[activeIndex]
   const videoId = extractYouTubeId(activeVideo.url)

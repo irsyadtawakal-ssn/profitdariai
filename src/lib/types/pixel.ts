@@ -6,6 +6,7 @@ export interface PixelEventData {
   session_id?: string;
   amount?: number;
   product_count?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;  // Allow additional fields
 }
 

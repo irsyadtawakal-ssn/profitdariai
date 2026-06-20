@@ -229,6 +229,7 @@ export function CheckoutForm({
     selectedBumps.reduce((sum, b) => sum + b.bumpPrice, 0)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchFee(selected, subtotal)
   }, [selected, subtotal, fetchFee])
 
@@ -264,6 +265,7 @@ export function CheckoutForm({
         setError(data.error ?? 'Gagal membuat transaksi, coba beberapa saat lagi.')
         return
       }
+      // eslint-disable-next-line react-hooks/immutability
       window.location.href = data.checkout_url
     } catch {
       setError('Gagal membuat transaksi, coba beberapa saat lagi.')
